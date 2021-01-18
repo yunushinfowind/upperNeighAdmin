@@ -1,0 +1,4683 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Heybabyy App",
+        "description": "Heybabyy App.",
+        "version": "1.0.0"
+    },
+    //"host": "heybabyyapi.codiant.com",
+    "host": "localhost:3000",
+    "basePath": "/api",
+    "schemes": [
+        "http"
+    ],
+    "tags": [{
+            "name": "User",
+            "description": "Operations about user"
+        },
+        {
+            "name": "Center",
+            "description": "Operations about Center"
+        },
+        {
+            "name": "Daily Schedule",
+            "description": "Operations about Daily schedule of a program"
+        },
+        {
+            "name": "Feedback",
+            "description": "Operations about feedback for a child"
+        },
+        {
+            "name": "Appointment",
+            "description": "Operations about doctor's appointment for child"
+        },
+        {
+            "name": "Event",
+            "description": "Operations about event"
+        },
+        {
+            "name": "Staff",
+            "description": "Operations about Staff"
+        },
+        {
+            "name": "Video",
+            "description": "Operations about Video"
+        },
+        {
+            "name": "Program",
+            "description": "Operations about Program"
+        },
+        {
+            "name": "Child",
+            "description": "Operations about Child"
+        },
+        {
+            "name": "Message",
+            "description": "Operations about message"
+        },
+        {
+            "name": "Assign",
+            "description": "Operations about Assign child to staff"
+        },
+        {
+            "name": "Attendance",
+            "description": "Operations about  child and staff attendance"
+        }
+    ],
+    "paths": {
+        "/login": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "User login into application.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "formData",
+                        "name": "email",
+                        "description": "User's email",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "password",
+                        "description": "User's password",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "source",
+                        "enum": [
+                            "mobile",
+                            "web"
+                        ],
+                        "description": "Select source either mobile or web.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "device_type",
+                        "enum": [
+                            "ios",
+                            "android",
+                            "web"
+                        ],
+                        "description": "Select device type.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "device_id",
+                        "description": "Select device id.",
+                        "required": false
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "update user into application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "first_name",
+                        "description": "User's first name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "last_name",
+                        "description": "User's last name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "email",
+                        "description": "User's email",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "photo",
+                        "description": "Manager's photo.",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "phone_number",
+                        "description": "User's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "mobile_number",
+                        "description": "User's mobile_number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "gender",
+                        "description": "User's gender",
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line1",
+                        "description": "user's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line2",
+                        "description": "user's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "country",
+                        "description": "user's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "state",
+                        "description": "user's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "city",
+                        "description": "user's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "zip_code",
+                        "description": "user's zipcode"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Update User.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "User's Access Token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "first_name",
+                        "description": "User's first name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "last_name",
+                        "description": "User's last name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "email",
+                        "description": "User's email",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "phone_number",
+                        "description": "User's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "mobile_number",
+                        "description": "User's mobile_number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "gender",
+                        "description": "User's gender",
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line1",
+                        "description": "user's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line2",
+                        "description": "user's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "country",
+                        "description": "user's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "state",
+                        "description": "user's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "city",
+                        "description": "user's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "zip_code",
+                        "description": "user's zipcode"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Logout User.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                    "in": "header",
+                    "name": "access_token",
+                    "description": "User's Access Token",
+                    "required": true
+
+                }],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/change-password": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Change user's password.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "User's Access Token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "current_password",
+                        "description": "User's current password",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "new_password",
+                        "description": "User's new password",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/forgot-password": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Forgot password request.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                    "in": "formData",
+                    "name": "email",
+                    "description": "User's email",
+                    "required": true
+
+                }],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/reset-password": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Reset Password.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "formData",
+                        "name": "token",
+                        "description": "Verification Token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "password",
+                        "description": "New password",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/dashboard": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Get dashboard data.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                    "in": "header",
+                    "name": "access_token",
+                    "description": "User's Access Token",
+                    "required": true
+
+                }],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/center": {
+            "post": {
+                "tags": [
+                    "Center"
+                ],
+                "description": "Create Center into application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "center_name",
+                        "description": "Center's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line1",
+                        "description": "Center's address",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line2",
+                        "description": "Center's address",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "country",
+                        "description": "Center's country",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "state",
+                        "description": "Center's state",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "city",
+                        "description": "Center's city",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "zip_code",
+                        "description": "Center's zipcode",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "staff_capacity",
+                        "description": "Center's staff capacity",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "child_capacity",
+                        "description": "Center's child capacity",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_first_name",
+                        "description": "Owner's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_last_name",
+                        "description": "Owner's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_address_line1",
+                        "description": "Owner's address",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_address_line2",
+                        "description": "Owner's address"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_email",
+                        "description": "Owner's email",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_phone_number",
+                        "description": "Owner's phone no"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_mobile_number",
+                        "description": "Owner's mobile no",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_country",
+                        "description": "Owner's country",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_state",
+                        "description": "Owner's state",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_city",
+                        "description": "Owner's city",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_zip_code",
+                        "description": "Owner's zip code",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_first_name",
+                        "description": "Manager's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_last_name",
+                        "description": "Manager's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_gender",
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "description": "Manager's gender",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_address_line1",
+                        "description": "Manager's address line1",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_address_line2",
+                        "description": "Manager's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_email",
+                        "description": "Manager's email",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_phone_number",
+                        "description": "Manager's phone no"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_mobile_number",
+                        "description": "Manager's mobile no",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "photo",
+                        "description": "Manager's photo.",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_country",
+                        "description": "Manager's country",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_state",
+                        "description": "Manager's state",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_city",
+                        "description": "Manager's city",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_zip_code",
+                        "description": "Manager's zip code",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Center"
+                ],
+                "description": "Get all centers.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "description": "query"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/center/{id}": {
+            "get": {
+                "tags": [
+                    "Center"
+                ],
+                "description": "Get center Id.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "type": "integer",
+                        "description": "Centers's Id",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Center"
+                ],
+                "description": "Update Center into application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Centers's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "center_name",
+                        "description": "Center's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line1",
+                        "description": "Center's address",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line2",
+                        "description": "Center's address"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "country",
+                        "description": "Center's country",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "state",
+                        "description": "Center's state",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "city",
+                        "description": "Center's city",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "zip_code",
+                        "description": "Center's zipcode",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "staff_capacity",
+                        "description": "Center's staff capacity",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "child_capacity",
+                        "description": "Center's child capacity",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_first_name",
+                        "description": "Owner's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_last_name",
+                        "description": "Owner's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_address_line1",
+                        "description": "Owner's address",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_address_line2",
+                        "description": "Owner's address"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_email",
+                        "description": "Owner's email",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_phone_number",
+                        "description": "Owner's phone no"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_mobile_number",
+                        "description": "Owner's mobile no",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_country",
+                        "description": "Owner's country",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_state",
+                        "description": "Owner's state",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_city",
+                        "description": "Owner's city",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "owner_zip_code",
+                        "description": "Owner's zip code",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_first_name",
+                        "description": "Manager's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_last_name",
+                        "description": "Manager's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_gender",
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "description": "Manager's gender",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_address_line1",
+                        "description": "Manager's address line1",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_address_line2",
+                        "description": "Manager's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_email",
+                        "description": "Manager's email",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_phone_number",
+                        "description": "Manager's phone no"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_mobile_number",
+                        "description": "Manager's mobile no",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "photo",
+                        "description": "Manager's photo.",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_country",
+                        "description": "Manager's country",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_state",
+                        "description": "Manager's state",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_city",
+                        "description": "Manager's city",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "manager_zip_code",
+                        "description": "Manager's zip code",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Center"
+                ],
+                "description": "Delete Center from application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Centers's Id",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/center/{center_id}/video": {
+            "post": {
+                "tags": [
+                    "Video"
+                ],
+                "description": "Create Video into application.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video_title",
+                        "description": "Video title",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "source",
+                        "enum": [
+                            "youtube"
+                        ],
+                        "description": "video source",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "emebed_code",
+                        "description": "Video emebed code",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Video"
+                ],
+                "description": "Get all Videos.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/center/{cenetr_id}/video/{video_id}": {
+            "get": {
+                "tags": [
+                    "Video"
+                ],
+                "description": "Get video by ID.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "cenetr_id",
+                        "description": "Cenetr Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "video_id",
+                        "description": "Video Id",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/staff": {
+            "post": {
+                "tags": [
+                    "Staff"
+                ],
+                "description": "Create Staff into application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "first_name",
+                        "description": "Staff's first name.",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "last_name",
+                        "description": "Staff's last name.",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "email",
+                        "description": "Staff's email",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "phone_number",
+                        "description": "Staff's phone number."
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "mobile_number",
+                        "description": "Staff's mobile number.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "gender",
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "description": "Staff's gender",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "join_date",
+                        "description": "Staff's join date."
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "leave_date",
+                        "description": "Staff's leave date."
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "designation",
+                        "enum": [
+                            "teacher",
+                            "assistant"
+                        ],
+                        "description": "Staff's designation.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "photo",
+                        "description": "Staff's photo.",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line1",
+                        "description": "Staff's address line1.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line2",
+                        "description": "Staff's address line2."
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "country",
+                        "description": "Staff's country",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "state",
+                        "description": "Staff's state",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "city",
+                        "description": "Staff's city",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "zip_code",
+                        "description": "Staff's zipcode",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "childs",
+                        "description": "Child id's comma separeted ids",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Staff"
+                ],
+                "description": "Get all Staffs.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "description": "Search"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "enum": [
+                            true,
+                            false
+                        ],
+                        "default": true,
+                        "type": "boolean",
+                        "description": "Select false for data without pagiantion"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/staff/{id}": {
+            "get": {
+                "tags": [
+                    "Staff"
+                ],
+                "description": "Get Staff by ID.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Staff's Id",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Staff"
+                ],
+                "description": "Update Staff into application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Staff's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "first_name",
+                        "description": "Staff's first name.",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "last_name",
+                        "description": "Staff's last name.",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "email",
+                        "description": "Staff's email",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "phone_number",
+                        "description": "Staff's phone number."
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "mobile_number",
+                        "description": "Staff's mobile number.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "gender",
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "description": "Staff's gender",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "join_date",
+                        "description": "Staff's join date."
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "leave_date",
+                        "description": "Staff's leave date."
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "designation",
+                        "enum": [
+                            "babysitter",
+                            "nanny"
+                        ],
+                        "description": "Staff's designation.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "photo",
+                        "description": "Staff's photo.",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line1",
+                        "description": "Staff's address line1.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "address_line2",
+                        "description": "Staff's address line2."
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "country",
+                        "description": "Staff's country",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "state",
+                        "description": "Staff's state",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "city",
+                        "description": "Staff's city",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "zip_code",
+                        "description": "Staff's zipcode",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/staff/{id}/status": {
+            "post": {
+                "tags": [
+                    "Staff"
+                ],
+                "description": "Change Staff Status.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Staff's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "status",
+                        "description": "Staff's status",
+                        "enum": [
+                            "active",
+                            "inactive"
+                        ],
+                        "required": true
+
+                    }
+
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/program": {
+            "post": {
+                "tags": [
+                    "Program"
+                ],
+                "description": "Create program into application.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "program_name",
+                        "description": "Program name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "from_age",
+                        "description": "From age",
+                        "type": "integer",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "to_age",
+                        "description": "To age",
+                        "type": "integer",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "skills",
+                        "description": "Skills",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "Description.",
+                        "required": true,
+                        "type": "text"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Program"
+                ],
+                "description": "Get all programs.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "description": "query"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/program/{id}": {
+            "get": {
+                "tags": [
+                    "Program"
+                ],
+                "description": "Get program by ID.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Program's Id",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Program"
+                ],
+                "description": "Update program by ID.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Program's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "program_name",
+                        "description": "Program name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "from_age",
+                        "description": "From age",
+                        "type": "integer",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "to_age",
+                        "description": "To age",
+                        "type": "integer",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "skills",
+                        "description": "Skills",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "Description.",
+                        "required": true,
+                        "type": "text"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Program"
+                ],
+                "description": "Delete program by ID.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Program's Id",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/child": {
+            "post": {
+                "tags": [
+                    "Child"
+                ],
+                "description": "Create Child into application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "center_id",
+                        "description": "Center's id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "program_id",
+                        "description": "Program's id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "first_name",
+                        "description": "Child's first name",
+                        "required": true,
+                        "default": "Maxx"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "last_name",
+                        "description": "Child's last name",
+                        "required": true,
+                        "default": "Lee"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "date_of_birth",
+                        "description": "Child's DOB",
+                        "required": true,
+                        "default": "08/12/2015"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "gender",
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "description": "child's gender",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "photo",
+                        "description": "Childs's photo.",
+                        "type": "file",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "medical_problem",
+                        "description": "Child's mediacal problem"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "special_requirement",
+                        "description": "Child's special requirments"
+
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_first_name",
+                        "description": "Doctor's first name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_last_name",
+                        "description": "Doctor's last name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_email",
+                        "description": "Doctor's Email"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_phone_number",
+                        "description": "Doctor's phone number"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_mobile_number",
+                        "description": "Doctor's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_address_line1",
+                        "description": "Doctor's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_address_line2",
+                        "description": "Doctor's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_country",
+                        "description": "Doctor's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_state",
+                        "description": "Doctor's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_city",
+                        "description": "Doctor's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_zip_code",
+                        "description": "Doctor's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_first_name",
+                        "description": "Dentist's first name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_last_name",
+                        "description": "Dentist's last name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_email",
+                        "description": "Dentist's email"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_phone_number",
+                        "description": "Dentist's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_mobile_number",
+                        "description": "Dentist's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_address_line1",
+                        "description": "Dentist's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_address_line2",
+                        "description": "Dentist's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_country",
+                        "description": "Dentist's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_state",
+                        "description": "Dentist's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_city",
+                        "description": "Dentist's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_zip_code",
+                        "description": "Dentist's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_first_name",
+                        "description": "Primary parent's first name",
+                        "required": true,
+                        "default": "Caroline"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_last_name",
+                        "description": "Primary parent's last name",
+                        "required": true,
+                        "default": "salvator"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_phone_number",
+                        "description": "Primary parent's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_mobile_number",
+                        "description": "Primary parent's mobile number",
+                        "required": true,
+                        "default": "1325469812"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_address_line1",
+                        "description": "Primary parent's address line1",
+                        "required": true,
+                        "default": "address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_address_line2",
+                        "description": "Primary parent's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_country",
+                        "description": "Primary parent's country",
+                        "required": true,
+                        "default": "india"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_state",
+                        "description": "Primary parent's state",
+                        "required": true,
+                        "default": "Maharashtra"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_city",
+                        "description": "Primary parent's city",
+                        "required": true,
+                        "default": "Mumbai"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_zip_code",
+                        "description": "Primary parent's zipcode",
+                        "required": true,
+                        "default": "452001"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_email",
+                        "description": "Primary parent's email",
+                        "required": true,
+                        "default": "parent@gmail.com"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_photo",
+                        "description": "Primary parent's photo",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_address_line1",
+                        "description": "Primary workplace's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_address_line2",
+                        "description": "Primary workplace's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_country",
+                        "description": "Primary workplace's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_state",
+                        "description": "Primary workplace's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_city",
+                        "description": "Primary workplace's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_zip_code",
+                        "description": "Primary workplace's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_phone_number",
+                        "description": "Primary workplace's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_mobile_number",
+                        "description": "Primary workplace's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_first_name",
+                        "description": "Secondary parent's first name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_last_name",
+                        "description": "Secondary parent's last name"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_phone_number",
+                        "description": "Secondary parent's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_mobile_number",
+                        "description": "Secondary parent's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_address_line1",
+                        "description": "Secondary parent's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_address_line2",
+                        "description": "Secondary parent's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_country",
+                        "description": "Secondary parent's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_state",
+                        "description": "Secondary parent's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_city",
+                        "description": "Secondary parent's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_zip_code",
+                        "description": "Secondary parent's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_email",
+                        "description": "Secondary parent's email"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_photo",
+                        "description": "Secondary parent's photo",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_address_line1",
+                        "description": "Secondary workplace's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_address_line2",
+                        "description": "Secondary workplace's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_country",
+                        "description": "Secondary workplace's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_state",
+                        "description": "Secondary workplace's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_city",
+                        "description": "Secondary workplace's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_zip_code",
+                        "description": "Secondary workplace's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_phone_number",
+                        "description": "Secondary workplace's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_mobile_number",
+                        "description": "Secondary workplace's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_first_name",
+                        "description": "Primary contact's first name",
+                        "required": true,
+                        "default": "Jhena"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_last_name",
+                        "description": "Primary contact's last name",
+                        "required": true,
+                        "default": "Broad"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_relation",
+                        "description": "Primary contact's relation",
+                        "required": true,
+                        "default": "Aunty"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_is_release_child",
+                        "description": "Primary contact's child release",
+                        "enum": [
+                            "yes",
+                            "no"
+                        ],
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_phone_number",
+                        "description": "Primary contact's phone number"
+
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_mobile_number",
+                        "description": "Primary contact's mobile number",
+                        "required": true,
+                        "default": "546897155121"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_address_line1",
+                        "description": "Primary contact's address line1",
+                        "required": true,
+                        "default": "address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_address_line2",
+                        "description": "Primary contact's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_country",
+                        "description": "Primary contact's country",
+                        "required": true,
+                        "default": "india"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_state",
+                        "description": "Primary contact's state",
+                        "required": true,
+                        "default": "Maharashtra"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_city",
+                        "description": "Primary contact's city",
+                        "required": true,
+                        "default": "Mumbai"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_zip_code",
+                        "description": "Primary contact's zipcode",
+                        "required": true,
+                        "default": "154621"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_first_name",
+                        "description": "Secondary contact's first name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_last_name",
+                        "description": "Secondary contact's last name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_relation",
+                        "description": "Secondary contact's relation"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_is_release_child",
+                        "description": "Secondary contact's child release",
+                        "enum": [
+                            "yes",
+                            "no"
+                        ]
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_phone_number",
+                        "description": "Secondary contact's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_mobile_number",
+                        "description": "Secondary contact's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_address_line1",
+                        "description": "Secondary contact's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_address_line2",
+                        "description": "Secondary contact's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_country",
+                        "description": "Secondary contact's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_state",
+                        "description": "Secondary contact's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_city",
+                        "description": "Secondary contact's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_zip_code",
+                        "description": "Secondary contact's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "language",
+                        "description": "child's laguage"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "custody",
+                        "description": "child's custody",
+                        "enum": [
+                            "yes",
+                            "no"
+                        ]
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "notes",
+                        "description": "child's notes"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "document_title",
+                        "description": "Document's title"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "document_file",
+                        "description": "Documents's file",
+                        "type": "file"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/child/{id}": {
+            "get": {
+                "tags": [
+                    "Child"
+                ],
+                "description": "Get child  by Id.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Child's Id",
+                        "required": true,
+                        "type": "integer"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Child object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Child"
+                ],
+                "description": "Update child into application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "child's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "center_id",
+                        "description": "Center's id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "program_id",
+                        "description": "Program's id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "first_name",
+                        "description": "Child's first name",
+                        "required": true,
+                        "default": "Maxx"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "last_name",
+                        "description": "Child's last name",
+                        "required": true,
+                        "default": "Lee"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "date_of_birth",
+                        "description": "Child's DOB",
+                        "required": true,
+                        "default": "08/12/2015"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "gender",
+                        "enum": [
+                            "male",
+                            "female"
+                        ],
+                        "description": "child's gender",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "photo",
+                        "description": "Manager's photo.",
+                        "type": "file",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "medical_problem",
+                        "description": "Child's mediacal problem",
+                        "default": "test medical problems"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "special_requirement",
+                        "description": "Child's special requirments",
+                        "default": "test special requirments"
+
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_first_name",
+                        "description": "Doctor's first name"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_last_name",
+                        "description": "Doctor's last name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_email",
+                        "description": "Doctor's Email"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_phone_number",
+                        "description": "Doctor's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_mobile_number",
+                        "description": "Doctor's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_address_line1",
+                        "description": "Doctor's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_address_line2",
+                        "description": "Doctor's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_country",
+                        "description": "Doctor's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_state",
+                        "description": "Doctor's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_city",
+                        "description": "Doctor's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_zip_code",
+                        "description": "Doctor's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_first_name",
+                        "description": "Dentist's first name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_last_name",
+                        "description": "Dentist's last name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_email",
+                        "description": "Dentist's email"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_phone_number",
+                        "description": "Dentist's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_mobile_number",
+                        "description": "Dentist's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_address_line1",
+                        "description": "Dentist's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_address_line2",
+                        "description": "Dentist's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_country",
+                        "description": "Dentist's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_state",
+                        "description": "Dentist's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_city",
+                        "description": "Dentist's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "dentist_zip_code",
+                        "description": "Dentist's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_first_name",
+                        "description": "Primary parent's first name",
+                        "required": true,
+                        "default": "Caroline"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_last_name",
+                        "description": "Primary parent's last name",
+                        "required": true,
+                        "default": "salvator"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_phone_number",
+                        "description": "Primary parent's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_mobile_number",
+                        "description": "Primary parent's mobile number",
+                        "required": true,
+                        "default": "1325469812"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_address_line1",
+                        "description": "Primary parent's address line1",
+                        "required": true,
+                        "default": "address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_address_line2",
+                        "description": "Primary parent's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_country",
+                        "description": "Primary parent's country",
+                        "required": true,
+                        "default": "india"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_state",
+                        "description": "Primary parent's state",
+                        "required": true,
+                        "default": "Maharashtra"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_city",
+                        "description": "Primary parent's city",
+                        "required": true,
+                        "default": "Mumbai"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_zip_code",
+                        "description": "Primary parent's zipcode",
+                        "required": true,
+                        "default": "452001"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_email",
+                        "description": "Primary parent's email",
+                        "required": true,
+                        "default": "parent@gmail.com"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_parent_photo",
+                        "description": "Primary parent's photo",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_address_line1",
+                        "description": "Primary workplace's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_address_line2",
+                        "description": "Primary workplace's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_country",
+                        "description": "Primary workplace's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_state",
+                        "description": "Primary workplace's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_city",
+                        "description": "Primary workplace's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_zip_code",
+                        "description": "Primary workplace's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_phone_number",
+                        "description": "Primary workplace's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_workplace_mobile_number",
+                        "description": "Primary workplace's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_first_name",
+                        "description": "Secondary parent's first name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_last_name",
+                        "description": "Secondary parent's last name"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_phone_number",
+                        "description": "Secondary parent's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_mobile_number",
+                        "description": "Secondary parent's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_address_line1",
+                        "description": "Secondary parent's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_address_line2",
+                        "description": "Secondary parent's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_country",
+                        "description": "Secondary parent's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_state",
+                        "description": "Secondary parent's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_city",
+                        "description": "Secondary parent's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_zip_code",
+                        "description": "Secondary parent's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_email",
+                        "description": "Secondary parent's email"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_parent_photo",
+                        "description": "Secondary parent's photo",
+                        "type": "file"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_address_line1",
+                        "description": "Secondary workplace's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_address_line2",
+                        "description": "Secondary workplace's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_country",
+                        "description": "Secondary workplace's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_state",
+                        "description": "Secondary workplace's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_city",
+                        "description": "Secondary workplace's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_zip_code",
+                        "description": "Secondary workplace's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_phone_number",
+                        "description": "Secondary workplace's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_workplace_mobile_number",
+                        "description": "Secondary workplace's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_first_name",
+                        "description": "Primary contact's first name",
+                        "required": true,
+                        "default": "Jhena"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_last_name",
+                        "description": "Primary contact's last name",
+                        "required": true,
+                        "default": "Broad"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_relation",
+                        "description": "Primary contact's relation",
+                        "required": true,
+                        "default": "Aunty"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_is_release_child",
+                        "description": "Primary contact's child release",
+                        "enum": [
+                            "yes",
+                            "no"
+                        ],
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_phone_number",
+                        "description": "Primary contact's phone number"
+
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_mobile_number",
+                        "description": "Primary contact's mobile number",
+                        "required": true,
+                        "default": "546897155121"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_address_line1",
+                        "description": "Primary contact's address line1",
+                        "required": true,
+                        "default": "address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_address_line2",
+                        "description": "Primary contact's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_country",
+                        "description": "Primary contact's country",
+                        "required": true,
+                        "default": "india"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_state",
+                        "description": "Primary contact's state",
+                        "required": true,
+                        "default": "Maharashtra"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_city",
+                        "description": "Primary contact's city",
+                        "required": true,
+                        "default": "Mumbai"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "primary_contact_zip_code",
+                        "description": "Primary contact's zipcode",
+                        "required": true,
+                        "default": "154621"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_first_name",
+                        "description": "Secondary contact's first name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_last_name",
+                        "description": "Secondary contact's last name"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_relation",
+                        "description": "Secondary contact's relation"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_is_release_child",
+                        "description": "Secondary contact's child release",
+                        "enum": [
+                            "yes",
+                            "no"
+                        ]
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_phone_number",
+                        "description": "Secondary contact's phone number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_mobile_number",
+                        "description": "Secondary contact's mobile number"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_address_line1",
+                        "description": "Secondary contact's address line1"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_address_line2",
+                        "description": "Secondary contact's address line2"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_country",
+                        "description": "Secondary contact's country"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_state",
+                        "description": "Secondary contact's state"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_city",
+                        "description": "Secondary contact's city"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "secondary_contact_zip_code",
+                        "description": "Secondary contact's zipcode"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "language",
+                        "description": "child's laguage"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "custody",
+                        "description": "child's custody",
+                        "enum": [
+                            "yes",
+                            "no"
+                        ]
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "notes",
+                        "description": "child's notes"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "document_title",
+                        "description": "Document's title"
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "document_file",
+                        "description": "Documents's file",
+                        "type": "file"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Child"
+                ],
+                "description": "Delete Child from application.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Child's Id",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/child/{status}": {
+            "get": {
+                "tags": [
+                    "Child"
+                ],
+                "description": "Get child  by Status.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "status",
+                        "description": "Child's status",
+                        "enum": [
+                            "pending",
+                            "active",
+                            "inactive"
+                        ],
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "description": "query"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "pagination",
+                        "enum": [
+                            true,
+                            false
+                        ],
+                        "default": true,
+                        "type": "boolean",
+                        "description": "Select false for data without pagiantion"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+
+        },
+        "/child/{id}/status": {
+            "post": {
+                "tags": [
+                    "Child"
+                ],
+                "description": "Change child status.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Child's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "status",
+                        "description": "Child's status",
+                        "enum": [
+                            "active",
+                            "inactive",
+                            "pending"
+                        ],
+                        "required": true
+
+                    }
+
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/child/{id}/activity": {
+            "get": {
+                "tags": [
+                    "Child"
+                ],
+                "description": "Get child's activities.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Child's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "activity_type",
+                        "description": "Multiple activity type with comma seperated"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "from_date",
+                        "description": "Search activity from date"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "to_date",
+                        "description": "Search activity to date"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Activity object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/message_group": {
+            "get": {
+                "tags": [
+                    "Message"
+                ],
+                "description": "Get all messages.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "q",
+                        "description": "Search"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/message_group/{message_group_id}/message": {
+            "post": {
+                "tags": [
+                    "Message"
+                ],
+                "description": "Send message.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "message_group_id",
+                        "description": "Message group Id",
+                        "type": "integer",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "message",
+                        "description": "Message",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Message"
+                ],
+                "description": "Get all messages.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "message_group_id",
+                        "description": "Message group id",
+                        "type": "integer",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit",
+                        "type": "integer"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset",
+                        "type": "integer"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/assign": {
+            "post": {
+                "tags": [
+                    "Assign"
+                ],
+                "description": "Assign child to staff.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "child_id",
+                        "description": "childs'id",
+                        "type": "integer",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "staff_id",
+                        "description": "Staff's user id",
+                        "type": "integer",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance/staff/check-in": {
+            "post": {
+                "tags": [
+                    "Attendance"
+                ],
+                "description": "Staff check in .",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                    "in": "header",
+                    "name": "access_token",
+                    "description": "Access token",
+                    "required": true
+
+                }],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance/staff/check-out": {
+            "post": {
+                "tags": [
+                    "Attendance"
+                ],
+                "description": "Staff check out .",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                    "in": "header",
+                    "name": "access_token",
+                    "description": "Access token",
+                    "required": true
+
+                }],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance/staff/{id}": {
+            "get": {
+                "tags": [
+                    "Attendance"
+                ],
+                "description": "Staff attendance .",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Staff's Id",
+                        "type": "integer",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "from_date",
+                        "description": "From date (YYYY-mm-dd)"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "to_date",
+                        "description": "To date (YYYY-mm-dd)"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "description": "Limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "type": "integer",
+                        "description": "offset"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance/child/{id}/check-in": {
+            "post": {
+                "tags": [
+                    "Attendance"
+                ],
+                "description": "Child check in .",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Child's id",
+                        "type": "integer",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance/child/{id}/check-out": {
+            "post": {
+                "tags": [
+                    "Attendance"
+                ],
+                "description": "Child check out .",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Child's id",
+                        "type": "integer",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance/child/{id}": {
+            "get": {
+                "tags": [
+                    "Attendance"
+                ],
+                "description": "Child attendance .",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Child's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "from_date",
+                        "description": "From date (YYYY-mm-dd)"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "to_date",
+                        "description": "To date (YYYY-mm-dd)"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "type": "integer",
+                        "description": "Limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "type": "integer",
+                        "description": "offset"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+
+        "/center/{center_id}/program/{program_id}/daily-schedule": {
+            "get": {
+                "tags": [
+                    "Daily Schedule"
+                ],
+                "description": "Get daily schedule for a program.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "program_id",
+                        "description": "Program's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daily schedule object list.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Daily Schedule"
+                ],
+                "description": "Post daily schedule for a program.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "program_id",
+                        "description": "Program's Id",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "start_time",
+                        "description": "Activity start time like 10:00 AM.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "end_time",
+                        "description": "Activity end time like 11:00 AM.",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "activity_schedule",
+                        "description": "Activity for schedule.",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daily schedule id.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/center/{center_id}/feedback": {
+            "get": {
+                "tags": [
+                    "Feedback"
+                ],
+                "description": "Get feedback for a child.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Feedback object list.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Feedback"
+                ],
+                "description": "Post feedback for a child.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "parent_id",
+                        "description": "parent's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "child_id",
+                        "description": "child's Id",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "subject",
+                        "description": "Subject for feedback.",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "feedback",
+                        "description": "feedback description.",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Feedback object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/center/{center_id}/appointment": {
+            "get": {
+                "tags": [
+                    "Appointment"
+                ],
+                "description": "Get doctor's appointment for child.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment object list.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Appointment"
+                ],
+                "description": "Post doctor's appointment for child.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_name",
+                        "description": "doctor's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "doctor_category",
+                        "description": "doctor's category",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "appointment_date",
+                        "description": "Appointment date in yyyy-mm-dd .",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "appointment_time",
+                        "description": "Appointment time in hh:mm am/pm .",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Appointment object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/center/{center_id}/event": {
+            "get": {
+                "tags": [
+                    "Event"
+                ],
+                "description": "Get events.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "from_date",
+                        "description": "Search events from date"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "to_date",
+                        "description": "Search events to date"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Item limit"
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Offset"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Event object list.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Event"
+                ],
+                "description": "Post event.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "name",
+                        "description": "Event's name",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "category",
+                        "description": "Event's category",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "Event's description",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "venue",
+                        "description": "Event's venue",
+                        "required": true
+
+                    }, {
+                        "in": "formData",
+                        "name": "event_date",
+                        "description": "Event date in yyyy-mm-dd .",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "event_start_time",
+                        "description": "Event start time in hh:mm am/pm .",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "event_end_time",
+                        "description": "Event end time in hh:mm am/pm .",
+                        "required": true
+
+                    },
+                    {
+                        "in": "formData",
+                        "name": "venue_image",
+                        "description": "Venue's image.",
+                        "type": "file"
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Event object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/center/{center_id}/event/{id}": {
+            "get": {
+                "tags": [
+                    "Event"
+                ],
+                "description": "Get event detail.",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [{
+                        "in": "header",
+                        "name": "access_token",
+                        "description": "Access token",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "center_id",
+                        "description": "Center's Id",
+                        "required": true
+
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "Event's Id",
+                        "required": true
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Event object",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}

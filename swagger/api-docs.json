@@ -1,0 +1,2356 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "upperneigh",
+        "description": "upperneigh",
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "schemes": [
+        "http"
+    ],
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Operations about Auth and chat"
+        }
+    ],
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "User login into application.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Login role will be ",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "email": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                },
+                                "role_id": {
+                                    "type": "string"
+                                },
+                                "device_id": {
+                                    "type": "string"
+                                }
+                                
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/socil-login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "User login into application.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Login with social , type will be google/facebook",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                },
+                                "first_name": {
+                                    "type": "string"
+                                },
+                                "last_name": {
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "type": "string"
+                                },
+                                "profile": {
+                                    "type": "string"
+                                },
+                                "role_id": {
+                                    "type": "string"
+                                },
+                                "source_id": {
+                                    "type": "string"
+                                },
+                                "device_id": {
+                                    "type": "string"
+                                }
+                                
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "User logout into application.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "email",
+                        "type": "string",
+                        "description": "email",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "email": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/user-logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "User logout.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Create user.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "email",
+                        "description": "email",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "password",
+                        "description": "password",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "fullname",
+                        "description": "name",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "role_id",
+                        "description": "role 1 for admin and 2 for user",
+                        "enum": [ "1", "2"],
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "profile",
+                        "description": "profile",
+                        "type": "file",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/update-profile": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Create user.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "type",
+                        "description": "profile type",
+                        "type": "string",
+                        "enum": [
+                            "group",
+                            "private"
+                        ],
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "name",
+                        "description": "name",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "profile",
+                        "description": "profile",
+                        "type": "file",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/save-unsave-routine": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Save / unsave video by user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "type": "string",
+                        "description": "type will be save/unsave",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "routine_id": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+
+        "/user/save-unsave-video": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Save / unsave video by user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "type": "string",
+                        "description": "type will be save/unsave and video_type will be artist/routine",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "video_id": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "video_type": {
+                                    "type": "string"
+                                }
+                                
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/blog-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "blog-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "description": "search",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/user-detail": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "get user detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/my-routine-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "saved video list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+               
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/my-saved-video-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "saved video list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+               
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/feed-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "user-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/teacher-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "teacher-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "description": "search",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/teacher-detail": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "teacher-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "description": "type",
+                        "enum": ["profile","video","routine"],
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "teacher_id",
+                        "description": "teacher_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+               
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/routine-video-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "teacher-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "routine_id",
+                        "description": "routine_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/blog/{blog_id}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "blog-detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "blog_id",
+                        "description": "blog_id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/change-password": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Change password.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "change password",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "current_password": {
+                                    "type": "string"
+                                },
+                                "new_password": {
+                                    "type": "string"
+                                },
+                                "confirm_password": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/forgot-password": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "forgot password.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "forgot password",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "email": {
+                                    "type": "string"
+                                }
+                                
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/add-blog": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Create blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "title",
+                        "description": "title",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "description",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "image",
+                        "description": "image",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/edit-blog": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Edit blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "title",
+                        "description": "title",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "description",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "image",
+                        "description": "image",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/blog/{id}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/dashboard-count": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete-blog/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/common-list": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "common-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "model",
+                        "description": "model",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/routine-list": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "routine-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "description": "search",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/artist-list": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "artist-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "description": "search",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/user-list": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "user-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "description": "search",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/artist-video-list": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "artist-video-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "description": "search",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/add-routine": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Create blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_name",
+                        "description": "routine_name",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_description",
+                        "description": "routine_description",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_level",
+                        "description": "routine_level",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "image",
+                        "description": "image",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/edit-routine": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Edit blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_name",
+                        "description": "routine_name",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_description",
+                        "description": "routine_description",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_level",
+                        "description": "routine_level",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "image",
+                        "description": "image",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/routine/{id}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete-routine/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/add-routine-video": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Create blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_id",
+                        "description": "routine_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "artist",
+                        "description": "artist",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "folder_id",
+                        "description": "folder_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video_type",
+                        "description": "video_type",
+                        "enum": [ "local", "youtube"],
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video_url",
+                        "description": "video_url",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video_title",
+                        "description": "video_title",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video_description",
+                        "description": "video_description",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video",
+                        "description": "video",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/edit-routine-video": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Edit blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "name",
+                        "description": "name",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_description",
+                        "description": "routine_description",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "routine_level",
+                        "description": "routine_level",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "image",
+                        "description": "image",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/create-slice-recording": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Create blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video_id",
+                        "description": "video_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "folder_id",
+                        "description": "folder_id",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/create-notation": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Create blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video_id",
+                        "description": "video_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "notation_file",
+                        "description": "notation_file",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/routine-video/{id}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete-routine-video/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/add-teacher": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Create blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "name",
+                        "description": "name",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "profession",
+                        "description": "profession",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "history",
+                        "description": "history",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "career_highlight",
+                        "description": "career_highlight",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "key_point",
+                        "description": "key_point",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "performance",
+                        "description": "performance",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "profile",
+                        "description": "profile",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/update-status": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Create blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "status",
+                        "description": "status",
+                        "enum": ["active","inactive"],
+                        "required": false
+                    }
+                    
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/edit-teacher": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "Edit blog.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "name",
+                        "description": "name",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "profession",
+                        "description": "profession",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "image",
+                        "description": "image",
+                        "type": "file",
+                        "required": false
+                    }
+                    
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/teacher/{id}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete-teacher/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "blog-delete",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete-slice-folder/{folder_id}": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "delete-slice-folder",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "folder_id",
+                        "description": "folder_id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete-slice/{slug}": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "delete-slice",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "description": "slug",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/get-slice-notation/{slug}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "get-notaion",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "slug",
+                        "description": "slug",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/slice-notation": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "post-notaion",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },"/admin/update-notation": {
+            "put": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "post-notaion",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "url",
+                        "description": "url",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/get-settings": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "get-settings",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/get-emojis": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "get-emojis",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "group",
+                        "description": "group",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {}
+}

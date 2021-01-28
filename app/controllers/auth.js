@@ -128,6 +128,9 @@ exports.login = async function (req, res, next) {
 
 	try {
 		let user = await User.findOne({ where: { email: req.body.email, role_id: req.body.role_id } });
+		if(user && user.status == 'inactive'){
+		return	res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
+		}
 		if (user) {
 			await bcrypt.compare(req.body.password, user.password, function (err, isMatch) {
 				if (err)
@@ -165,6 +168,9 @@ exports.socialLogin = async function (req, res, next) {
 
 		let token = User.generateToken();
 		var user = await User.findOne({ where: { source_id: req.body.source_id } });
+		if(user && user.status == 'inactive'){
+			return	res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
+		}
 		if (user) {
 			let updateData = {
 				login_token: token

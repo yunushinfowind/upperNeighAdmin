@@ -13,6 +13,7 @@ const TeacherPrfile = db.teacherProfile;
 const UserEmoji = db.userEmoji;
 const InstagramInfo = db.instagramInfo;
 const Op = db.Sequelize.Op;
+const EmojiImage = db.emojiImage;
 const Sequelize = require('sequelize');
 const config = require("../config/config.js");
 const user = require("../routes/user");
@@ -345,7 +346,19 @@ exports.feedList = async function (req, res, next) {
 exports.routineVideoList = async function (req, res, next) {
 
 	try {
-
+	
+		// console.log('innnnnnnnnnnnnnnnnnnnnnnnnnnnn');
+		// var emojiArrr =	["one.png","two.png","three.png","four.png","five.png","six.png","seven.png","eight.png","nine.png","keycap_ten.png","1234.png","zero.png","hash.png","symbols.png","arrow_backward.png","arrow_down.png","arrow_forward.png","arrow_left.png","capital_abcd.png","abcd.png","abc.png","arrow_lower_left.png","arrow_lower_right.png","arrow_right.png","arrow_up.png","arrow_upper_left.png","arrow_upper_right.png","arrow_double_down.png","arrow_double_up.png","arrow_down_small.png","arrow_heading_down.png","arrow_heading_up.png","leftwards_arrow_with_hook.png","arrow_right_hook.png","left_right_arrow.png","arrow_up_down.png","arrow_up_small.png","arrows_clockwise.png","arrows_counterclockwise.png","rewind.png","fast_forward.png","information_source.png","ok.png","twisted_rightwards_arrows.png","repeat.png","repeat_one.png","new.png","top.png","up.png","cool.png","free.png","ng.png","cinema.png","koko.png","signal_strength.png","u5272.png","u5408.png","u55b6.png","u6307.png","u6708.png","u6709.png","u6e80.png","u7121.png","u7533.png","u7a7a.png","u7981.png","sa.png","restroom.png","mens.png","womens.png","baby_symbol.png","no_smoking.png","parking.png","wheelchair.png","metro.png","baggage_claim.png","accept.png","wc.png","potable_water.png","put_litter_in_its_place.png","secret.png","congratulations.png","m.png","passport_control.png","left_luggage.png","customs.png","ideograph_advantage.png","cl.png","sos.png","id.png","no_entry_sign.png","underage.png","no_mobile_phones.png","do_not_litter.png","non-potable_water.png","no_bicycles.png","no_pedestrians.png","children_crossing.png","no_entry.png","eight_spoked_asterisk.png","eight_pointed_black_star.png","heart_decoration.png","vs.png","vibration_mode.png","mobile_phone_off.png","chart.png","currency_exchange.png","aries.png","taurus.png","gemini.png","cancer.png","leo.png","virgo.png","libra.png","scorpius.png","sagittarius.png","capricorn.png","aquarius.png","pisces.png","ophiuchus.png","six_pointed_star.png","negative_squared_cross_mark.png","a.png","b.png","ab.png","o2.png","diamond_shape_with_a_dot_inside.png","recycle.png","end.png","on.png","soon.png","clock1.png","clock130.png","clock10.png","clock1030.png","clock11.png","clock1130.png","clock12.png","clock1230.png","clock2.png","clock230.png","clock3.png","clock330.png","clock4.png","clock430.png","clock5.png","clock530.png","clock6.png","clock630.png","clock7.png","clock730.png","clock8.png","clock830.png","clock9.png","clock930.png","heavy_dollar_sign.png","copyright.png","registered.png","tm.png","x.png","heavy_exclamation_mark.png","bangbang.png","interrobang.png","o.png","heavy_multiplication_x.png","heavy_plus_sign.png","heavy_minus_sign.png","heavy_division_sign.png","white_flower.png","100.png","heavy_check_mark.png","ballot_box_with_check.png","radio_button.png","link.png","curly_loop.png","wavy_dash.png","part_alternation_mark.png","trident.png","black_square.png","white_check_mark.png","black_square_button.png","white_square_button.png","black_circle.png","white_circle.png","red_circle.png","large_blue_circle.png","large_blue_diamond.png","large_orange_diamond.png","small_blue_diamond.png","small_orange_diamond.png","small_red_triangle.png","small_red_triangle_down.png","shipit.png"];
+		// var emojiLength = emojiArrr.length;
+		// for(let i=0;i<emojiLength ; i++){
+		// 	let data = {
+		// 		group_id : 5,
+		// 		image : emojiArrr[i]
+		// 	}
+		// 	EmojiImage.create(data);
+		
+		// }
+		
 		let token = await User.getToken(req);
 		let isValidToekn = await validateToekn(token);
 		if (isValidToekn) {
@@ -390,17 +403,19 @@ exports.routineVideoList = async function (req, res, next) {
 					}
 				],
 				group: ['routineVideo.id'],
-				order: [['id', 'DESC']]
+				// order: [['id', 'DESC']]
+				order: [['list_order', 'ASC']]
 			}
 			);
 			routineVideoList['rows'] = routineVideoList['rows'];
 			routineVideoList['currentPage'] = req.query.page;
 			routineVideoList['totalPages'] = Math.ceil(routineVideoList['count'] / limit);
 			res.send({ success: true, message: "", data: routineVideoList });
+			
 		} else {
 			res.send({ success: false, message: "Invalid token", data: [] });
-		}
-
+		} 
+		
 	} catch (e) {
 		res.send({ success: false, message: e.message, data: [] });
 	}

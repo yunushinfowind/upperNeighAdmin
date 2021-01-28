@@ -37,8 +37,13 @@ module.exports = (sequelize, Sequelize) => {
         video_link: {
             type: Sequelize.STRING,
             get() {
-                return (this.getDataValue('video_link')) ? config.HOST + 'uploads/routines/videos/' + this.getDataValue('video_link') : config.HOST + '/app/controllers/images/user_default.png';
-            }
+                if(this.getDataValue('video_type') == 'embed_url'){
+                  return (this.getDataValue('video_link')) ?  this.getDataValue('video_link') : config.HOST + '/app/controllers/images/user_default.png';
+                }else{
+                  return (this.getDataValue('video_link')) ? config.HOST + 'uploads/routines/videos/' + this.getDataValue('video_link') : config.HOST + '/app/controllers/images/user_default.png';
+                }
+               
+              }
         },
         slice_added:{
             type: Sequelize.ENUM('yes', 'no'),

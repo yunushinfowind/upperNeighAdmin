@@ -262,7 +262,9 @@ exports.blogDetail = async (req, res) => {
     let isValidToekn = await validateToekn(token);
     if (isValidToekn) {
         var blog = await Blog.findOne({ where: { id: req.params.id } });
-        res.send({ success: true, message: "", data: blog });
+        var obj = Object.assign({}, blog.get());
+        obj.description = obj.description.replace(/<\/?[^>]+(>|$)/g, "");
+        res.send({ success: true, message: "", data: obj });
     } else {
         res.send({ success: false, type:"token_invalid", message: "Invalid token", data: [] });
     }
@@ -300,7 +302,7 @@ exports.blogDelete = async (req, res) => {
     let isValidToekn = await validateToekn(token);
     if (isValidToekn) {
         var blog = await Blog.destroy({ where: { id: req.params.id } });
-        res.send({ success: true, message: "Bolog deleted successfully.", data: [] });
+        res.send({ success: true, message: "Blog deleted successfully.", data: [] });
     } else {
         res.send({ success: false, type:"token_invalid", message: "Invalid token", data: [] });
     }
@@ -421,7 +423,7 @@ exports.artistList = async (req, res) => {
             order: [['id', 'DESC']]
         }
         );
-        res.send({ success: false, message: "", data: teacherList });
+        res.send({ success: true, message: "", data: teacherList });
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
     }
@@ -434,6 +436,14 @@ exports.addRoutine = async (req, res) => {
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
             var fileName = '';
+
+            var routine = await Routine.findOne({where:{routine_name : req.body.routine_name , user_id:parseInt(req.body.user_id)}});
+            console.log(routine);
+
+            if(routine){
+              return  res.send({ success: false, message: "This Routine already has been added by you.", data: [] });
+            }
+
             if (req.files) {
                 const image = req.files.image
                 let dir = 'uploads/routines/images';
@@ -451,6 +461,7 @@ exports.addRoutine = async (req, res) => {
                 })
                 fileName = image.name
             }
+
             var user = await User.findOne({ where: { id: req.body.user_id } });
             var sliceFolderName = user.fullname + ' ' + req.body.routine_name
             let insertData = {
@@ -503,6 +514,30 @@ exports.editRoutine = async (req, res) => {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
+
+            var routineExist = await Routine.findOne({
+                where:{
+                    routine_name : req.body.routine_name,
+                    [Op.and]: [
+                        {user_id: parseInt(req.body.user_id)}, 
+                        {
+                            id: {
+                                [Op.not]: req.body.id
+                            }
+                        },
+                        {
+                            routine_name: {
+                                [Op.eq]: req.body.routine_name
+                            }
+                        }
+                    ]
+                }
+            });
+            
+            if(routineExist){
+             return  res.send({ success: false, message: "This Routine already has been added by you.", data: [] });
+            }
+            
             var routine = await Routine.findOne({
                 where: { id: req.body.id },
                 include: [
@@ -511,7 +546,7 @@ exports.editRoutine = async (req, res) => {
                     }
                 ],
             });
-
+            
             var folderId = routine.routineFolder.folder_info.id;
             var fileName;
             if (req.files) {
@@ -918,6 +953,8 @@ exports.editArtistVideo = async (req, res) => {
                                 duration: total_duration,
                                 video_thumb: video_thumb,
                                 video_link: video_link,
+                                slice_added: 'no',
+                                notation_file_added: 'no'
                             }
                             await TeacherVideo.update(Data, { where: { id: req.body.id } });
                         });
@@ -1265,53 +1302,55 @@ exports.routineDelete = async (request, res) => {
             ],
         });
         await removeFileFromFolder('uploads/routines/images' + routine.image)
-        var folderId = routine.routineFolder.folder_info.id;
+        var routineDelete = await Routine.destroy({ where: { id: request.params.id } });
+        res.send({ success: true, message: "Routine deleted successfully.", data: [] });
+        // var folderId = routine.routineFolder.folder_info.id;
         /*delete folder's sloces*/
-        var slices = await VideoSliceModel.findAll({ where: { routine_id: routine.id } });
-        if (slices && slices.length > 0) {
-            for (let i = 0; i < slices.length; i++) {
-                var slug = slices[i];
-                var slugId = JSON.parse(slug.slice_info).slug;
-                var options = await getOptionValue('/api/v1/scores/' + slugId, 'DELETE');
-                var req = https.request(options, function (response) {
-                    var chunks = [];
-                    response.on("data", function (chunk) {
-                        chunks.push(chunk);
-                    });
-                    response.on("end", function (chunk) {
-                        var body = Buffer.concat(chunks);
-                    });
-                    response.on("error", function (error) {
-                        console.error(error);
-                    });
-                });
-                var postData = qs.stringify({
-                });
-                req.write(postData);
-                req.end();
-            }
-        }
-        /*delete routine folder from soundslice*/
-        var options = await getOptionValue('/api/v1/folders/' + folderId + '/', 'DELETE');
-        var req = https.request(options, function (response) {
-            var chunks = [];
-            response.on("data", function (chunk) {
-                chunks.push(chunk);
-            });
-            response.on("end", async function (chunk) {
-                var body = Buffer.concat(chunks);
-                //console.log(body.toString());
-                var routineDelete = await Routine.destroy({ where: { id: request.params.id } });
-                res.send({ success: true, message: "Routine deleted successfully.", data: [] });
-            });
-            response.on("error", function (error) {
-                return res.send({ success: false, message: error.message, data: [] });
-            });
-        });
-        var postData = qs.stringify({
-        });
-        req.write(postData);
-        req.end();
+        // var slices = await VideoSliceModel.findAll({ where: { routine_id: routine.id } });
+        // if (slices && slices.length > 0) {
+        //     for (let i = 0; i < slices.length; i++) {
+        //         var slug = slices[i];
+        //         var slugId = JSON.parse(slug.slice_info).slug;
+        //         var options = await getOptionValue('/api/v1/scores/' + slugId, 'DELETE');
+        //         var req = https.request(options, function (response) {
+        //             var chunks = [];
+        //             response.on("data", function (chunk) {
+        //                 chunks.push(chunk);
+        //             });
+        //             response.on("end", function (chunk) {
+        //                 var body = Buffer.concat(chunks);
+        //             });
+        //             response.on("error", function (error) {
+        //                 console.error(error);
+        //             });
+        //         });
+        //         var postData = qs.stringify({
+        //         });
+        //         req.write(postData);
+        //         req.end();
+        //     }
+        // }
+        // /*delete routine folder from soundslice*/
+        // var options = await getOptionValue('/api/v1/folders/' + folderId + '/', 'DELETE');
+        // var req = https.request(options, function (response) {
+        //     var chunks = [];
+        //     response.on("data", function (chunk) {
+        //         chunks.push(chunk);
+        //     });
+        //     response.on("end", async function (chunk) {
+        //         var body = Buffer.concat(chunks);
+        //         //console.log(body.toString());
+        //         var routineDelete = await Routine.destroy({ where: { id: request.params.id } });
+        //         res.send({ success: true, message: "Routine deleted successfully.", data: [] });
+        //     });
+        //     response.on("error", function (error) {
+        //         return res.send({ success: false, message: error.message, data: [] });
+        //     });
+        // });
+        // var postData = qs.stringify({
+        // });
+        // req.write(postData);
+        // req.end();
     } else {
         res.send({ success: false, type:"token_invalid", message: "Invalid token", data: [] });
     }
@@ -1535,7 +1574,7 @@ exports.addRoutineVideo = async (req, res) => {
                             slice_added: "yes",
                             notation_file_added: "yes",
                             video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
-                            list_order : getRoutineCount()+1
+                            list_order : await getRoutineVideoCount(parseInt(postData[i].user_id))+1
                         }
                         var routineVideo = await RoutineVideo.create(insertData);
 
@@ -1620,7 +1659,7 @@ exports.addRoutineVideo = async (req, res) => {
                         video_thumb: video_thumb,
                         video_link: video_link,
                         video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
-                        list_order : getRoutineCount()+1
+                        list_order : await getRoutineVideoCount(parseInt(postData[i].user_id))+1
                     }
                     var routineVideo = await RoutineVideo.create(insertData);
                 });
@@ -1705,7 +1744,7 @@ exports.addArtistVideo = async (req, res) => {
                             slice_added: "yes",
                             notation_file_added: "yes",
                             video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
-                            list_order : getArtistVideoCount()+1
+                            list_order : await getArtistVideoCount(parseInt(postData[i].user_id))+1
                         }
                         var routineVideo = await TeacherVideo.create(insertData);
     
@@ -1790,7 +1829,7 @@ exports.addArtistVideo = async (req, res) => {
                             video_thumb: video_thumb,
                             video_link: video_link,
                             video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
-                            list_order : getArtistVideoCount()+1
+                            list_order : await getArtistVideoCount(parseInt(postData[i].user_id))+1
                         }
                         var routineVideo = await TeacherVideo.create(insertData);
                     });
@@ -2015,6 +2054,7 @@ exports.createVideoSliceRecordong = async (req, res) => {
                         recording_info: body,
                         routine_id: video.routine_id
                     }
+                    VideoSliceModel.destroy({where:{video_id:video.id , routine_id : video.routine_id}});
                     VideoSliceModel.create(sliceData);
                     RoutineVideo.update({ slice_added: 'yes' }, { where: { id: req.body.video_id } });
                     res.send({ success: true, message: "Slice created successfully", data: JSON.parse(body) });
@@ -2132,6 +2172,7 @@ exports.createArtistVideoSliceRecordong = async (req, res) => {
                         artist_id: video.user.id
                     }
                     //console.log(sliceData);
+                    VideoSliceModel.destroy({where:{artist_video_id:video.id , artist_id:video.user.id}});
                     VideoSliceModel.create(sliceData);
                     TeacherVideo.update({ slice_added: 'yes' }, { where: { id: req.body.video_id } });
                     res.send({ success: true, message: "Slice created successfully", data: JSON.parse(body) });
@@ -2452,7 +2493,7 @@ exports.addTeacher = async (req, res) => {
         await UserProfile.create(profileData);
 
         /* create artist folder */
-        var sliceFolderName = req.body.fullname
+        var sliceFolderName = req.body.fullname+new Date().toLocaleDateString();
         var options = await getOptionValue('/api/v1/folders/', 'POST');
         var requset = https.request(options, function (response) {
             var chunks = [];
@@ -2584,7 +2625,7 @@ exports.checkAdminCurrentPass = async (req, res) => {
 
 exports.editTeacher = async (req, res) => {
 
-    try {
+    // try {
 
         let token = await User.getToken(req);
 
@@ -2631,7 +2672,8 @@ exports.editTeacher = async (req, res) => {
             if (teacher) {
                 let data = {
                     fullname: req.body.fullname,
-                    profile: fileName
+                    profile: fileName,
+                    email : req.body.email
                 }
 
                 await User.update(data, { where: { id: req.body.id } });
@@ -2647,16 +2689,19 @@ exports.editTeacher = async (req, res) => {
                 }
                 await UserProfile.update(profileData, { where: { user_id: teacher.id } });
                 /*update emoji*/
+         
+                if(req.body['emojis[]']){
                 await UserEmoji.destroy({where:{user_id:teacher.id}});
                 var emojis = JSON.parse(req.body['emojis[]']);
                 var length = emojis.length;
                 for (let i = 0; i < length; i++) {
                     let emojiData = {
+                        teacher_profile_id : teacher.teacherProfile.id,
                         user_id: teacher.id,
                         emoji: emojis[i],
-                        teacher_profile_id: teacher.teacherProfile.teacher_profile_id
                     }
                     await UserEmoji.create(emojiData);
+                }
                 }
                 
                 /*update artist folder name */
@@ -2692,9 +2737,9 @@ exports.editTeacher = async (req, res) => {
         } else {
             res.send({ success: false, type:"token_invalid", message: "Invalid token", data: [] });
         }
-    } catch (e) {
-        res.send({ success: false, message: e.message, data: [] });
-    }
+    // } catch (e) {
+    //     res.send({ success: false, message: e.message, data: [] });
+    // }
 }
 
 // exports.blogList = async (req, res) => {

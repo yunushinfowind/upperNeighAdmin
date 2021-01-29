@@ -36,7 +36,6 @@ exports.blogList = async (req, res) => {
 			status: 'active'
 		}
 		if (req.query.search) {
-			console.log('innnn')
 			whereCondition = {
 				[Op.and]: [
 					{ status: 'active' },
@@ -51,6 +50,7 @@ exports.blogList = async (req, res) => {
 		var All = [];
 		let limit = 10
 		let offset = 0 + (req.query.page - 1) * limit
+		let totatCount = await Blog.count({ where: whereCondition});
 		let blogList = await Blog.findAndCountAll({
 			where: whereCondition,
 			limit: limit,
@@ -64,6 +64,7 @@ exports.blogList = async (req, res) => {
         }
 		if (blogList) {
 			blogList['rows'] = All;
+			blogList['count'] = totatCount;
 			blogList['currentPage'] = req.query.page;
 			blogList['totalPages'] = Math.ceil(blogList['count'] / limit);
 		}
@@ -110,7 +111,8 @@ exports.savedRoutineList = async function (req, res, next) {
 			let loginId = await getLoginUserId(token);
 			var All = [];
 			let limit = 10
-			let offset = 0 + (req.query.page - 1) * limit
+			let offset = (req.query.page - 1) + (req.query.page - 1) * limit;
+			let totatCount = await UserSavedRoutine.count({ where: {user_id: loginId , type: 'routine'}});
 			let userVideoList = await UserSavedRoutine.findAndCountAll({
 				where: {
 					user_id: loginId,
@@ -131,6 +133,7 @@ exports.savedRoutineList = async function (req, res, next) {
 				All.push(obj);
 			}
 			userVideoList['rows'] = All;
+			userVideoList['count'] = totatCount;
 			userVideoList['currentPage'] = req.query.page;
 			userVideoList['totalPages'] = Math.ceil(userVideoList['count'] / limit);
 			res.send({ success: true, message: "", data: userVideoList });
@@ -153,7 +156,8 @@ exports.savedVideoList = async function (req, res, next) {
 			console.log('Login User:' + loginId)
 			var All = [];
 			let limit = 10
-			let offset = 0 + (req.query.page - 1) * limit
+			let offset = 0 + (req.query.page - 1) * limit;
+			let totatCount = await UserSavedRoutine.count({ where: {user_id: loginId , type: 'video'}});
 			let userVideoList = await UserSavedRoutine.findAndCountAll({
 				where: {
 					user_id: loginId,
@@ -187,6 +191,7 @@ exports.savedVideoList = async function (req, res, next) {
 				All.push(obj);
 			}
 			userVideoList['rows'] = All;
+			userVideoList['count'] = totatCount;
 			userVideoList['currentPage'] = req.query.page;
 			userVideoList['totalPages'] = Math.ceil(userVideoList['count'] / limit);
 			res.send({ success: true, message: "", data: userVideoList });
@@ -228,6 +233,7 @@ exports.teacherList = async function (req, res, next) {
 			}
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit
+			let totatCount = await User.count({ where: whereCondition});
 			let teacherList = await User.findAndCountAll({
 				where: whereCondition,
 				include: [{
@@ -250,6 +256,7 @@ exports.teacherList = async function (req, res, next) {
 				All.push(obj);
 			}
 			teacherList['rows'] = All;
+			teacherList['count'] = totatCount;
 			teacherList['currentPage'] = req.query.page;
 			teacherList['totalPages'] = Math.ceil(teacherList['count'] / limit);
 			res.send({ success: true, message: "", data: teacherList });
@@ -271,8 +278,8 @@ exports.adminTeacherList = async function (req, res, next) {
 			var All = [];
 			let whereCondition = {
 				[Op.and]: [
-					{ role_id: 3 },
-					{ status: 'active' }
+					{ role_id: 3 }
+					// { status: 'active' }
 				]
 			}
 
@@ -378,7 +385,8 @@ exports.routineVideoList = async function (req, res, next) {
 				}
 			}
 			let limit = 10
-			let offset = 0 + (req.query.page - 1) * limit
+			let offset = 0 + (req.query.page - 1) * limit;
+			let totatCount = await RoutineVideo.count({ where: whereCondition});
 			let routineVideoList = await RoutineVideo.findAndCountAll({
 				where: whereCondition,
 				limit: limit,
@@ -408,6 +416,7 @@ exports.routineVideoList = async function (req, res, next) {
 			}
 			);
 			routineVideoList['rows'] = routineVideoList['rows'];
+			routineVideoList['count'] = totatCount;
 			routineVideoList['currentPage'] = req.query.page;
 			routineVideoList['totalPages'] = Math.ceil(routineVideoList['count'] / limit);
 			res.send({ success: true, message: "", data: routineVideoList });

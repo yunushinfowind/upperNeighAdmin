@@ -15,6 +15,7 @@ module.exports = app => {
     router.get("/teacher-detail" , user.teacherDetail);
     router.post("/save-unsave-routine" , user.saveUnsaveRoutine);
     router.post("/save-unsave-video" , user.saveUnsaveVideo);
+    router.get("/user-play-list" , user.getUserPlayList);
     router.get("/blog/:blog_id" , user.blogDetail);
     router.get("/get-hashtag" , user.Hashtag);
     router.post("/get-hashtag-details" , user.getHashtagDetails);

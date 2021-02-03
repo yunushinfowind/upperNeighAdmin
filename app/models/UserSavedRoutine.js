@@ -15,6 +15,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         routine_video_id: {
             type: Sequelize.STRING,
+        },
+        playlist_id :{
+            type: Sequelize.INTEGER
         }
         
     },

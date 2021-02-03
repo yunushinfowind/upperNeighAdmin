@@ -382,7 +382,7 @@
                         "in": "body",
                         "name": "body",
                         "type": "string",
-                        "description": "type will be save/unsave and video_type will be artist/routine",
+                        "description": "type will be save/unsave and video_type will be artist/routine and playlist_type will be name/id",
                         "required": true,
                         "schema": {
                             "properties": {
@@ -394,10 +394,68 @@
                                 },
                                 "video_type": {
                                     "type": "string"
+                                },
+                                "playlist": {
+                                    "type": "string"
+                                },
+                                "playlist_type": {
+                                    "type": "string"
                                 }
                                 
                             }
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/user-play-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "play-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "search",
+                        "description": "search",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -542,6 +600,13 @@
                         "in": "header",
                         "name": "token",
                         "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "play_list_id",
+                        "description": "play_list_id",
                         "type": "string",
                         "required": true
                     },

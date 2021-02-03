@@ -334,14 +334,12 @@ exports.routineList = async function (req, res, next) {
 
                 }
             }
-
-            let limit = 10;
-            let offset = 0 + (req.query.page - 1) * limit;
-            let count = await Routine.count({where: search});
+            let limit = 10
+            let offset = 0 + (req.query.page - 1) * limit
             let routineList = await Routine.findAndCountAll({
                 where: search,
-                limit: limit,
-                offset: offset,
+                // limit: limit,
+                // offset: offset,
                 order: [['id', 'DESC']],
                 include: [
                     {
@@ -360,7 +358,6 @@ exports.routineList = async function (req, res, next) {
             }
             routineList['rows'] = All;
             routineList['currentPage'] = req.query.page;
-            routineList['count'] = count;
             routineList['totalPages'] = Math.ceil(routineList['count'] / limit);
             res.send({ success: true, message: "", data: routineList });
         } else {
@@ -400,8 +397,8 @@ exports.userList = async (req, res) => {
             let offset = 0 + (req.query.page - 1) * limit
             let userList = await User.findAndCountAll({
                 where: search,
-                limit: limit,
-                offset: offset,
+                // limit: limit,
+                // offset: offset,
                 order: [['id', 'DESC']]
             }
             );
@@ -440,7 +437,9 @@ exports.addRoutine = async (req, res) => {
         if (isValidToekn) {
             var fileName = '';
 
-            var routine =  await Routine.findOne({where:{routine_name : req.body.routine_name , user_id:parseInt(req.body.user_id)}});
+            var routine = await Routine.findOne({where:{routine_name : req.body.routine_name , user_id:parseInt(req.body.user_id)}});
+            console.log(routine);
+
             if(routine){
               return  res.send({ success: false, message: "This Routine already has been added by you.", data: [] });
             }
@@ -462,6 +461,7 @@ exports.addRoutine = async (req, res) => {
                 })
                 fileName = image.name
             }
+
             var user = await User.findOne({ where: { id: req.body.user_id } });
             var sliceFolderName = user.fullname + ' ' + req.body.routine_name
             let insertData = {
@@ -537,7 +537,7 @@ exports.editRoutine = async (req, res) => {
             if(routineExist){
              return  res.send({ success: false, message: "This Routine already has been added by you.", data: [] });
             }
-
+            
             var routine = await Routine.findOne({
                 where: { id: req.body.id },
                 include: [
@@ -546,7 +546,7 @@ exports.editRoutine = async (req, res) => {
                     }
                 ],
             });
-
+            
             var folderId = routine.routineFolder.folder_info.id;
             var fileName;
             if (req.files) {
@@ -1305,7 +1305,7 @@ exports.routineDelete = async (request, res) => {
         var routineDelete = await Routine.destroy({ where: { id: request.params.id } });
         res.send({ success: true, message: "Routine deleted successfully.", data: [] });
         // var folderId = routine.routineFolder.folder_info.id;
-        // /*delete folder's sloces*/
+        /*delete folder's sloces*/
         // var slices = await VideoSliceModel.findAll({ where: { routine_id: routine.id } });
         // if (slices && slices.length > 0) {
         //     for (let i = 0; i < slices.length; i++) {
@@ -1636,11 +1636,11 @@ exports.addRoutineVideo = async (req, res) => {
                     fs.mkdirSync(thumbdir, { recursive: true });
                 }
                 console.log(videoPath);
-                var duration = await getVideoDurationInSeconds(config.HOST+videoPath);
-                var measuredTime = new Date(null);
-                measuredTime.setSeconds(duration); // specify value of SECONDS
-                var MHSTime = measuredTime.toISOString().substr(11, 8);
-                total_duration =  MHSTime;
+                //var duration = await getVideoDurationInSeconds(config.HOST+videoPath);
+                //var measuredTime = new Date(null);
+                //measuredTime.setSeconds(duration); // specify value of SECONDS
+                //var MHSTime = measuredTime.toISOString().substr(11, 8);
+                //total_duration =  MHSTime;
 
                 const tg = await new ThumbnailGenerator({
                     sourcePath: videoPath,
@@ -1654,7 +1654,7 @@ exports.addRoutineVideo = async (req, res) => {
                         user_id: parseInt(postData[i].user_id),
                         routine_id: postData[i].routine_id,
                         video_title: postData[i].video_title,
-                        video_duration: total_duration,
+                        video_duration: "00:00:00",
                         video_description: postData[i].video_description,
                         video_thumb: video_thumb,
                         video_link: video_link,
@@ -1807,11 +1807,11 @@ exports.addArtistVideo = async (req, res) => {
                         fs.mkdirSync(thumbdir, { recursive: true });
                     }
                     console.log(videoPath);
-                    var duration = await getVideoDurationInSeconds(config.HOST+videoPath);
-                    var measuredTime = new Date(null);
-                    measuredTime.setSeconds(duration); // specify value of SECONDS
-                    var MHSTime = measuredTime.toISOString().substr(11, 8);
-                    total_duration =  MHSTime;
+                    //var duration = await getVideoDurationInSeconds(config.HOST+videoPath);
+                    //var measuredTime = new Date(null);
+                    //measuredTime.setSeconds(duration); // specify value of SECONDS
+                    //var MHSTime = measuredTime.toISOString().substr(11, 8);
+                    //total_duration =  MHSTime;
 
                     const tg = await new ThumbnailGenerator({
                         sourcePath: videoPath,
@@ -1824,7 +1824,7 @@ exports.addArtistVideo = async (req, res) => {
                         let insertData = {
                             user_id: parseInt(postData[i].user_id),
                             video_title: postData[i].video_title,
-                            duration: total_duration,
+                            duration: '00:00:00',
                             video_description: postData[i].video_description,
                             video_thumb: video_thumb,
                             video_link: video_link,
@@ -1948,8 +1948,8 @@ exports.artistVideoList = async function (req, res, next) {
             let offset = 0 + (req.query.page - 1) * limit
             let routineVideoList = await TeacherVideo.findAndCountAll({
                 where: whereCondition,
-                limit: limit,
-                offset: offset,
+                // limit: limit,
+                // offset: offset,
                 include: [{
                     model: db.user,
                     include: [
@@ -3063,10 +3063,10 @@ exports.routineVideoList = async function (req, res, next) {
             let offset = 0 + (req.query.page - 1) * limit
             let routineVideoList = await RoutineVideo.findAndCountAll({
                 where: {
-                    routine_id: req.query.routine_id 
+                    [Op.and]: [{ routine_id: req.query.routine_id }]
                 },
-                limit: limit,
-                offset: offset,
+                // limit: limit,
+                // offset: offset,
                 order: [['id', 'DESC']]
             }
             );

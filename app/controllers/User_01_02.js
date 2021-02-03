@@ -11,9 +11,9 @@ const TeacherVideos = db.teacherVideo;
 const Routine = db.routine;
 const TeacherPrfile = db.teacherProfile;
 const UserEmoji = db.userEmoji;
-const UserPlaylist = db.userPlaylist;
 const InstagramInfo = db.instagramInfo;
 const Op = db.Sequelize.Op;
+const EmojiImage = db.emojiImage;
 const Sequelize = require('sequelize');
 const config = require("../config/config.js");
 const user = require("../routes/user");
@@ -22,7 +22,6 @@ const request = require('request');
 var https = require('follow-redirects').https;
 var qs = require('querystring');
 const axios = require('axios');
-
 
 // const { where } = require("sequelize");
 // const Instagram = require('instagram-web-api')
@@ -37,7 +36,6 @@ exports.blogList = async (req, res) => {
 			status: 'active'
 		}
 		if (req.query.search) {
-			console.log('innnn')
 			whereCondition = {
 				[Op.and]: [
 					{ status: 'active' },
@@ -51,8 +49,8 @@ exports.blogList = async (req, res) => {
 		}
 		var All = [];
 		let limit = 10
-		let offset = 0 + (req.query.page - 1) * limit;
-		let totatCount = await Blog.count({ where: whereCondition });
+		let offset = 0 + (req.query.page - 1) * limit
+		let totatCount = await Blog.count({ where: whereCondition});
 		let blogList = await Blog.findAndCountAll({
 			where: whereCondition,
 			limit: limit,
@@ -60,10 +58,10 @@ exports.blogList = async (req, res) => {
 			order: [['list_order', 'ASC']]
 		});
 		for (const row of blogList['rows']) {
-			var obj = Object.assign({}, row.get());
-			obj.description = obj.description.replace(/<\/?[^>]+(>|$)/g, "");
-			All.push(obj);
-		}
+            var obj = Object.assign({}, row.get());
+            obj.description = obj.description.replace(/<\/?[^>]+(>|$)/g, "");
+            All.push(obj);
+        }
 		if (blogList) {
 			blogList['rows'] = All;
 			blogList['count'] = totatCount;
@@ -113,8 +111,8 @@ exports.savedRoutineList = async function (req, res, next) {
 			let loginId = await getLoginUserId(token);
 			var All = [];
 			let limit = 10
-			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await UserSavedRoutine.count({ where: { user_id: loginId, type: 'routine' } });
+			let offset = (req.query.page - 1) + (req.query.page - 1) * limit;
+			let totatCount = await UserSavedRoutine.count({ where: {user_id: loginId , type: 'routine'}});
 			let userVideoList = await UserSavedRoutine.findAndCountAll({
 				where: {
 					user_id: loginId,
@@ -151,7 +149,6 @@ exports.savedRoutineList = async function (req, res, next) {
 exports.savedVideoList = async function (req, res, next) {
 
 	try {
-
 		let token = await User.getToken(req);
 		let isValidToekn = await validateToekn(token);
 		if (isValidToekn) {
@@ -160,12 +157,11 @@ exports.savedVideoList = async function (req, res, next) {
 			var All = [];
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await UserSavedRoutine.count({ where: { user_id: loginId, type: 'video', playlist_id: req.query.play_list_id } });
+			let totatCount = await UserSavedRoutine.count({ where: {user_id: loginId , type: 'video'}});
 			let userVideoList = await UserSavedRoutine.findAndCountAll({
 				where: {
 					user_id: loginId,
-					type: 'video',
-					playlist_id: req.query.play_list_id
+					type: 'video'
 				},
 				limit: limit,
 				offset: offset,
@@ -236,8 +232,8 @@ exports.teacherList = async function (req, res, next) {
 				}
 			}
 			let limit = 10
-			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await User.count({ where: whereCondition });
+			let offset = 0 + (req.query.page - 1) * limit
+			let totatCount = await User.count({ where: whereCondition});
 			let teacherList = await User.findAndCountAll({
 				where: whereCondition,
 				include: [{
@@ -249,7 +245,7 @@ exports.teacherList = async function (req, res, next) {
 				],
 				limit: limit,
 				offset: offset,
-				order: [['teacherProfile', 'list_order', 'ASC']]
+				order: [['teacherProfile','list_order', 'ASC']]
 			}
 			);
 			for (const row of teacherList['rows']) {
@@ -308,9 +304,9 @@ exports.adminTeacherList = async function (req, res, next) {
 					model: db.teacherProfile
 				}
 				],
-				limit: limit,
-				offset: offset,
-				order: [['teacherProfile', 'list_order', 'ASC']]
+				// limit: limit,
+				// offset: offset,
+				order: [['teacherProfile','list_order', 'ASC']]
 			}
 			);
 			for (const row of teacherList['rows']) {
@@ -357,7 +353,19 @@ exports.feedList = async function (req, res, next) {
 exports.routineVideoList = async function (req, res, next) {
 
 	try {
-
+	
+		// console.log('innnnnnnnnnnnnnnnnnnnnnnnnnnnn');
+		// var emojiArrr =	["one.png","two.png","three.png","four.png","five.png","six.png","seven.png","eight.png","nine.png","keycap_ten.png","1234.png","zero.png","hash.png","symbols.png","arrow_backward.png","arrow_down.png","arrow_forward.png","arrow_left.png","capital_abcd.png","abcd.png","abc.png","arrow_lower_left.png","arrow_lower_right.png","arrow_right.png","arrow_up.png","arrow_upper_left.png","arrow_upper_right.png","arrow_double_down.png","arrow_double_up.png","arrow_down_small.png","arrow_heading_down.png","arrow_heading_up.png","leftwards_arrow_with_hook.png","arrow_right_hook.png","left_right_arrow.png","arrow_up_down.png","arrow_up_small.png","arrows_clockwise.png","arrows_counterclockwise.png","rewind.png","fast_forward.png","information_source.png","ok.png","twisted_rightwards_arrows.png","repeat.png","repeat_one.png","new.png","top.png","up.png","cool.png","free.png","ng.png","cinema.png","koko.png","signal_strength.png","u5272.png","u5408.png","u55b6.png","u6307.png","u6708.png","u6709.png","u6e80.png","u7121.png","u7533.png","u7a7a.png","u7981.png","sa.png","restroom.png","mens.png","womens.png","baby_symbol.png","no_smoking.png","parking.png","wheelchair.png","metro.png","baggage_claim.png","accept.png","wc.png","potable_water.png","put_litter_in_its_place.png","secret.png","congratulations.png","m.png","passport_control.png","left_luggage.png","customs.png","ideograph_advantage.png","cl.png","sos.png","id.png","no_entry_sign.png","underage.png","no_mobile_phones.png","do_not_litter.png","non-potable_water.png","no_bicycles.png","no_pedestrians.png","children_crossing.png","no_entry.png","eight_spoked_asterisk.png","eight_pointed_black_star.png","heart_decoration.png","vs.png","vibration_mode.png","mobile_phone_off.png","chart.png","currency_exchange.png","aries.png","taurus.png","gemini.png","cancer.png","leo.png","virgo.png","libra.png","scorpius.png","sagittarius.png","capricorn.png","aquarius.png","pisces.png","ophiuchus.png","six_pointed_star.png","negative_squared_cross_mark.png","a.png","b.png","ab.png","o2.png","diamond_shape_with_a_dot_inside.png","recycle.png","end.png","on.png","soon.png","clock1.png","clock130.png","clock10.png","clock1030.png","clock11.png","clock1130.png","clock12.png","clock1230.png","clock2.png","clock230.png","clock3.png","clock330.png","clock4.png","clock430.png","clock5.png","clock530.png","clock6.png","clock630.png","clock7.png","clock730.png","clock8.png","clock830.png","clock9.png","clock930.png","heavy_dollar_sign.png","copyright.png","registered.png","tm.png","x.png","heavy_exclamation_mark.png","bangbang.png","interrobang.png","o.png","heavy_multiplication_x.png","heavy_plus_sign.png","heavy_minus_sign.png","heavy_division_sign.png","white_flower.png","100.png","heavy_check_mark.png","ballot_box_with_check.png","radio_button.png","link.png","curly_loop.png","wavy_dash.png","part_alternation_mark.png","trident.png","black_square.png","white_check_mark.png","black_square_button.png","white_square_button.png","black_circle.png","white_circle.png","red_circle.png","large_blue_circle.png","large_blue_diamond.png","large_orange_diamond.png","small_blue_diamond.png","small_orange_diamond.png","small_red_triangle.png","small_red_triangle_down.png","shipit.png"];
+		// var emojiLength = emojiArrr.length;
+		// for(let i=0;i<emojiLength ; i++){
+		// 	let data = {
+		// 		group_id : 5,
+		// 		image : emojiArrr[i]
+		// 	}
+		// 	EmojiImage.create(data);
+		
+		// }
+		
 		let token = await User.getToken(req);
 		let isValidToekn = await validateToekn(token);
 		if (isValidToekn) {
@@ -378,7 +386,7 @@ exports.routineVideoList = async function (req, res, next) {
 			}
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await RoutineVideo.count({ where: whereCondition });
+			let totatCount = await RoutineVideo.count({ where: whereCondition});
 			let routineVideoList = await RoutineVideo.findAndCountAll({
 				where: whereCondition,
 				limit: limit,
@@ -412,10 +420,11 @@ exports.routineVideoList = async function (req, res, next) {
 			routineVideoList['currentPage'] = req.query.page;
 			routineVideoList['totalPages'] = Math.ceil(routineVideoList['count'] / limit);
 			res.send({ success: true, message: "", data: routineVideoList });
+			
 		} else {
 			res.send({ success: false, message: "Invalid token", data: [] });
-		}
-
+		} 
+		
 	} catch (e) {
 		res.send({ success: false, message: e.message, data: [] });
 	}
@@ -444,12 +453,11 @@ exports.adminRoutineVideoList = async function (req, res, next) {
 				}
 			}
 			let limit = 10
-			let offset = 0 + (req.query.page - 1) * limit;
-			let count = await RoutineVideo.count({ where: whereCondition });
+			let offset = 0 + (req.query.page - 1) * limit
 			let routineVideoList = await RoutineVideo.findAndCountAll({
 				where: whereCondition,
-				limit: limit,
-				offset: offset,
+				// limit: limit,
+				// offset: offset,
 				include: [
 					{
 						model: db.videoSlice
@@ -474,7 +482,6 @@ exports.adminRoutineVideoList = async function (req, res, next) {
 			}
 			);
 			routineVideoList['rows'] = routineVideoList['rows'];
-			routineVideoList['count'] = count;
 			routineVideoList['currentPage'] = req.query.page;
 			routineVideoList['totalPages'] = Math.ceil(routineVideoList['count'] / limit);
 			res.send({ success: true, message: "", data: routineVideoList });
@@ -486,61 +493,6 @@ exports.adminRoutineVideoList = async function (req, res, next) {
 		res.send({ success: false, message: e.message, data: [] });
 	}
 }
-
-exports.getUserPlayList = async function (req, res, next) {
-
-	try {
-
-		let token = await User.getToken(req);
-		let isValidToekn = await validateToekn(token);
-		if (isValidToekn) {
-			var All = [];
-			let whereCondition = {
-				user_id: req.query.user_id
-			}
-			if (req.query.search) {
-				whereCondition = {
-					[Op.and]: [
-						{ user_id: req.query.user_id },
-						{
-							name: {
-								[Op.like]: '%' + req.query.search + '%'
-							}
-						}
-					]
-				}
-			}
-			let limit = 10
-			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await UserPlaylist.count({ where: whereCondition });
-			let routineVideoList = await UserPlaylist.findAndCountAll({
-				where: whereCondition,
-				limit: limit,
-				offset: offset,
-				order: [['id', 'DESC']]
-			}
-			);
-			for (const row of routineVideoList['rows']) {
-				var obj = Object.assign({}, row.get());
-				obj.total_duration_inMint = await getTotalPlayListDuration(obj.id);
-				obj.total_duration = await getTotalDurationHms(obj.id);
-				obj.video_count = await getPlayListVideoCount(obj.id);
-				All.push(obj);
-			}
-			routineVideoList['rows'] = All;
-			routineVideoList['count'] = totatCount;
-			routineVideoList['currentPage'] = req.query.page;
-			routineVideoList['totalPages'] = Math.ceil(routineVideoList['count'] / limit);
-			res.send({ success: true, message: "", data: routineVideoList });
-		} else {
-			res.send({ success: false, message: "Invalid token", data: [] });
-		}
-
-	} catch (e) {
-		res.send({ success: false, message: e.message, data: [] });
-	}
-}
-
 exports.teacherDetail = async function (req, res, next) {
 
 	try {
@@ -672,31 +624,17 @@ exports.saveUnsaveVideo = async function (req, res, next) {
 
 			if (req.body.type == 'save') {
 				var saveData;
-				var playListId;
-				if (req.body.playlist_type == 'name') {
-					let createData = {
-						user_id: user_id,
-						name: req.body.playlist
-					}
-					let addRes = await UserPlaylist.create(createData);
-					playListId = addRes.id;
-				} else {
-					playListId = req.body.playlist;
-				}
-
 				if (req.body.video_type == 'artist') {
 					saveData = {
 						user_id: user_id,
 						video_id: req.body.video_id,
-						type: 'video',
-						playlist_id: playListId
+						type: 'video'
 					}
 				} else {
 					saveData = {
 						user_id: user_id,
 						routine_video_id: req.body.video_id,
-						type: 'video',
-						playlist_id: playListId
+						type: 'video'
 					}
 				}
 				var isSaved = await UserSavedRoutine.findOne({ where: saveData });
@@ -747,17 +685,6 @@ let getNormalVideoCount = async (teacherId) => {
 	return await TeacherVideos.count({ where: { user_id: teacherId } });
 }
 
-let getPlayListVideoCount = async (playListId) => {
-	return await UserSavedRoutine.count({
-		where: {
-			playlist_id: playListId,
-			type: 'video'
-		}
-	}
-	);
-
-}
-
 let getTotalRoutineDuration = async (routineId) => {
 	let videos = await RoutineVideo.findAll({ where: { routine_id: routineId } });
 	console.log(videos);
@@ -798,7 +725,9 @@ let getTotalRoutineDuration = async (routineId) => {
 }
 
 let getTotalRoutineMinutDuration = async (routineId) => {
+	console.log('Innnnn')
 	let videos = await RoutineVideo.findAll({ where: { routine_id: routineId } });
+	console.log(videos);
 	if (videos) {
 		var times = [0, 0, 0]
 		var max = times.length;
@@ -818,103 +747,6 @@ let getTotalRoutineMinutDuration = async (routineId) => {
 
 
 		return (hoursMin + minutes);
-	}
-}
-
-let getTotalPlayListDuration = async (playListId) => {
-
-	let savedVideos = await UserSavedRoutine.findAll({
-		where: {
-			playlist_id: playListId,
-			type: 'video'
-		},
-		include: [
-			{
-				model: db.teacherVideo
-			},
-			{
-				model: db.routineVideo
-			}
-		],
-		order: [['id', 'DESC']]
-	}
-	);
-
-	if (savedVideos) {
-		var times = [0, 0, 0]
-		var max = times.length;
-		// store time values
-		var hoursum = 0;
-		var mintsum = 0;
-		var secondsum = 0;
-		for (var j = 0; j < savedVideos.length; j++) {
-			if (savedVideos[j].teacherVideo) {
-				var duration = (savedVideos[j].teacherVideo.duration).split(':');
-			} else if (savedVideos[j].routineVideo) {
-				var duration = (savedVideos[j].routineVideo.video_duration).split(':');
-			}
-			hoursum = parseInt(hoursum) + parseInt(duration[0])
-			mintsum = parseInt(mintsum) + parseInt(duration[1])
-			secondsum = parseInt(secondsum) + parseInt(duration[2])
-
-		}
-		var hoursMin = hoursum * 60
-		var minutes = mintsum;
-		return (hoursMin + minutes);
-	}
-}
-
-let getTotalDurationHms = async (playListId) => {
-	let savedVideos = await UserSavedRoutine.findAll({
-		where: {
-			playlist_id: playListId,
-			type: 'video'
-		},
-		include: [
-			{
-				model: db.teacherVideo
-			},
-			{
-				model: db.routineVideo
-			}
-		],
-		order: [['id', 'DESC']]
-	}
-	);
-	if (savedVideos) {
-		var times = [0, 0, 0]
-		var max = times.length;
-		// store time values
-		var hoursum = 0;
-		var mintsum = 0;
-		var secondsum = 0;
-		for (var j = 0; j < savedVideos.length; j++) {
-			if (savedVideos[j].teacherVideo) {
-				var duration = (savedVideos[j].teacherVideo.duration).split(':');
-			} else if (savedVideos[j].routineVideo) {
-				var duration = (savedVideos[j].routineVideo.video_duration).split(':');
-			}
-			hoursum = parseInt(hoursum) + parseInt(duration[0])
-			mintsum = parseInt(mintsum) + parseInt(duration[1])
-			secondsum = parseInt(secondsum) + parseInt(duration[2])
-
-		}
-		var hours = hoursum
-		var minutes = mintsum
-		var seconds = secondsum
-
-		if (seconds >= 60) {
-			var m = (seconds / 60) << 0
-			minutes += m
-			seconds -= 60 * m
-		}
-
-		if (minutes >= 60) {
-			var h = (minutes / 60) << 0
-			hours += h
-			minutes -= 60 * h
-		}
-		return ('0' + hours).slice(-2) + ' hrs :' + ('0' + minutes).slice(-2) + ' min :' + ('0' + seconds).slice(-2) + ' sec'
 	}
 }
 

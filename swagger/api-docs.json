@@ -660,6 +660,44 @@
                 }
             }
         },
+        "/user/remove-article": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "remove-article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/user/teacher-list": {
             "get": {
                 "tags": [

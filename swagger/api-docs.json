@@ -363,9 +363,9 @@
                 "tags": [
                     "User"
                 ],
-                "description": "Save / unsave video by user",
+                "description": "type will be save/unsave and video_type will be artist/routine and playlist_type will be name/id",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -379,36 +379,108 @@
                         "required": true
                     },
                     {
-                        "in": "body",
-                        "name": "body",
+                        "in": "formData",
+                        "name": "video_id",
+                        "description": "video_id",
                         "type": "string",
-                        "description": "type will be save/unsave and video_type will be artist/routine and playlist_type will be name/id",
-                        "required": true,
-                        "schema": {
-                            "properties": {
-                                "video_id": {
-                                    "type": "string"
-                                },
-                                "type": {
-                                    "type": "string"
-                                },
-                                "video_type": {
-                                    "type": "string"
-                                },
-                                "playlist": {
-                                    "type": "string"
-                                },
-                                "playlist_type": {
-                                    "type": "string"
-                                }
-                                
-                            }
-                        }
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "playlist",
+                        "description": "playlist",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "type",
+                        "description": "operation type",
+                        "type": "string",
+                        "enum": [
+                            "save",
+                            "unsave"
+                        ],
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "video_type",
+                        "description": "video_type",
+                        "type": "string",
+                        "enum": [
+                            "artist",
+                            "routine"
+                        ],
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "playlist_type",
+                        "description": "playlist_type",
+                        "type": "string",
+                        "enum": [
+                            "id",
+                            "name"
+                        ],
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "playlist_icon",
+                        "description": "playlist_icon",
+                        "type": "file",
+                        "required": false
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "User object.",
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/update-playlist-icon": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Update playlist icon",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "playlist_id",
+                        "description": "playlist_id",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "playlist_icon",
+                        "description": "playlist_icon",
+                        "type": "file",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
                         "schema": {
                             "type": "object"
                         }

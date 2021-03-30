@@ -175,13 +175,13 @@ const socialLogin = (req, res, next) => {
 
     const validationRule = {
         "type": "required",
-        "first_name": "required",
+        // "first_name": "required",
         // "last_name": "required",
-        "email": "required",
-        "profile": "required",
+        // "email": "required",
+        // "profile": "required",
         "role_id": "required",
         "source_id": "required",
-        "device_id": "required"
+        // "device_id": "required"
     }
 
     validator(req.body, validationRule, {}, (err, status) => {

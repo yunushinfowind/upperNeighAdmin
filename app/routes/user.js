@@ -16,6 +16,7 @@ module.exports = app => {
     router.get("/teacher-detail" , checkSatatus.checkAccountStatus ,user.teacherDetail);
     router.post("/save-unsave-routine" , checkSatatus.checkAccountStatus , user.saveUnsaveRoutine);
     router.post("/save-unsave-video" , checkSatatus.checkAccountStatus , user.saveUnsaveVideo);
+    router.post("/update-playlist-icon" , checkSatatus.checkAccountStatus , user.updatePlayListIcon);
     router.get("/user-play-list" , checkSatatus.checkAccountStatus , user.getUserPlayList);
     router.get("/blog/:blog_id" ,checkSatatus.checkAccountStatus , user.blogDetail);
     router.get("/get-hashtag" , user.Hashtag);

@@ -1508,7 +1508,7 @@ exports.addRoutineVideoOld = async (req, res) => {
 
 exports.addRoutineVideo = async (req, res) => {
 
-    // try {
+    try {
     var videos = [];
     var postData = [];
     var uploadedVideos = req.files;
@@ -1655,11 +1655,13 @@ exports.addRoutineVideo = async (req, res) => {
 
                 tg.generateOneByPercentCb(50, async (err, result) => {
                     video_thumb = result;
+                    console.log('video_link');
+                    console.log(video_link);
                     let insertData = {
                         user_id: parseInt(postData[i].user_id),
                         routine_id: postData[i].routine_id,
                         video_title: postData[i].video_title,
-                        video_duration: total_duration,
+                        video_duration: '0:0:0',
                         video_description: postData[i].video_description,
                         video_thumb: video_thumb,
                         video_link: video_link,
@@ -1673,9 +1675,9 @@ exports.addRoutineVideo = async (req, res) => {
     }
     console.log('complete')
     return res.send({ success: true, message: "Routine video created successfully.", data: [] });
-    // } catch (e) {
-    //     res.send({ success: false, message: e.message, data: [] });
-    // }
+    } catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
 }
 
 exports.addArtistVideo = async (req, res) => {

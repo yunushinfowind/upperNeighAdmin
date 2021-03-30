@@ -22,6 +22,7 @@ const request = require('request');
 var https = require('follow-redirects').https;
 var qs = require('querystring');
 const axios = require('axios');
+var fs = require('fs');
 
 
 // const { where } = require("sequelize");
@@ -689,13 +690,41 @@ exports.saveUnsaveVideo = async function (req, res, next) {
 			if (req.body.type == 'save') {
 				var saveData;
 				var playListId;
-
+				console.log(req.files.playlist_icon)
 				if (req.body.playlist_type == 'name') {
-					let createData = {
-						user_id: user_id,
-						name: req.body.playlist
+					var fileName = '';
+					if (req.files != null) {
+						const image = req.files.playlist_icon
+						let dir = 'uploads/playlist_icon';
+						const path = dir + '/' + image.name
+						if (!fs.existsSync(dir)) {
+							fs.mkdirSync(dir, { recursive: true });
+						}
+						image.mv(path, (error) => {
+							if (error) {
+								res.writeHead(500, {
+									'Content-Type': 'application/json'
+								})
+								res.end(JSON.stringify({ status: 'error', message: error }))
+							}
+						})
+						fileName = image.name
 					}
-					let playList = await UserPlaylist.findOne({ where: createData });
+					var createData;
+					if (req.files != null) {
+						 createData = {
+							user_id: user_id,
+							name: req.body.playlist,
+							icon : fileName
+						}
+			     	}else{
+						createData = {
+							user_id: user_id,
+							name: req.body.playlist,
+						}
+					 }
+					 console.log(createData)
+					let playList = await UserPlaylist.findOne({ where: {user_id:user_id , name:createData.name} });
 					if (playList) {
 						return res.send({ success: false, message: 'Sorry , this playlist already has been added by you.', data: [] });
 					}
@@ -744,6 +773,52 @@ exports.saveUnsaveVideo = async function (req, res, next) {
 	} catch (e) {
 		res.send({ success: false, message: e.message, data: [] });
 	}
+}
+exports.updatePlayListIcon = async function (req, res, next) {
+	//   logger.info('get data  #### %s.', req.body.type);
+	try {
+		let token = await User.getToken(req);
+		let isValidToekn = await validateToekn(token);
+		var message;
+		if (isValidToekn) {
+			console.log(req.body)
+		var playListIcon =	await uploadPlayListIcon(req.files.playlist_icon);
+		console.log(playListIcon);
+		var Updatedstatus = UserPlaylist.update({icon:playListIcon}, { where: { id: req.body.playlist_id } });
+		 if(Updatedstatus){
+		  res.send({ success: true, message: 'Icon Updated Successfully.', data: [] });
+		 }else{
+			res.send({ success: false, message: 'Something went wrong.', data: [] });
+		 }
+		} else {
+			res.send({ success: false, message: message, data: [] });
+		}
+
+	} catch (e) {
+		res.send({ success: false, message: e.message, data: [] });
+	}
+}
+
+let uploadPlayListIcon = async (playListIcon) => {
+	var fileName;
+	if (playListIcon != null) {
+		const image = playListIcon
+		let dir = 'uploads/playlist_icon';
+		const path = dir + '/' + image.name
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir, { recursive: true });
+		}
+		await image.mv(path, (error) => {
+			if (error) {
+				res.writeHead(500, {
+					'Content-Type': 'application/json'
+				})
+				res.end(JSON.stringify({ status: 'error', message: error }))
+			}
+		})
+		fileName = image.name
+	}
+	return fileName;
 }
 
 let getRandomString = (num) => {

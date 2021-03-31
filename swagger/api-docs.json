@@ -468,7 +468,14 @@
                         "name": "playlist_id",
                         "description": "playlist_id",
                         "type": "string",
-                        "required": false
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "name",
+                        "description": "name",
+                        "type": "string",
+                        "required": true
                     },
                     {
                         "in": "formData",

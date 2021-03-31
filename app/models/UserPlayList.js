@@ -9,6 +9,9 @@ module.exports = (sequelize, Sequelize) => {
       }, 
       icon: {
         type: Sequelize.STRING,
+      },
+      icon_url: {
+        type: Sequelize.VIRTUAL,
         get() {
           return (this.getDataValue('icon')) ? config.HOST + 'uploads/playlist_icon/' + this.getDataValue('icon') : config.HOST + 'uploads/ic_play_list.png';
         }

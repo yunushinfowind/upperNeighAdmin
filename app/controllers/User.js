@@ -782,11 +782,18 @@ exports.updatePlayListIcon = async function (req, res, next) {
 		var message;
 		if (isValidToekn) {
 			console.log(req.body)
-		var playListIcon =	await uploadPlayListIcon(req.files.playlist_icon);
-		console.log(playListIcon);
-		var Updatedstatus = UserPlaylist.update({icon:playListIcon}, { where: { id: req.body.playlist_id } });
+			var playListIcon;
+			if (req.files != null) {
+		      playListIcon =	await uploadPlayListIcon(req.files.playlist_icon);
+			}
+		var playList = await UserPlaylist.findOne({where:{id:req.body.playlist_id}});
+		let updateData = {
+			icon: (playListIcon)?playListIcon:playList.icon,
+			name:req.body.name
+		}
+		var Updatedstatus = UserPlaylist.update(updateData, { where: { id: req.body.playlist_id } });
 		 if(Updatedstatus){
-		  res.send({ success: true, message: 'Icon Updated Successfully.', data: [] });
+		  res.send({ success: true, message: 'Playlist Updated Successfully.', data: [] });
 		 }else{
 			res.send({ success: false, message: 'Something went wrong.', data: [] });
 		 }

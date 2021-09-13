@@ -132,6 +132,9 @@ module.exports = (sequelize, Sequelize) => {
     User.hasOne(models.routineFolder, {
       foreignKey: 'artist_id'
     });
+    User.hasOne(models.user_chalenges, {
+      foreignKey: 'user_id'
+    });
 
   }
 

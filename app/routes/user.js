@@ -1,6 +1,7 @@
 
 module.exports = app => {
     const user = require("../controllers/User.js");
+    const userChallenges = require('../controllers/userChallenges.js');
     const validationMiddleware = require('../middleware/validation-middleware');
     const checkSatatus = require('../middleware/check-account-status');
     var router = require("express").Router();
@@ -22,6 +23,11 @@ module.exports = app => {
     router.get("/get-hashtag" , user.Hashtag);
     router.post("/get-hashtag-details"  , user.getHashtagDetails);
     router.get("/remove-article" , checkSatatus.checkAccountStatus , user.removeArticle);
+
+    //USER CHALLENGES
+    router.post("/userchallenge", userChallenges.uploadUserVideo);
+    router.post("/list",userChallenges.challengesList);
+    router.get('/details',userChallenges.detailVedio);
     
     app.use('/api/user', router);
   };

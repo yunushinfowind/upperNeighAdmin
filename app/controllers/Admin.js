@@ -185,7 +185,7 @@ exports.addBlog = async (req, res) => {
                     fs.mkdirSync(dir, { recursive: true });
                 }
                 image.mv(path, (error) => {
-                    if (error) {
+                          if (error) {
                         res.writeHead(500, {
                             'Content-Type': 'application/json'
                         })
@@ -462,6 +462,7 @@ exports.addRoutine = async (req, res) => {
                 })
                 fileName = image.name
             }
+            
             var user = await User.findOne({ where: { id: req.body.user_id } });
             var sliceFolderName = user.fullname + ' ' + req.body.routine_name
             let insertData = {

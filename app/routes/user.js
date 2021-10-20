@@ -26,8 +26,33 @@ module.exports = app => {
 
     //USER CHALLENGES
     router.post("/userchallenge", userChallenges.uploadUserVideo);
-    router.post("/list",userChallenges.challengesList);
-    router.get('/details',userChallenges.detailVedio);
+    router.get("/challenge-list",userChallenges.challengesList);
+    router.get('/challenge-video-details',userChallenges.detailVideo);
+    // like comment share
+    router.post('/challenge-video-likes',userChallenges.likeVideo);
+    router.post('/challenge-video-comment',userChallenges.commentVideo);
+    router.get('/challenge-video-comment-list', userChallenges.commentVideolist);
+    router.get('/challenge-video-comment-details',userChallenges.commentDetails);
+    router.get('/challenge-video-comment-like-list',userChallenges.commentLikesList);
+    router.post('/challenge-video-share',userChallenges.shareVideo);
+    router.post('/challenge-comment-like',userChallenges.commentLike);
+    router.post('/challenge-comment-on-comment',userChallenges.commentOnComment);
+
+    //Practice
+    router.post('/add-practice',userChallenges.addPractice);
+    router.get('/practice-list',userChallenges.practiceList);
+    router.get('/practice-details',userChallenges.practiceDetails);
+    router.post('/practice-like',userChallenges.practiceLike);
+    router.post('/practice-comment',userChallenges.practiceComment);
+    router.get('/practice-comment-list', userChallenges.practiceCommentList);
+    router.post('/practice-share',userChallenges.practiceShare);
+    router.post('/practice-comment-like',userChallenges.practicecommentLike);
+    router.post('/practice-comment-on-comment',userChallenges.practicecommentOnComment);
+    router.get('/practice-stats',userChallenges.practiceStats);
+    
+   //Quiz
+   router.get('/quiz', userChallenges.quizList);
+
     
     app.use('/api/user', router);
   };

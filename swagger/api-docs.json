@@ -5,7 +5,7 @@
         "description": "upperneigh",
         "version": "1.0.0"
     },
-    "host": "localhost:8080",
+    "host": "192.168.1.81:8080",
     "basePath": "/api",
     "schemes": [
         "http"
@@ -65,6 +65,7 @@
                 }
             }
         },
+        
         "/auth/socil-login": {
             "post": {
                 "tags": [
@@ -950,8 +951,919 @@
                     }
                 }
             }
+        },  
+        "/user/userchallenge": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "upload challenge-videos",
+                "consumes": [
+                     "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "formData",
+                        "name": "videos",
+                        "description": "videos",
+                        "type": "file",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Videos Uploaded Successfully.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
         },
-        "/admin/change-password": {
+         "/user/challenge-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "list of challenge-videos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "limit",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of challenge-videos",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/challenge-video-details": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Details of challenge-video",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "description": "id",
+                        "type": "integer",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of challenge-video",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/challenge-video-likes": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "challenge-video likes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "challenge_id",
+                        "description": "challenge_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "description": "type",
+                        "enum": ["like","unlike"],
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Video Liked.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/challenge-video-comment": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Comment on challenged-video",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "challenge_id",
+                        "description": "challenge_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "comment",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "comment": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "commented on video.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/challenge-video-comment-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "challenge-video-comment-details",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                {
+                    "in": "header",
+                    "name": "token",
+                    "description": "token",
+                    "type": "token",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "challenge_id",
+                    "description": "challenge_id",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "limit",
+                    "description": "limit",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "page",
+                    "type": "string",
+                    "required": true
+                }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found Successfully..",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+
+            }
+        },
+        "/user/challenge-video-share": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "challenge-video share",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "challenge_id",
+                        "description": "challenge_id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "vedio shared.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/challenge-comment-like": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "likes on comment of challenged-video ",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "comment_id",
+                        "description": "comment_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "description": "type",
+                        "enum": ["like","unlike"],
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liked comment.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/challenge-comment-on-comment": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "commented on comment of challenge video.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "comment_id",
+                        "description": "comment_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "comment",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "comment": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "commented on comment.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/add-practice": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "add practices",
+                "consumes": [
+                     "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    { "in": "body",
+                        "name": "body",
+                        "description": "add practice ",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "practice_name": {
+                                    "type": "string"
+                                },
+                                "focus": {
+                                    "type": "string"
+                                },
+                                "duration": {
+                                    "type": "string"
+                                },
+                                "mood": {
+                                    "type": "integer"
+                                },
+                                "productivity": {
+                                    "type": "string"
+                                }
+                            }
+                        } 
+                    }       
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Videos Added Successfully.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/practice-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "list of practices",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "limit",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of practices",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/practice-details": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Details of practice",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "limit",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of practice",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/practice-like": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "practice likes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "practice_id",
+                        "description": "practice_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "description": "type",
+                        "enum": ["like","unlike"],
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Practice Liked.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/practice-comment": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Comment on practice",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "practice_id",
+                        "description": "practice_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "comment",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "comment": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "commented on practice.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/practice-comment-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Practice-comment-details",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                {
+                    "in": "header",
+                    "name": "token",
+                    "description": "token",
+                    "type": "token",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "practice_id",
+                    "description": "practice_id",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "limit",
+                    "description": "limit",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "page",
+                    "type": "string",
+                    "required": true
+                }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found Successfully..",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+
+            }
+        },
+        "/user/practice-share": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "practice share",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "practice_id",
+                        "description": "practice_id",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Practice shared.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/practice-comment-like": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "likes on comment of practice ",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "practice_comment_id",
+                        "description": "practice_comment_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "description": "type",
+                        "enum": ["like","unlike"],
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liked comment.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/practice-comment-on-comment": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "commented on comment of practice.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "practice_comment_id",
+                        "description": "practice_comment_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "comment",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "comment": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "commented on comment.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/practice-stats": {
+            "get": {
+               "tags": [
+                   "User"
+               ],
+               "description": "Statictis of Practice",
+               "consumes": [
+                   "application/json"
+               ],
+               "produces": [
+                  "application/json"
+               ],
+               "parameters": [
+                {
+                    "in": "header",
+                    "name": "token",
+                    "description": "token",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "header",
+                    "name": "type",
+                    "description": "type",
+                    "enum": ["week","month","today"],
+                    "required": true
+                }
+             
+            ],
+            "responses": {
+                "200": {
+                    "description": "Message.",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }   
+            }
+        },
+        "/user/quiz": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "describtion": "Quiz List",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "type" : "string",
+                        "required": true
+                    }
+                
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            
+            }
+
+        },
+         "/admin/change-password": {
             "post": {
                 "tags": [
                     "Admin"

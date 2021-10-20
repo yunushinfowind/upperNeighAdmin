@@ -132,7 +132,7 @@ module.exports = (sequelize, Sequelize) => {
     User.hasOne(models.routineFolder, {
       foreignKey: 'artist_id'
     });
-    User.hasOne(models.user_chalenges, {
+    User.hasOne(models.user_challenges, {
       foreignKey: 'user_id'
     });
 

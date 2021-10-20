@@ -3669,3 +3669,35 @@ exports.hashtagDelete = async (req, res) => {
         res.send({ success: false, message: "Invalid token", data: [] });
     }
 };
+
+
+//upload videos
+
+exports.uploadVideos = async (req,res) => {
+   try{
+    var videos = [];
+    var uploadVideos = req.files;
+    videos = ((uploadVideos != 'null') && !Array.isArray(uploadVideos['videos'])) ? [uploadVideos['videos']]:uploadVideos['videos'];
+    let len = videos.length
+    for (let i = 0; i < len; i++){
+        let dir = 'uploads/admin/videos';
+        var NewName =Math.round(new Date() / 1000) + User.generateToken();
+        var fileExt = videos[i].mimetype.split('/').pop();
+        var fileName = NewName + '.' + fileExt;
+        const path = dir + '/' + fileName
+       
+       if (!fs.existsSync(dir)) {
+           fs.mkdirSync(dir, { recursive: true });
+       }
+       videos[i].mv(path, (error) => {
+           if (error) {
+                res.end(JSON.stringify({ status: 'error', message: error }))
+            }
+        }) ;
+    }
+    res.send({ success: true, message: "Video Uploaded successfully.", data: [] });
+
+   }catch(e){
+    res.send({ success: false, message: "something went wrong", data: [] });
+   }
+}

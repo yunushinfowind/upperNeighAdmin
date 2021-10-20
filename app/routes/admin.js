@@ -62,5 +62,9 @@ module.exports = app => {
   router.delete("/delete-hashtag/:id", admin.hashtagDelete);
   router.get("/hashtag-list", admin.hashtagList);
 
+
+  //upload videos
+   router.post("/upload-videos", admin.uploadVideos);
+
   app.use('/api/admin', router);
 };

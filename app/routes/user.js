@@ -4,6 +4,7 @@ module.exports = app => {
     const userChallenges = require('../controllers/userChallenges.js');
     const validationMiddleware = require('../middleware/validation-middleware');
     const checkSatatus = require('../middleware/check-account-status');
+    const challengesvalidation = require('../middleware/challenges-validation-check');
     var router = require("express").Router();
     router.get("/blog-list" , checkSatatus.checkAccountStatus , user.blogList);
     router.get("/user-detail" , checkSatatus.checkAccountStatus ,user.userDetail);
@@ -25,18 +26,17 @@ module.exports = app => {
     router.get("/remove-article" , checkSatatus.checkAccountStatus , user.removeArticle);
 
     //USER CHALLENGES
-    router.post("/userchallenge", userChallenges.uploadUserVideo);
+    router.post("/userchallenge", challengesvalidation.video ,userChallenges.uploadUserVideo);
     router.get("/challenge-list",userChallenges.challengesList);
     router.get('/challenge-video-details',userChallenges.detailVideo);
     // like comment share
-    router.post('/challenge-video-likes',userChallenges.likeVideo);
-    router.post('/challenge-video-comment',userChallenges.commentVideo);
+    router.post('/challenge-video-likes', challengesvalidation.like , userChallenges.likeVideo);
+    router.post('/challenge-video-comment',challengesvalidation.comment,userChallenges.commentVideo);
     router.get('/challenge-video-comment-list', userChallenges.commentVideolist);
     router.get('/challenge-video-comment-details',userChallenges.commentDetails);
-    router.get('/challenge-video-comment-like-list',userChallenges.commentLikesList);
-    router.post('/challenge-video-share',userChallenges.shareVideo);
-    router.post('/challenge-comment-like',userChallenges.commentLike);
-    router.post('/challenge-comment-on-comment',userChallenges.commentOnComment);
+    router.post('/challenge-video-share',challengesvalidation.like, userChallenges.shareVideo);
+    router.post('/challenge-comment-like',challengesvalidation.reply , userChallenges.commentLike);
+    router.post('/challenge-comment-on-comment',challengesvalidation.commentoncomment, userChallenges.commentOnComment);
 
     //Practice
     router.post('/add-practice',userChallenges.addPractice);

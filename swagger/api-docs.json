@@ -1023,6 +1023,13 @@
                         "description": "page",
                         "type": "string",
                         "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1094,17 +1101,17 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "challenge_id",
                         "description": "challenge_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["like","unlike"],
+                        "enum": ["1","0"],
                         "required": true
                     }
                 ],
@@ -1139,7 +1146,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "challenge_id",
                         "description": "challenge_id",
                         "type": "string",
@@ -1241,7 +1248,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "challenge_id",
                         "description": "challenge_id",
                         "type": "string",
@@ -1279,17 +1286,17 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "comment_id",
                         "description": "comment_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["like","unlike"],
+                        "enum": ["1","0"],
                         "required": true
                     }
                 ],
@@ -1324,7 +1331,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "comment_id",
                         "description": "comment_id",
                         "type": "string",
@@ -1530,17 +1537,17 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_id",
                         "description": "practice_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["like","unlike"],
+                        "enum": ["1","0"],
                         "required": true
                     }
                 ],
@@ -1575,7 +1582,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_id",
                         "description": "practice_id",
                         "type": "string",
@@ -1677,7 +1684,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_id",
                         "description": "practice_id",
                         "type": "string",
@@ -1715,17 +1722,17 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_comment_id",
                         "description": "practice_comment_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["like","unlike"],
+                        "enum": ["1","1"],
                         "required": true
                     }
                 ],
@@ -1760,7 +1767,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_comment_id",
                         "description": "practice_comment_id",
                         "type": "string",

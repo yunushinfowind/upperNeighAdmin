@@ -27,7 +27,19 @@ module.exports = (sequelize, Sequelize) => {
     },
     is_like: {
       type: Sequelize.VIRTUAL
-    }
+    },
+    video_thumb: {
+      type: Sequelize.VIRTUAL,
+      get() {
+        return (this.getDataValue('thumb')) ? config.HOST + 'uploads/users/thumbs/' + this.getDataValue('thumb') : config.HOST + '/app/controllers/images/user_default.png';
+      }
+    },
+    video_url: {
+      type: Sequelize.VIRTUAL,
+      get() {
+        return (this.getDataValue('vedio_name')) ? config.HOST + 'uploads/users/videos/' + this.getDataValue('vedio_name') : config.HOST + '/app/controllers/images/user_default.png';
+      }
+    },
   },
    {
       createdAt: 'created_at',

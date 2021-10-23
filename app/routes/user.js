@@ -32,7 +32,13 @@ module.exports = app => {
     // like comment share
     router.post('/challenge-video-likes', challengesvalidation.like , userChallenges.likeVideo);
     router.post('/challenge-video-comment',challengesvalidation.comment,userChallenges.commentVideo);
+    router.post('/challenges-comment',challengesvalidation.comment,userChallenges.challengesComment);
+    
     router.get('/challenge-video-comment-list', userChallenges.commentVideolist);
+    router.get('/challenges-comment-list', userChallenges.videoCommentList);
+    router.get('/comment-of-comment', userChallenges.commentOfComment);
+    
+
     router.get('/challenge-video-comment-details',userChallenges.commentDetails);
     router.post('/challenge-video-share',challengesvalidation.like, userChallenges.shareVideo);
     router.post('/challenge-comment-like',challengesvalidation.reply , userChallenges.commentLike);

@@ -15,6 +15,8 @@ const UserEmoji = db.userEmoji;
 const EmojiImage = db.emojiImage;
 const RoutineFolder = db.routineFolder;
 const VideoSliceModel = db.videoSlice;
+const Series = db.series;
+const SeriesVideos = db.series_videos;
 const Setting = db.setting;
 const Op = db.Sequelize.Op;
 const bcrypt = require('bcrypt');
@@ -3700,4 +3702,14 @@ exports.uploadVideos = async (req,res) => {
    }catch(e){
     res.send({ success: false, message: "something went wrong", data: [] });
    }
+}
+
+//SERIES-----------------
+
+exports.addSeries = async (req,res) => {
+    try{
+
+    }catch(e){
+
+    }
 }

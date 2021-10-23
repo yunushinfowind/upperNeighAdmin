@@ -135,6 +135,9 @@ module.exports = (sequelize, Sequelize) => {
     User.hasOne(models.user_challenges, {
       foreignKey: 'user_id'
     });
+    // User.hasOne(models.practice, {
+    //   foreignKey: 'user_id'
+    // });
 
   }
 

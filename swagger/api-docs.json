@@ -1023,6 +1023,13 @@
                         "description": "page",
                         "type": "string",
                         "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1094,17 +1101,17 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "challenge_id",
                         "description": "challenge_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["like","unlike"],
+                        "enum": ["1","0"],
                         "required": true
                     }
                 ],
@@ -1139,9 +1146,53 @@
                         "required": true
                     },
                     {
-                        "in": "query",
-                        "name": "challenge_id",
-                        "description": "challenge_id",
+                        "in": "body",
+                        "name": "body",
+                        "description": "comment",
+                        "type": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "challenge_id": {
+                                    "type": "string"
+                                },
+                                "comment_id": {
+                                    "type": "string"
+                                },
+                                "comment": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "commented on video.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/challenges-comment": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "description": "Comment on challenged-video",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
                         "type": "string",
                         "required": true
                     },
@@ -1153,6 +1204,12 @@
                         "required": true,
                         "schema": {
                             "properties": {
+                                "challenge_id": {
+                                    "type": "string"
+                                },
+                                "comment_id": {
+                                    "type": "string"
+                                },
                                 "comment": {
                                     "type": "string"
                                 }
@@ -1220,6 +1277,106 @@
 
             }
         },
+        "/user/challenges-comment-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "challenge-comment",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                {
+                    "in": "header",
+                    "name": "token",
+                    "description": "token",
+                    "type": "token",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "challenge_id",
+                    "description": "challenge_id",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "limit",
+                    "description": "limit",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "page",
+                    "type": "string",
+                    "required": true
+                }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found Successfully..",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+
+            }
+        },
+        "/user/comment-of-comment": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "comment-of-comment",
+                "consumes": [
+                    "application/json"
+                ],
+                "parameters": [
+                {
+                    "in": "header",
+                    "name": "token",
+                    "description": "token",
+                    "type": "token",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "comment_id",
+                    "description": "comment_id",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "limit",
+                    "description": "limit",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "page",
+                    "type": "string",
+                    "required": true
+                }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Data found Successfully..",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+
+            }
+        },
         "/user/challenge-video-share": {
             "post": {
                 "tags": [
@@ -1241,7 +1398,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "challenge_id",
                         "description": "challenge_id",
                         "type": "string",
@@ -1279,17 +1436,17 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "comment_id",
                         "description": "comment_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["like","unlike"],
+                        "enum": ["1","0"],
                         "required": true
                     }
                 ],
@@ -1324,7 +1481,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "comment_id",
                         "description": "comment_id",
                         "type": "string",
@@ -1530,17 +1687,17 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_id",
                         "description": "practice_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["like","unlike"],
+                        "enum": ["1","0"],
                         "required": true
                     }
                 ],
@@ -1575,7 +1732,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_id",
                         "description": "practice_id",
                         "type": "string",
@@ -1677,7 +1834,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_id",
                         "description": "practice_id",
                         "type": "string",
@@ -1715,17 +1872,17 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_comment_id",
                         "description": "practice_comment_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["like","unlike"],
+                        "enum": ["1","1"],
                         "required": true
                     }
                 ],
@@ -1760,7 +1917,7 @@
                         "required": true
                     },
                     {
-                        "in": "query",
+                        "in": "formData",
                         "name": "practice_comment_id",
                         "description": "practice_comment_id",
                         "type": "string",

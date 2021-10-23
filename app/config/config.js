@@ -1,6 +1,6 @@
 module.exports = {
    //HOST: "http://localhost/upperneigh/",
-   HOST: "http://localhost/upperNeighAdmin/",
+   HOST: "http://192.168.1.81/upperNeighAdmin/",
   //HOST: "http://upperneighbormusic.com:8080/",
   
   // SOUNDURL = "http://upperneighbormusic.com/",

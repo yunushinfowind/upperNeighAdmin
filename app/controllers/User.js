@@ -115,12 +115,15 @@ exports.savedRoutineList = async function (req, res, next) {
 			var All = [];
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
+			let whereCondition = {
+				[Op.and]: [
+					{ user_id: loginId },
+					{ type: 'routine' }
+				]
+			}
 			let totatCount = await UserSavedRoutine.count({ where: { user_id: loginId, type: 'routine' } });
 			let userVideoList = await UserSavedRoutine.findAndCountAll({
-				where: {
-					user_id: loginId,
-					type: 'routine'
-				},
+				where: whereCondition,
 				limit: limit,
 				offset: offset,
 				include: [{
@@ -604,10 +607,22 @@ exports.teacherDetail = async function (req, res, next) {
 				result['totalPages'] = Math.ceil(result['count'] / limit);
 			}
 			if (req.query.type == 'routine') {
+				let whereCondition = {
+					[Op.and]: [
+						{ user_id: req.query.teacher_id }
+					]
+				}
+	
+				if (req.query.routine_level && req.query.routine_level != 'all') {
+					whereCondition = {
+					[Op.and]: [
+						{ user_id: req.query.teacher_id },
+						{routine_level:req.query.routine_level}
+					 ]
+					}
+				}
 				result = await Routine.findAndCountAll({
-					where: {
-						[Op.and]: [{ user_id: req.query.teacher_id }]
-					},
+					where: whereCondition,
 					limit: limit,
 					offset: offset,
 					include: [{

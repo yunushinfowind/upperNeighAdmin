@@ -1573,12 +1573,14 @@ exports.addRoutineVideo = async (req, res) => {
                                 }
                             })
                             var thumb_file_name = thumbfileName;
+                            console.log('datav------------------------',postData[i])
                             let insertData = {
                                 user_id: parseInt(postData[i].user_id),
                                 routine_id: postData[i].routine_id,
                                 video_title: postData[i].video_title,
                                 video_duration: urlVideoDuration,
                                 video_description: postData[i].video_description,
+                                content_type: postData[i].content_type,
                                 video_thumb: thumb_file_name,
                                 video_link: postData[i].embed_url,
                                 slice_added: "yes",
@@ -1665,12 +1667,14 @@ exports.addRoutineVideo = async (req, res) => {
                         video_thumb = result;
                         console.log('video_link');
                         console.log(video_link);
+                        console.log('datav------------------------',postData[i])
                         let insertData = {
                             user_id: parseInt(postData[i].user_id),
                             routine_id: postData[i].routine_id,
                             video_title: postData[i].video_title,
                             video_duration: '0:0:0',
                             video_description: postData[i].video_description,
+                            content_type: postData[i].content_type,
                             video_thumb: video_thumb,
                             video_link: video_link,
                             video_type: (postData[i].video_type) ? postData[i].video_type : 'local',

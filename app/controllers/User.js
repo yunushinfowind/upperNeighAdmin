@@ -62,7 +62,7 @@ exports.blogList = async (req, res) => {
 		});
 		for (const row of blogList['rows']) {
 			var obj = Object.assign({}, row.get());
-			obj.description = obj.description.replace(/<\/?[^>]+(>|$)/g, "");
+			obj.description = (obj.description)?obj.description.replace(/<\/?[^>]+(>|$)/g, ""):'';
 			All.push(obj);
 		}
 		if (blogList) {

@@ -63,8 +63,13 @@ module.exports = app => {
   router.get("/hashtag-list", admin.hashtagList);
 
 
-  //upload videos
-   router.post("/upload-videos", admin.uploadVideos);
+  
+   //series
+   router.post("/add-series", admin.addSeries);
+
+   //quiz 
+   router.post("/addquiz", admin.addQuiz);
+   router.get("/quizlist", admin.quizList);
 
   app.use('/api/admin', router);
 };

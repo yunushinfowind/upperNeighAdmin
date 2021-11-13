@@ -35,7 +35,11 @@ module.exports = (sequelize,Sequelize) => {
       Practice_Comment.hasMany(models.practice_comment_like, {
       foreignKey: 'practice_comment_id'
       });
- 
+     
+      Practice_Comment.belongsTo(models.user, {
+           foreignKey: 'user_id'
+         });
+       
   
     }
   return Practice_Comment;

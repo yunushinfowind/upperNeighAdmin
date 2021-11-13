@@ -15,6 +15,9 @@ module.exports = (sequelize, Sequelize) => {
     type: {
       type: Sequelize.ENUM('normal', 'social')
     },
+    level: {
+      type : Sequelize.STRING
+    },
     fullname: {
       type: Sequelize.STRING
     },

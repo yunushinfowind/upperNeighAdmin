@@ -28,6 +28,15 @@ module.exports = (sequelize, Sequelize) => {
     is_like: {
       type: Sequelize.VIRTUAL
     },
+    total_likes:{
+      type: Sequelize.VIRTUAL
+    },
+    total_comments:{
+      type: Sequelize.VIRTUAL
+    },
+    total_shares: {
+      type: Sequelize.VIRTUAL
+    },
     video_thumb: {
       type: Sequelize.VIRTUAL,
       get() {

@@ -7,14 +7,14 @@ const Challengelikes = db.challenge_likes;
 const Challengeshare = db.challenge_shares;
 const Challengecomment = db.challenge_comments;
 const Commentlikes = db.comment_like;
-const Commentoncomment = db.comment_on_comment;
+//const Commentoncomment = db.comment_on_comment;
 const Practice = db.practice;
 const Practicelikes = db.practice_likes;
 const Practicecomment = db.practice_comments;
 const Practiceshare = db.practice_share;
-const PracticecommentonComment = db.practice_comment_on_comment;
+// const PracticecommentonComment = db.practice_comment_on_comment;
 const PracticelikeonComment = db.practice_comment_like;
-const Quiz = db.quiz_questions;
+const Quiz = db.quiz_quests;
 const Quiz_Options = db.quiz_question_options;
 console.log(Quiz_Options);
 var logger = require('@setreflex/logger').logger();
@@ -47,16 +47,24 @@ let getLoginUserId = async (token) => {
 }
 
 let getCommentCount = async (challengeId) => {
-    return await Challengecomment.count({ where: { challenge_id: challengeId } });
+    return await Challengecomment.count({ where: { challenge_id: challengeId }, parent_id: 0 });
 }
-let videoCommentCount = async (challengeId) => {
-    return await Challengecomment.count({ where: { parent_id: 0 } });
-}
+
 let getLikeCount = async (challengeId) => {
     return await Challengelikes.count({ where: { challenge_id: challengeId } });
 }
 let getIsLikeByUser = async (challengeId, userId) => {
     let count = await Challengelikes.count({ where: { challenge_id: challengeId, user_id: userId } });
+    if (count > 0) {
+        return true
+    } else {
+        return false;
+    }
+
+}
+
+let IsLikeByUser = async (commentId, userId) => {
+    let count = await Commentlikes.count({ where: {  comment_id: commentId, user_id: userId } });
     if (count > 0) {
         return true
     } else {
@@ -74,18 +82,17 @@ let getLikeOnCommentCount = async (commentId) => {
     }
   
 
-let getCommentOnCommentCount = async (commentId) => {
-   console.log('ggggggggggggggggggggg',getCommentOnCommentCount)
-    let count =   await Commentoncomment.count({ where: { comment_id: commentId } });     
-    return count;
+// let getCommentOnCommentCount = async (commentId) => {
+//     let count =   await Commentoncomment.count({ where: { comment_id: commentId } });     
+//     return count;
     
-}
+// }
 
 let commentCount = async (commentId) => {
      return  await Challengecomment.count({ where: { parent_id: commentId } });     
  }
 let getPracticeCommentCount = async (practiceId) => {
-    return await Practicecomment.count({ where: { practice_id: practiceId } });
+    return await Practicecomment.count({ where: { practice_id: practiceId, parent_id: 0 } });
 }
 let getPracticeLikeCount = async (practiceId) => {
     return await Practicelikes.count({ where: { practice_id: practiceId } });
@@ -100,6 +107,15 @@ let getIsLikeAtPractice = async (practiceId, userId) => {
     }
 }
 
+let getPracticeLike = async (practicecommentId, userId) => {
+    let count = await PracticelikeonComment.count({ where: { practice_comment_id: practicecommentId, user_id: userId } });
+    if(count > 0) {
+        return true
+    } else {
+        return false;
+    }
+}
+
 let getPracticeShareCount = async (practiceId) => {
     return await Practiceshare.count({ where: { practice_id: practiceId } });
 }
@@ -107,7 +123,7 @@ let getPracticeLikeOnCommentCount = async (practicecommentId) => {
     return await PracticelikeonComment.count({ where: { practice_comment_id: practicecommentId } });
 }
 let getPracticeCommentOnCommentCount = async (practicecommentId) => {
-    return await PracticecommentonComment.count({ where: { practice_comment_id: practicecommentId } });
+    return await Practicecomment.count({ where: { parent_id: practicecommentId } });
 }
 
 
@@ -119,7 +135,7 @@ var day = NOW.getDay(),
 const MON = new Date(NOW.setDate(diff));
 var firstDay = new Date(NOW.getFullYear(), NOW.getMonth(), 1);
 var year = new Date(NOW.getFullYear(), 0, 1)
-console.log(year)
+
 
 let getTotalPracticeDuration = async (userId, type) => {
     let practices = [];
@@ -501,8 +517,10 @@ exports.uploadUserVideo = async (req, res) => {
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
 
+            var response;
             var videos = [];
             var uploadedVideos = req.files;
+            var ResultData;
 
             var thumbs = [];
             if (uploadedVideos == null) {
@@ -540,7 +558,7 @@ exports.uploadUserVideo = async (req, res) => {
                     thumbnailPath: 'uploads/users/thumbs',
                     tmpDir: 'uploads/users/videos/thumbs'
                 });
-
+                ;
                 tg.generateOneByPercentCb(50, async (err, result) => {
                     video_thumb = result;
                     let data = {
@@ -549,13 +567,34 @@ exports.uploadUserVideo = async (req, res) => {
                         thumb: result,
                         vedio_name: fileName
                     }
-                    await Userchallenge.create(data)
-
-                }
-
-                )
+                    response = await Userchallenge.create(data)
+                     
+                    ResultData = await Userchallenge.findOne({
+                       
+                        where: {
+                            [Op.and]: [{
+                                user_id: loginId,
+                                id: response.id
+                            }]
+                        },
+                        include: [{
+                            model: db.user
+                        }]
+                       
+                    });
+                    console.log("ressssssss", ResultData)
+                   
+                    ResultData.total_likes = 0;
+                    ResultData.total_comments = 0;
+                    ResultData.total_shares = 0;
+                    ResultData.is_like = await getIsLikeByUser(ResultData.id, loginId);
+console.log("rrrrrrr",  ResultData)
+                    res.send({ success: true, message: "video uploaded successfully.", data: ResultData });
+                })
             }
-            res.send({ success: true, message: "video uploaded successfully.", data: [] });
+
+
+
         } else {
 
             res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
@@ -604,8 +643,6 @@ exports.challengesList = async (req, res) => {
                 obj.total_likes = await getLikeCount(obj.id);
                 obj.total_comments = await getCommentCount(obj.id);
                 obj.total_shares = await getShareCount(obj.id);
-                 // obj.total_comment_likes = await getLikeOnCommentCount(obj.id);
-                // obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id);
                 All.push(obj);
             }
             if (list) {
@@ -656,15 +693,9 @@ exports.detailVideo = async (req, res) => {
 
             detail.like_count = await getLikeCount(detail.id);
             detail.is_like = await getIsLikeByUser(detail.id, loginId);
-            detail.comment_count = await videoCommentCount(detail.id);
+            detail.comment_count = await getCommentCount(detail.id);
             detail.share_video_count = await getShareCount(detail.id);
-            // detail.total_comment_likes = await getLikeOnCommentCount(detail.id);
-            // detail.total_comments_on_comment  = await getCommentOnCommentCount(detail.id);
-            // await Promise.all(detail.challenge_comments.map(async (element) => {
-            //     element.comment_like_count = await getLikeOnCommentCount( element.id)
-            //     element.comment_on_comment_count = await getCommentOnCommentCount( element.id)
-
-            //   }));
+            
             res.send({ success: true, message: "Data found Successfully..", data: detail });
 
         } else {
@@ -718,47 +749,47 @@ exports.likeVideo = async (req, res) => {
 }
 
 
-exports.commentVideo = async (req, res) => {
-    try {
+// exports.commentVideo = async (req, res) => {
+//     try {
 
-        let token = await User.getToken(req);
-        let isValidToekn = await validateToekn(token);
+//         let token = await User.getToken(req);
+//         let isValidToekn = await validateToekn(token);
 
-        if (isValidToekn) {
-            let loginId = await getLoginUserId(token);
+//         if (isValidToekn) {
+//             let loginId = await getLoginUserId(token);
 
-            let data = {
-                user_id: loginId,
-                challenge_id: req.body.challenge_id,
-                comment: req.body.comment
+//             let data = {
+//                 user_id: loginId,
+//                 challenge_id: req.body.challenge_id,
+//                 comment: req.body.comment
 
-            }
-            var comment = await Challengecomment.create(data);
-
-
-            let details = await Challengecomment.findOne({
-                where: { id: comment.id },
-
-                include: [
-                    {
-                        model: db.user
-                    }]
-            })
+//             }
+//             var comment = await Challengecomment.create(data);
 
 
-            res.send({ success: true, message: "commented on a video", data: details });
+//             let details = await Challengecomment.findOne({
+//                 where: { id: comment.id },
 
-        } else {
+//                 include: [
+//                     {
+//                         model: db.user
+//                     }]
+//             })
 
-            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
 
-        }
+//             res.send({ success: true, message: "commented on a video", data: details });
 
-    } catch (e) {
-        res.send({ success: false, message: e.message, data: [] });
-    }
+//         } else {
 
-}
+//             res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
+
+//         }
+
+//     } catch (e) {
+//         res.send({ success: false, message: e.message, data: [] });
+//     }
+
+// }
 exports.challengesComment = async (req, res) => {
     try {
 
@@ -781,7 +812,11 @@ exports.challengesComment = async (req, res) => {
                         model: db.user
                     }]
             })
-            res.send({ success: true, message: "Commented successfully.", data: details });
+            var obj = Object.assign({}, details.get());
+            obj.total_comments_on_comment = 0;
+            obj.total_comment_likes = 0 ;
+            obj.is_like = await IsLikeByUser(obj.id, loginId);
+            res.send({ success: true, message: "Commented successfully.", data: obj });
 
         } else {
             res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
@@ -794,54 +829,54 @@ exports.challengesComment = async (req, res) => {
 
 }
 
-exports.commentVideolist = async (req, res) => {
-    try {
-        let token = await User.getToken(req);
-        let isValidToekn = await validateToekn(token);
-        var All = [];
-        if (isValidToekn) {
-            let limit = parseInt(req.query.limit);
-            let offset = parseInt(0 + (req.query.page - 1) * limit);
-            let totatCount = await Challengecomment.count({ where: { challenge_id: req.query.challenge_id } });
+// exports.commentVideolist = async (req, res) => {
+//     try {
+//         let token = await User.getToken(req);
+//         let isValidToekn = await validateToekn(token);
+//         var All = [];
+//         if (isValidToekn) {
+//             let limit = parseInt(req.query.limit);
+//             let offset = parseInt(0 + (req.query.page - 1) * limit);
+//             let totatCount = await Challengecomment.count({ where: { challenge_id: req.query.challenge_id } });
 
-            let list = await Challengecomment.findAndCountAll({
-                where: {
+//             let list = await Challengecomment.findAndCountAll({
+//                 where: {
 
-                    challenge_id: req.query.challenge_id
+//                     challenge_id: req.query.challenge_id
 
-                },
-                limit: limit,
-                offset: offset,
+//                 },
+//                 limit: limit,
+//                 offset: offset,
 
-                include: [
-                    {
-                        model: db.user
-                    },
-                ]
-            });
-            for (const row of list['rows']) {
+//                 include: [
+//                     {
+//                         model: db.user
+//                     },
+//                 ]
+//             });
+//             for (const row of list['rows']) {
 
-                var obj = Object.assign({}, row.get());
-                obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'main');
-                obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'main');
-                All.push(obj);
-            }
+//                 var obj = Object.assign({}, row.get());
+//                 obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'main');
+//                 obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'main');
+//                 All.push(obj);
+//             }
 
 
-            if (list) {
-                list['rows'] = All;
-                list['count'] = totatCount;
-                list['currentPage'] = req.query.page;
-                list['totalPages'] = Math.ceil(list['count'] / limit);
-            }
-            res.send({ success: true, message: "Comment List", data: list });
-        } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
-        }
-    } catch (e) {
-        res.send({ success: false, message: e.message, data: [] });
-    }
-}
+//             if (list) {
+//                 list['rows'] = All;
+//                 list['count'] = totatCount;
+//                 list['currentPage'] = req.query.page;
+//                 list['totalPages'] = Math.ceil(list['count'] / limit);
+//             }
+//             res.send({ success: true, message: "Comment List", data: list });
+//         } else {
+//             res.send({ success: false, message: "Invalid token", data: [] });
+//         }
+//     } catch (e) {
+//         res.send({ success: false, message: e.message, data: [] });
+//     }
+// }
 
 exports.videoCommentList = async (req, res) => {
     try {
@@ -849,6 +884,7 @@ exports.videoCommentList = async (req, res) => {
         let isValidToekn = await validateToekn(token);
         var All = [];
         if (isValidToekn) {
+            let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
             let totatCount = await Challengecomment.count({ where: { challenge_id: req.query.challenge_id,parent_id : 0 } });
@@ -867,7 +903,8 @@ exports.videoCommentList = async (req, res) => {
             });
             for (const row of list['rows']) {
                 var obj = Object.assign({}, row.get());
-                obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'main');
+                obj.total_comment_likes = await getLikeOnCommentCount(obj.id);
+                obj.is_like = await IsLikeByUser(obj.id, loginId);
                 obj.total_comments_on_comment = await commentCount(obj.id);
                 All.push(obj);
             }
@@ -887,11 +924,13 @@ exports.videoCommentList = async (req, res) => {
 }
 
 exports.commentOfComment = async (req, res) => {
+   
     try {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
         var All = [];
         if (isValidToekn) {
+            let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
             let totatCount = await Challengecomment.count({ where: { parent_id : req.query.comment_id } });
@@ -909,7 +948,8 @@ exports.commentOfComment = async (req, res) => {
             });
             for (const row of list['rows']) {
                 var obj = Object.assign({}, row.get());
-                obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'main');
+                obj.total_comment_likes = await getLikeOnCommentCount(obj.id);
+                obj.is_like = await IsLikeByUser(obj.id, loginId);
                 obj.total_comments_on_comment = await commentCount(obj.id);
                 All.push(obj);
             }
@@ -920,6 +960,7 @@ exports.commentOfComment = async (req, res) => {
                 list['totalPages'] = Math.ceil(list['count'] / limit);
             }
             res.send({ success: true, message: "Comment List", data: list });
+          
         } else {
             res.send({ success: false, message: "Invalid token", data: [] });
         }
@@ -930,78 +971,79 @@ exports.commentOfComment = async (req, res) => {
 
 
 
-exports.commentDetails = async (req, res) => {
-    try {
-        let token = await User.getToken(req);
-        let isValidToekn = await validateToekn(token);
-        var All = [];
-        if (isValidToekn) {
 
-            let limit = parseInt(req.query.limit);
-            let offset = parseInt(0 + (req.query.page - 1) * limit);
+// exports.commentDetails = async (req, res) => {
+//     try {
+//         let token = await User.getToken(req);
+//         let isValidToekn = await validateToekn(token);
+//         var All = [];
+//         if (isValidToekn) {
+
+//             let limit = parseInt(req.query.limit);
+//             let offset = parseInt(0 + (req.query.page - 1) * limit);
 
           
         
-       if( req.query.type == 'main'){
-        whereCondition =  {
-                    comment_id : req.query.comment_id }
-                }else{
-                    whereCondition =  { parent_id : req.query.comment_id
-                    }
-                }         
+//        if( req.query.type == 'main'){
+//         whereCondition =  {
+//                     comment_id : req.query.comment_id }
+//                 }else{
+//                     whereCondition =  { parent_id : req.query.comment_id
+//                     }
+//                 }         
             
-            let details = await Commentoncomment.findAndCountAll({
-                where: whereCondition,
-                limit: limit,
-                offset: offset,
+//             let details = await Commentoncomment.findAndCountAll({
+//                 where: whereCondition,
+//                 limit: limit,
+//                 offset: offset,
 
-                include: [
-                    {
-                        model: db.user
-                    }
-                    // {
-                    //     model: db.comment_on_comment,
-                    //     include: [
-                    //         {
-                    //             model: db.user
-                    //         }
-                    //     ]
-                    // }
-                ]
-            });
-            for (const row of details['rows']) {
+//                 include: [
+//                     {
+//                         model: db.user
+//                     }
+//                     // {
+//                     //     model: db.comment_on_comment,
+//                     //     include: [
+//                     //         {
+//                     //             model: db.user
+//                     //         }
+//                     //     ]
+//                     // }
+//                 ]
+//             });
+//             for (const row of details['rows']) {
 
-                var obj = Object.assign({}, row.get());
-                if(req.query.type == 'main'){
-                    obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'inner');
-                    obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'inner');
-                }else{
-                    obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'inner');
-                    obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'inner');
-                }
+//                 var obj = Object.assign({}, row.get());
+//                 if(req.query.type == 'main'){
+//                     obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'inner');
+//                     obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'inner');
+//                 }else{
+//                     obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'inner');
+//                     obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'inner');
+//                 }
                
                
-                All.push(obj);
-            }
+//                 All.push(obj);
+//             }
 
 
-            if (details) {
-                details['rows'] = All;
-                details['count'] = details.count;
-                details['currentPage'] = req.query.page;
-                details['totalPages'] = Math.ceil(details['count'] / limit);
-            }
-            res.send({ success: true, message: "Comments Details", data: details });
+//             if (details) {
+//                 details['rows'] = All;
+//                 details['count'] = details.count;
+//                 details['currentPage'] = req.query.page;
+//                 details['totalPages'] = Math.ceil(details['count'] / limit);
+//             }
+//             res.send({ success: true, message: "Comments Details", data: details });
 
-        } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
-        }
+//         } else {
+//             res.send({ success: false, message: "Invalid token", data: [] });
+//         }
 
 
-    } catch (e) {
-        res.send({ success: false, message: e.message, data: [] });
-    }
-}
+//     } catch (e) {
+//         res.send({ success: false, message: e.message, data: [] });
+//     }
+// }
 
 
 exports.shareVideo = async (req, res) => {
@@ -1076,52 +1118,52 @@ exports.commentLike = async (req, res) => {
 
 }
 
-exports.commentOnComment = async (req, res) => {
-    try {
+// exports.commentOnComment = async (req, res) => {
+//     try {
 
-        let token = await User.getToken(req);
-        let isValidToekn = await validateToekn(token);
+//         let token = await User.getToken(req);
+//         let isValidToekn = await validateToekn(token);
 
-        if (isValidToekn) {
-            let loginId = await getLoginUserId(token);
-            if (req.body.type == 'main') {
-                var data = {
-                    user_id: loginId,
-                    comment_id: req.body.comment_id,
-                    comment: req.body.comment
-                }
+//         if (isValidToekn) {
+//             let loginId = await getLoginUserId(token);
+//             if (req.body.type == 'main') {
+//                 var data = {
+//                     user_id: loginId,
+//                     comment_id: req.body.comment_id,
+//                     comment: req.body.comment
+//                 }
 
-            }else{
-                var data = {
-                    user_id: loginId,
-                    parent_id: req.body.comment_id,
-                    comment: req.body.comment
-                }
-            }
-            let comment = await Commentoncomment.create(data);
-            let detail = await Commentoncomment.findOne({
-                where: { id: comment.id },
-                include: [
-                    { model: db.user }
-                ]
-            });
+//             }else{
+//                 var data = {
+//                     user_id: loginId,
+//                     parent_id: req.body.comment_id,
+//                     comment: req.body.comment
+//                 }
+//             }
+//             let comment = await Commentoncomment.create(data);
+//             let detail = await Commentoncomment.findOne({
+//                 where: { id: comment.id },
+//                 include: [
+//                     { model: db.user }
+//                 ]
+//             });
 
-            res.send({ success: true, message: "commented on comment", data: detail });
-
-
+//             res.send({ success: true, message: "commented on comment", data: detail });
 
 
-        } else {
 
-            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
 
-        }
+//         } else {
 
-    } catch (e) {
-        res.send({ success: false, message: e.message, data: [] });
-    }
+//             res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
 
-}
+//         }
+
+//     } catch (e) {
+//         res.send({ success: false, message: e.message, data: [] });
+//     }
+
+// }
 
 
 //PRACTICE
@@ -1169,43 +1211,19 @@ exports.practiceList = async (req, res) => {
             let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
-            let totatCount = await Practice.count({ where: { user_id: loginId } });
+            let totatCount = await Practice.count({ where: {  user_id: req.query.user_id } });
             let lists = await Practice.findAndCountAll({
-                where: {
-                    [Op.and]:
-                    [{ user_id: loginId }
-
-                        // { id:req.query.id}   
-                    ]
-                },
+                where: 
+                { user_id: req.query.user_id },
+                
                 limit: limit,
                 offset: offset,
 
                 include: [
                     { model: db.user }
                 ]
-                //             include:[
 
-                //                 {
-                //                     model: db.practice_likes
-
-                //                 },
-                //             {
-                //                 model: db.practice_comments  ,
-                //                 include:[
-                //                  {
-                //                       model: db.practice_comment_like
-                //                 },
-                //                     {
-                //                          model: db.practice_comment_on_comment
-                //                     } 
-                //                 ]
-                //             },
-                //         {
-                //             model : db.practice_share
-
-                //         }
-                //    ] 
+               
             });
             for (const row of lists['rows']) {
                 var obj = Object.assign({}, row.get());
@@ -1213,8 +1231,7 @@ exports.practiceList = async (req, res) => {
                 obj.like_practice_count = await getPracticeLikeCount(obj.id);
                 obj.comment_practice_count = await getPracticeCommentCount(obj.id);
                 obj.share_practice_count = await getPracticeShareCount(obj.id);
-                // obj.comment_like_count = await getPracticeLikeOnCommentCount(obj.id);
-                // obj.comment_on_comment_count = await getPracticeCommentOnCommentCount(obj.id);
+                
                 All.push(obj);
             }
             if (lists) {
@@ -1243,54 +1260,29 @@ exports.practiceDetails = async (req, res) => {
         if (isValidToekn) {
             let loginId = await getLoginUserId(token);
 
-            let details = await Practice.findOne({
+            let detail = await Practice.findOne({
                 where: {
-                    // [Op.and]: 
-
-                    // [  { user_id: loginId },
-
                     id: req.query.id
-                    // ]
+                
                 },
-                // include:[
-
-                // {
-                //     model: db.practice_likes
-
-                // },
-                // { 
-
-                //     model: db.practice_comments,
-                //          include:[
-                //                 {
-                //                     model: db.practice_comment_like
-                //                 },
-                //                 {
-                //                      model: db.practice_comment_on_comment
-                //                 } 
-                //             ]
-
-                // },
-                // {
-                //     model : db.practice_share
-
-                // }
-                // ] 
+                include: [
+                    {
+                        model: db.user
+                    }
+                ]
+               
             });
-
-            details.like_practice_count = await getPracticeLikeCount(details.id);
-            details.comment_practice_count = await getPracticeCommentCount(details.id);
-            details.share_practice_count = await getPracticeShareCount(details.id);
-            await Promise.all(details.Challengecomment.map(async (element) => {
-                element.practice_comment_like_count = await getPracticeLikeOnCommentCount(element.id)
-                element.practice_comment_on_comment_count = await getPracticeCommentOnCommentCount(element.id)
-
-            }));
-
-            res.send({ success: true, message: "Details of Practice", data: details });
-
+       
+            detail.like_practice_count = await getPracticeLikeCount(detail.id);
+            detail.is_like = await getIsLikeAtPractice(detail.id, loginId);
+            detail.comment_practice_count = await getPracticeCommentCount(detail.id);
+            detail.share_practice_count = await getPracticeShareCount(detail.id);
+        
+           
+            res.send({ success: true, message: "Details of Practice", data: detail });
+            
         } else {
-            res.send({ success: false, type: "token_invalid", message: "Invalid Tsoken", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid Token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
@@ -1344,10 +1336,18 @@ exports.practiceComment = async (req, res) => {
             let data = {
                 user_id: loginId,
                 practice_id: req.body.practice_id,
-                comment: req.body.comment
+                comment: req.body.comment,
+                parent_id : (req.body.comment_id)?req.body.comment_id:0
             }
-            await Practicecomment.create(data);
-            res.send({ success: true, message: "Commented on Practice ", data: [] });
+            var comment = await Practicecomment.create(data);
+            let details = await Practicecomment.findOne({
+                where: { id: comment.id },
+                include: [
+                    {
+                        model: db.user
+                    }]
+                })
+            res.send({ success: true, message: "Commented on Practice ", data: details });
 
         } else {
             res.send({ success: false, type: "token_invalid", message: "Invalid Token", data: [] })
@@ -1365,31 +1365,28 @@ exports.practiceCommentList = async (req, res) => {
         let isValidToekn = await validateToekn(token);
         var All = [];
         if (isValidToekn) {
-            let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
             let totalCount = await Practicecomment.count({ where: { practice_id: req.query.practice_id } });
             let list = await Practicecomment.findAndCountAll({
                 where: {
                     [Op.and]: [
-                        { user_id: loginId },
-                        { practice_id: req.query.practice_id }
+                        { practice_id: req.query.practice_id },
+                        { parent_id : 0 }
                     ]
                 },
                 limit: limit,
                 offset: offset,
                 include: [
                     {
-                        model: db.practice_comment_like
-                    },
-                    {
-                        model: db.practice_comment_on_comment
+                        model: db.user
                     }
                 ]
             });
             for (const row of list['rows']) {
                 var obj = Object.assign({}, row.get());
                 obj.comment_like_count = await getPracticeLikeOnCommentCount(obj.id);
+                obj.is_like = await getPracticeLike(obj.id, loginId);
                 obj.comment_on_comment_count = await getPracticeCommentOnCommentCount(obj.id);
                 All.push(obj);
             }
@@ -1407,7 +1404,7 @@ exports.practiceCommentList = async (req, res) => {
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
-    }
+     }
 }
 
 exports.practiceShare = async (req, res) => {
@@ -1470,20 +1467,42 @@ exports.practicecommentLike = async (req, res) => {
 }
 
 
-exports.practicecommentOnComment = async (req, res) => {
+exports.practicecomment_Comment = async (req, res) => {
     try {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
-
+         var All = [];
         if (isValidToekn) {
             let loginId = await getLoginUserId(token);
-            let data = {
-                user_id: loginId,
-                practice_comment_id: req.body.practice_comment_id,
-                comment: req.body.comment
+            let limit = parseInt(req.query.limit);
+            let offset = parseInt(0 + (req.query.page - 1) * limit);
+            totalcount = await Practicecomment.count({ where : {parent_id : req.query.comment_id}})
+            let list = await Practicecomment.findAndCountAll({
+                where : {
+                    parent_id : req.query.comment_id
+                },
+                limit : limit,
+                offset : offset,
+                include : [
+                    {
+                        model: db.user
+                    }
+                ]
+            });
+            for (const row of list['rows']) {
+                var obj = Object.assign({},row.get());
+                obj.practice_comment_like_count = await getPracticeLikeOnCommentCount(obj.id)
+                obj.is_like = await getPracticeLike(obj.id, loginId);
+                obj.practice_comment_on_comment_count = await getPracticeCommentOnCommentCount(obj.id)
+                All.push(obj);
             }
-            await PracticecommentonComment.create(data);
-            res.send({ success: true, message: "Commented on your comment ", data: [] });
+            if (list) {
+                list['rows'] = All;
+                list['count'] = totalcount;
+                list['currentPage'] = req.query.page;
+                list['totalPages'] = Math.ceil(list['count'] /limit );
+            }
+            res.send({ success: true, message: "Comment List ", data: list });
 
         } else {
             res.send({ success: false, type: "token_invalid", message: "Invalid Token", data: [] })
@@ -1563,23 +1582,127 @@ exports.practiceStats = async (req, res) => {
 
 exports.quizList = async (req, res) => {
 
-    try {
+      try {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
-            let quiz = await Quiz.findAll({
-                // where: {id : req.query.id},
-                include: [
-                    { model: db.quiz_question_options }
-                ]
+            let quiz ;
+            
+             if(req.query.type == 'question'){
+                 quiz = await Quiz.findOne( {  where: { id : 1 },
+                    include: [
+                        { model: db.quiz_question_options }
+                    ]
             })
+           
+               } else {
+                    let question = req.query.question_id;
+                      var optionArray = JSON.parse("[" + req.query.id + "]");
+                    // var optionArray = ("[" + req.query.id + "]");
+                    
+                  
+                    if(question == '1'){
+                        switch(optionArray[0]) {
+                            case 1:
+                                quiz = { "level":"Beginner"}
+                                break;
+                            case 2:
+                                    
+                                    quiz = await Quiz.findOne({ where: { id:2},
+                                        include: [
+                                            { model: db.quiz_question_options }
+                                        ]
+                                    })
+                                break;
+                            case 3:
+                                        quiz = await Quiz.findOne({ where: { id:3},
+                                            include: [
+                                                { model: db.quiz_question_options }
+                                            ]
+                                        })
+                                break;
+                            case 4:
+                                quiz = await Quiz.findOne({ where: { id: 4},
+                                    include: [
+                                        { model: db.quiz_question_options }
+                                    ]
+                                })
+                                break;
+                        }
+                        
+                    
 
-            res.send({ success: true, message: "Quiz List", data: quiz });
+                    }else if(question == '2'){
+                      
+                        if(optionArray[0]==5) {
+                            
+                                quiz = { "level":"Beginner"}
+                                
+                        } 
+                        if(optionArray[0]== 5 && optionArray[0,1]== 6 ) {
+                        
+                            quiz = { "level":"Level 1"}
+                            
+                    } 
+                    if(optionArray[0]== 5 && optionArray[0,1]==6  && optionArray[0,1,2]==7) {
+                        
+                        quiz = await Quiz.findOne({ where: { id: 3},
+                            include: [
+                                { model: db.quiz_question_options }
+                            ]
+                        })
+                        
+                    }
+                   }else if(question == '3'){
+                        switch(optionArray[0]) {
+                        case 8:
+                            quiz = await Quiz.findOne({ where: { id: 4},
+                                include: [
+                                    { model: db.quiz_question_options }
+                                ]
+                            })
+                            break;
+                        case 9:
+                                quiz ={ "level":"Level 1"}
+                            break;
+                        case 10:
+                                quiz = { "level":"Level 2" }
+                            break;
+                                }
+                    }else if(question == '4'){
+                        switch(optionArray[0]) {
+                        case 11:
+                                quiz = await Quiz.findOne({ where: { id: 5},
+                                        include: [
+                                             { model: db.quiz_question_options }
+                                                ]
+                                            })
+                                        break;
+                        case 12:
+                                quiz = { "level":"Level 4 or 5"}
+                                break;
+                                        }           
+                  }else{
+                    switch(optionArray[0]) {
+                        case 13:
+                                quiz = { "level":"Level 5+"}
+                                break;
+                        case 14:
+                                quiz = { "level":"Level 4 or 5"}
+                                break;
+                            }
+                                    }
+                                   
+                                }
+     
+     res.send({ success: true, message:"QUIz" , data: quiz });
+     
+    }else{
+        
+        res.send({ success: false, type: "token_invalid", message: "Invalid Token", data: [] })
 
-        } else {
-            res.send({ success: false, type: "token_invalid", message: "Invalid Token", data: [] })
+    }
 
-        }
 
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });

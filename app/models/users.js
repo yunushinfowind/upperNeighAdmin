@@ -15,6 +15,9 @@ module.exports = (sequelize, Sequelize) => {
     type: {
       type: Sequelize.ENUM('normal', 'social')
     },
+    level: {
+      type : Sequelize.STRING
+    },
     fullname: {
       type: Sequelize.STRING
     },
@@ -135,6 +138,9 @@ module.exports = (sequelize, Sequelize) => {
     User.hasOne(models.user_challenges, {
       foreignKey: 'user_id'
     });
+    // User.hasOne(models.practice, {
+    //   foreignKey: 'user_id'
+    // });
 
   }
 

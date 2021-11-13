@@ -14,10 +14,10 @@ module.exports = (sequelize, Sequelize) => {
       updatedAt: 'updated_at',
     }
   );
-  // User_Challenge.associate = models => {
-  // User_Challenge.belongsTo(models.users, {
-  //    foreignKey: 'user_id'
-  //  });
+//   Practice_Comment_likes.associate = models => {
+//   Practice_Comment_likes.belongsTo(models.users, {
+//      foreignKey: 'user_id'
+//    });
 //  }
 
 

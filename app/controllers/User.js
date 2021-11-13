@@ -377,6 +377,7 @@ exports.routineVideoList = async function (req, res, next) {
 					]
 				}
 			}
+			
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
 			let totatCount = await RoutineVideo.count({ where: whereCondition });

@@ -5,9 +5,10 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER
     },
    thumb: {
-    type: Sequelize.STRING
-    // get() {
-    //   return (this.getDataValue('video_thumb')) ? config.HOST + 'uploads/artists/thumbs/' + this.getDataValue('video_thumb') : config.HOST + '/app/controllers/images/user_default.png';
+    type: Sequelize.STRING,
+    get() {
+      return (this.getDataValue('thumb')) ? config.HOST + 'uploads/users/thumbs/' + this.getDataValue('thumb') : config.HOST + '/app/controllers/images/user_default.png';
+    }
     },
     vedio_name: {
       type: Sequelize.STRING
@@ -25,6 +26,15 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.ENUM('active', 'inactive')
     },
     is_like: {
+      type: Sequelize.VIRTUAL
+    },
+    total_likes:{
+      type: Sequelize.VIRTUAL
+    },
+    total_comments:{
+      type: Sequelize.VIRTUAL
+    },
+    total_shares: {
       type: Sequelize.VIRTUAL
     },
     video_thumb: {

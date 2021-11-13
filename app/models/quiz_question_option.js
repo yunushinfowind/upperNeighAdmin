@@ -5,7 +5,17 @@ module.exports = (sequelize,Sequelize) => {
         type : Sequelize.INTEGER
         },
         option_name : {
-            type: Sequelize.STRING
+            type: Sequelize.STRING, 
+              // get: function() {
+              //     return JSON.parse(this.getDataValue('option_name'));
+              // }, 
+              // set: function(val) {
+              //     return this.setDataValue('option_name', JSON.stringify(val));
+              // },
+            get() {
+              return  this.getDataValue('option_name').replace(/(\r\n|\n|\r)/gm, "");
+                
+              }
         }
         
     },

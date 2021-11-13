@@ -1,12 +1,18 @@
 const config = require('../config/config.js');
 module.exports = (sequelize,Sequelize) => {
-    const Quiz_Questions = sequelize.define('quiz_questions',{ 
+    const Quiz_Questions = sequelize.define('quiz_quests',{ 
       question : {
         type : Sequelize.TEXT
         },
         status : {
             type: Sequelize.ENUM('active', 'inactive')
+        },
+        
+        choice_type: {
+            type: Sequelize.ENUM('single','multiple')
+           
         }
+        
         
     },
     {

@@ -71,58 +71,23 @@ exports.register = (req, res) => {
 
 };
 
-exports.updateProfile = async function (req, res, next) {
-
-	console.log(req.files);
-	try {
-		var fileName;
-		if (req.files) {
-			const image = req.files.profile
-			const path = __dirname + '/images/' + image.name
-			await image.mv(path, (error) => {
-				if (error) {
-					console.error(error)
-					res.writeHead(500, {
-						'Content-Type': 'application/json'
-					})
-					res.end(JSON.stringify({ status: 'error', message: error }))
-				}
-			})
-			fileName = image.name;
+exports.updateProfile = async function (req, res) {
+try{
+	var user = await User.findOne({ where: { id: req.body.user_id } });
+	if (user) {
+		let level;
+		user.update({
+			 level : req.body.level
+		  })
+		res.send({ 'success': true, message: "level updated ", data:user });
+		}else{
+			res.send({ 'success': false, message: "record not found", data: [] });
 		}
-
-		if (req.body.type == 'private') {
-			var userModel = await User.findOne({ where: { id: req.body.user_id } });
-			if (userModel) {
-				if (req.body.name) {
-					userModel.name = req.body.name;
-				}
-				if (req.files) {
-					userModel.profile = fileName;
-				}
-				userModel.save();
-				res.send({ 'success': true, message: "profile updated successfully.", data: userModel });
-			}
-			res.send({ 'success': false, message: "record not found.", data: [] });
-		} else {
-			var roomModel = await Room.findOne({ where: { id: req.body.user_id } });
-			if (roomModel) {
-				if (req.body.name) {
-					roomModel.group_name = req.body.name;
-				}
-				if (req.files) {
-					roomModel.group_image = fileName;
-				}
-				roomModel.save();
-				res.send({ 'success': true, message: "profile updated successfully.", data: roomModel });
-			}
-			res.send({ 'success': false, message: "record not found.", data: [] });
-		}
-	} catch (error) {
+	}catch (error) {
 		res.send({ 'success': false, message: error.message, data: [] });
 	}
+} 
 
-}
 
 exports.login = async function (req, res, next) {
 

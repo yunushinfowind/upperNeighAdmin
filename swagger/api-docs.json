@@ -276,33 +276,15 @@
                     },
                     {
                         "in": "formData",
-                        "name": "type",
-                        "description": "profile type",
+                        "name": "level",
+                        "description": "level",
                         "type": "string",
-                        "enum": [
-                            "group",
-                            "private"
-                        ],
-                        "required": false
-                    },
-                    {
-                        "in": "formData",
-                        "name": "name",
-                        "description": "name",
-                        "type": "string",
-                        "required": false
-                    },
-                    {
-                        "in": "formData",
-                        "name": "profile",
-                        "description": "profile",
-                        "type": "file",
                         "required": false
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Message.",
+                        "description": "Level updated",
                         "schema": {
                             "type": "object"
                         }
@@ -1125,57 +1107,6 @@
                 }
             }
         },
-        "/user/challenge-video-comment": {
-            "post": {
-                "tags": [
-                    "User"
-                ],
-                "description": "Comment on challenged-video",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "in": "header",
-                        "name": "token",
-                        "description": "token",
-                        "type": "string",
-                        "required": true
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "comment",
-                        "type": "body",
-                        "required": true,
-                        "schema": {
-                            "properties": {
-                                "challenge_id": {
-                                    "type": "string"
-                                },
-                                "comment_id": {
-                                    "type": "string"
-                                },
-                                "comment": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "commented on video.",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
         "/user/challenges-comment": {
             "post": {
                 "tags": [
@@ -1219,7 +1150,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "commented on video.",
+                        "description": "Commented successfully.",
                         "schema": {
                             "type": "object"
                         }
@@ -1227,56 +1158,7 @@
                 }
             }
         },
-        "/user/challenge-video-comment-list": {
-            "get": {
-                "tags": [
-                    "User"
-                ],
-                "description": "challenge-video-comment-details",
-                "consumes": [
-                    "application/json"
-                ],
-                "parameters": [
-                {
-                    "in": "header",
-                    "name": "token",
-                    "description": "token",
-                    "type": "token",
-                    "required": true
-                },
-                {
-                    "in": "query",
-                    "name": "challenge_id",
-                    "description": "challenge_id",
-                    "type": "string",
-                    "required": true
-                },
-                {
-                    "in": "query",
-                    "name": "limit",
-                    "description": "limit",
-                    "type": "string",
-                    "required": true
-                },
-                {
-                    "in": "query",
-                    "name": "page",
-                    "description": "page",
-                    "type": "string",
-                    "required": true
-                }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Data found Successfully..",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-
-            }
-        },
+      
         "/user/challenges-comment-list": {
             "get": {
                 "tags": [
@@ -1368,7 +1250,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Data found Successfully..",
+                        "description": "Comment List",
                         "schema": {
                             "type": "object"
                         }
@@ -1460,58 +1342,7 @@
                 }
             }
         },
-        "/user/challenge-comment-on-comment": {
-            "post": {
-                "tags": [
-                    "User"
-                ],
-                "description": "commented on comment of challenge video.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [
-                    {
-                        "in": "header",
-                        "name": "token",
-                        "description": "token",
-                        "type": "string",
-                        "required": true
-                    },
-                    {
-                        "in": "formData",
-                        "name": "comment_id",
-                        "description": "comment_id",
-                        "type": "string",
-                        "required": true
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "comment",
-                        "type": "body",
-                        "required": true,
-                        "schema": {
-                            "properties": {
-                                "comment": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "commented on comment.",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
+       
         "/user/add-practice": {
             "post": {
                 "tags": [
@@ -1601,6 +1432,13 @@
                         "description": "page",
                         "type": "string",
                         "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "user_id",
+                        "description": "user_id",
+                        "type": "string",
+                        "required": true
                     }
 
                 ],
@@ -1632,20 +1470,6 @@
                         "name": "token",
                         "description": "token",
                         "type": "token",
-                        "required": true
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "description": "limit",
-                        "type": "string",
-                        "required": true
-                    },
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "description": "page",
-                        "type": "string",
                         "required": true
                     },
                     {
@@ -1732,13 +1556,6 @@
                         "required": true
                     },
                     {
-                        "in": "formData",
-                        "name": "practice_id",
-                        "description": "practice_id",
-                        "type": "string",
-                        "required": true
-                    },
-                    {
                         "in": "body",
                         "name": "body",
                         "description": "comment",
@@ -1746,6 +1563,12 @@
                         "required": true,
                         "schema": {
                             "properties": {
+                                "practice_id": {
+                                    "type": "string"
+                                },
+                                "comment_id": {
+                                    "type": "string"
+                                },
                                 "comment": {
                                     "type": "string"
                                 }
@@ -1882,7 +1705,7 @@
                         "in": "formData",
                         "name": "type",
                         "description": "type",
-                        "enum": ["1","1"],
+                        "enum": ["1","0"],
                         "required": true
                     }
                 ],
@@ -1896,12 +1719,12 @@
                 }
             }
         },
-        "/user/practice-comment-on-comment": {
-            "post": {
+        "/user/practice-comment-of-comment": {
+            "get": {
                 "tags": [
                     "User"
                 ],
-                "description": "commented on comment of practice.",
+                "description": "comment on comment of practice.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1913,34 +1736,34 @@
                         "in": "header",
                         "name": "token",
                         "description": "token",
+                        "type": "token",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "comment_id",
+                        "description": "comment_id",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "formData",
-                        "name": "practice_comment_id",
-                        "description": "practice_comment_id",
+                        "in": "query",
+                        "name": "limit",
+                        "description": "limit",
                         "type": "string",
                         "required": true
                     },
                     {
-                        "in": "body",
-                        "name": "body",
-                        "description": "comment",
-                        "type": "body",
-                        "required": true,
-                        "schema": {
-                            "properties": {
-                                "comment": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }  
                 ],
                 "responses": {
                     "200": {
-                        "description": "commented on comment.",
+                        "description": "Comment List",
                         "schema": {
                             "type": "object"
                         }
@@ -2003,8 +1826,30 @@
                     {
                         "in": "header",
                         "name": "token",
-                        "type" : "string",
+                        "description": "token",
+                        "type": "token",
                         "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "type",
+                        "description": "type",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "question_id",
+                        "description": "question_id"
+                        
+                        
+                    },
+                    {
+                        "in": "query",
+                        "name": "id",
+                        "description": "id",
+                        "type": "string"
+                        
                     }
                 
                 ],
@@ -3601,7 +3446,54 @@
                     }
                 }
             }
+        },
+        "/admin/addquiz": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "description": "add quiz question",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "from-data",
+                        "name": "question",
+                        "description": "question ",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "from-data",
+                        "name": "option_name",
+                        "description": "option_name ",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
         }
+
     },
+    
     "definitions": {}
 }

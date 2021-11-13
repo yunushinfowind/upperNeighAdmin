@@ -48,6 +48,9 @@ module.exports = (sequelize, Sequelize) => {
     Practice.hasMany(models.practice_share, {
       foreignKey: 'practice_id'
     });
+    Practice.belongsTo(models.user, {
+      foreignKey: 'user_id'
+    });
 
   }
 return Practice;

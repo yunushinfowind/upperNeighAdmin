@@ -446,7 +446,7 @@ exports.addRoutine = async (req, res) => {
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
             var fileName = '';
-
+            console.log('body',res.body)
             var routine = await Routine.findOne({ where: { routine_name: req.body.routine_name, user_id: parseInt(req.body.user_id) } });
             if (routine) {
                 return res.send({ success: false, message: "This Routine already has been added by you.", data: [] });
@@ -542,9 +542,9 @@ exports.editRoutine = async (req, res) => {
                 }
             });
 
-            if (routineExist) {
+            /*if (routineExist) {
                 return res.send({ success: false, message: "This Routine already has been added by you.", data: [] });
-            }
+            }*/
 
             var routine = await Routine.findOne({
                 where: { id: req.body.id },
@@ -731,6 +731,7 @@ exports.editRoutineVideo = async (req, res) => {
                             video_duration: "00:00:00",
                             video_thumb: video_link,
                             video_link: req.body.embed_url,
+                            content_type : req.body.content_type
                         }
 
                         await RoutineVideo.update(Data, { where: { id: req.body.id } });
@@ -740,7 +741,8 @@ exports.editRoutineVideo = async (req, res) => {
                         let Data = {
                             video_title: req.body.video_title,
                             video_description: req.body.video_description,
-                            video_link: req.body.embed_url
+                            video_link: req.body.embed_url,
+                            content_type : req.body.content_type
                         }
                         await RoutineVideo.update(Data, { where: { id: req.body.id } });
                         /// Update videoslice table data //
@@ -816,6 +818,7 @@ exports.editRoutineVideo = async (req, res) => {
                                 video_link: video_link,
                                 slice_added: 'no',
                                 notation_file_added: 'no',
+                                content_type : req.body.content_type
                             }
                             await RoutineVideo.update(Data, { where: { id: req.body.id } });
                         });
@@ -823,8 +826,10 @@ exports.editRoutineVideo = async (req, res) => {
                     } else {
                         let data = {
                             video_title: req.body.video_title,
-                            video_description: req.body.video_description
+                            video_description: req.body.video_description,
+                            content_type : req.body.content_type
                         }
+                        console.log('data',data);
                         await RoutineVideo.update(data, { where: { id: req.body.id } });
                         return res.send({ success: true, message: "Routine video updated.", data: [] });
                     }
@@ -848,6 +853,7 @@ exports.editArtistVideo = async (req, res) => {
         if (isValidToekn) {
             var routineVideo = await TeacherVideo.findOne({ where: { id: req.body.id } });
             if (routineVideo) {
+                
                 if (routineVideo.video_type == 'embed_url') {
                     if (req.files != null) {
 
@@ -877,6 +883,8 @@ exports.editArtistVideo = async (req, res) => {
                             duration: "00:00:00",
                             video_thumb: video_link,
                             video_link: req.body.embed_url,
+                            video_level: req.body.video_level,
+                            content_type: req.body.content_type
                         }
                         await TeacherVideo.update(Data, { where: { id: req.body.id } });
 
@@ -885,7 +893,9 @@ exports.editArtistVideo = async (req, res) => {
                         let data = {
                             video_title: req.body.video_title,
                             video_description: req.body.video_description,
-                            video_link: req.body.embed_url
+                            video_link: req.body.embed_url,
+                            video_level: req.body.video_level,
+                            content_type: req.body.content_type
                         }
                         await TeacherVideo.update(data, { where: { id: req.body.id } });
                         /// Update videoslice table data //
@@ -962,7 +972,9 @@ exports.editArtistVideo = async (req, res) => {
                                 video_thumb: video_thumb,
                                 video_link: video_link,
                                 slice_added: 'no',
-                                notation_file_added: 'no'
+                                notation_file_added: 'no',
+                                video_level: req.body.video_level,
+                                content_type: req.body.content_type
                             }
                             await TeacherVideo.update(Data, { where: { id: req.body.id } });
                         });
@@ -970,7 +982,9 @@ exports.editArtistVideo = async (req, res) => {
                     } else {
                         let data = {
                             video_title: req.body.video_title,
-                            video_description: req.body.video_description
+                            video_description: req.body.video_description,
+                            video_level: req.body.video_level,
+                            content_type: req.body.content_type
                         }
                         await TeacherVideo.update(data, { where: { id: req.body.id } });
                         return res.send({ success: true, message: "Artist video updated.", data: [] });
@@ -1711,7 +1725,6 @@ exports.addArtistVideo = async (req, res) => {
         var length = postData.length;
         for (let i = 0; i < length; i++) {
             postData[i] = JSON.parse(postData[i]);
-            console.log(postData[i]);
             var video_thumb = '';
             //var video_link = '';
             var total_duration = '';
@@ -1761,8 +1774,10 @@ exports.addArtistVideo = async (req, res) => {
                                 video_description: postData[i].video_description,
                                 video_thumb: thumb_video_thumb,
                                 video_link: postData[i].embed_url,
+                                video_level: postData[i].video_level,
                                 slice_added: "yes",
                                 notation_file_added: "yes",
+                                content_type: postData[i].content_type,
                                 video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
                                 list_order: await getArtistVideoCount(parseInt(postData[i].user_id)) + 1
                             }
@@ -1851,6 +1866,8 @@ exports.addArtistVideo = async (req, res) => {
                             video_description: postData[i].video_description,
                             video_thumb: video_thumb,
                             video_link: video_link,
+                            content_type: postData[i].content_type,
+                            video_level: postData[i].video_level,
                             video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
                             list_order: await getArtistVideoCount(parseInt(postData[i].user_id)) + 1
                         }

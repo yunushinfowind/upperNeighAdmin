@@ -21,6 +21,12 @@ module.exports = (sequelize, Sequelize) => {
     video_title: {
       type: Sequelize.STRING
     },
+    content_type:{
+      type: Sequelize.STRING
+    },
+    video_level:{
+      type: Sequelize.STRING
+    },
     video_type: {
             type: Sequelize.STRING,
     },

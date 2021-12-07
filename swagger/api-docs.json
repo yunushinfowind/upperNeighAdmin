@@ -841,8 +841,8 @@
                     },
                     {
                         "in": "query",
-                        "name": "routine_level",
-                        "description": "routine_level",
+                        "name": "level",
+                        "description": "level",
                         "enum": [ "0", "1","2","3","4","all"],
                         "required": false
                     },

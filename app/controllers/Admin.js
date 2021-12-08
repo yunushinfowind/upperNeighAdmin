@@ -477,9 +477,17 @@ exports.addRoutine = async (req, res) => {
                 user_id: parseInt(req.body.user_id),
                 routine_description: req.body.routine_description,
                 routine_level: req.body.routine_level,
-                image: fileName
+                image: fileName,
+                content_type : req.body.content_type
             }
             var routineResponse = await Routine.create(insertData);
+            // if(req.body.content_type == 'premium')
+            // {   
+                let updatetData = {
+                    content_type : req.body.content_type
+                }
+                await RoutineVideo.update(updatetData, { where: { routine_id: routineResponse.id } });   
+            // }
             var routineId = routineResponse.id;
             /* create routine folder */
             var options = await getOptionValue('/api/v1/folders/', 'POST');
@@ -580,9 +588,17 @@ exports.editRoutine = async (req, res) => {
                     user_id: parseInt(req.body.user_id),
                     routine_description: req.body.routine_description,
                     routine_level: req.body.routine_level,
-                    image: fileName
+                    image: fileName,
+                    content_type : req.body.content_type
                 }
                 await Routine.update(updatetData, { where: { id: req.body.id } });
+                // if(req.body.content_type == 'premium')
+                // {   
+                    let updatData = {
+                        content_type : req.body.content_type
+                    }
+                    await RoutineVideo.update(updatData, { where: { routine_id: req.body.id } });   
+                // }
                 /*update routine folder name */
                 if (routine.routine_name != req.routine_name) {
                     var options = await getOptionValue('/api/v1/folders/' + folderId + '/', 'POST');

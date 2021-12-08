@@ -35,7 +35,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.VIRTUAL
     },
     content_type: {
-      type: Sequelize.VIRTUAL
+      type: Sequelize.STRING
     }
   },
     {

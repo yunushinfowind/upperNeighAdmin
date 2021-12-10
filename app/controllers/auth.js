@@ -72,29 +72,36 @@ exports.register = (req, res) => {
 };
 
 exports.updateProfile = async function (req, res) {
-try{
-	var user = await User.findOne({ where: { id: req.body.user_id } });
-	if (user) {
-		let level;
-		user.update({
-			 level : req.body.level
-		  })
-		res.send({ 'success': true, message: "level updated ", data:user });
-		}else{
+	console.log("level", req.body)
+	try {
+		var user = await User.findOne({ where: { id: req.body.user_id } });
+		
+		if (user) {
+			let data;
+			if (req.body.level) {
+				data = await User.update({ level: req.body.level }, { where: { id: req.body.user_id } })
+			} else if (req.body.expiry_date) {
+				data = await User.update({ expiry_date: req.body.expiry_date }, { where: { id: req.body.user_id } })
+			}
+			console.log("user", data)
+			 user = await User.findOne({ where: { id: req.body.user_id } });
+			console.log("user", user)
+			res.send({ 'success': true, message: "Profile updated ", data: user });
+		} else {
 			res.send({ 'success': false, message: "record not found", data: [] });
 		}
-	}catch (error) {
+	} catch (error) {
 		res.send({ 'success': false, message: error.message, data: [] });
 	}
-} 
+}
 
 
 exports.login = async function (req, res, next) {
 
 	try {
 		let user = await User.findOne({ where: { email: req.body.email, role_id: req.body.role_id } });
-		if(user && user.status == 'inactive'){
-		return	res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
+		if (user && user.status == 'inactive') {
+			return res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
 		}
 		if (user) {
 			await bcrypt.compare(req.body.password, user.password, function (err, isMatch) {
@@ -133,8 +140,8 @@ exports.socialLogin = async function (req, res, next) {
 
 		let token = User.generateToken();
 		var user = await User.findOne({ where: { source_id: req.body.source_id } });
-		if(user && user.status == 'inactive'){
-			return	res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
+		if (user && user.status == 'inactive') {
+			return res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
 		}
 		if (user) {
 			let updateData = {

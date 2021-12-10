@@ -37,7 +37,7 @@ require("./app/routes/chat.js")(app);
 require("./app/routes/auth.js")(app);
 require("./app/routes/user.js")(app);
 require("./app/routes/admin.js")(app);
-require("/app/routes/user.js")(app);
+require("./app/routes/user.js")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

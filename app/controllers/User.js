@@ -38,7 +38,6 @@ exports.blogList = async (req, res) => {
 			status: 'active'
 		}
 		if (req.query.search) {
-			console.log('innnn')
 			whereCondition = {
 				[Op.and]: [
 					{ status: 'active' },
@@ -136,6 +135,7 @@ exports.savedRoutineList = async function (req, res, next) {
 			for (const row of userVideoList['rows']) {
 				var obj = Object.assign({}, row.get());
 				obj.total_duration = await getTotalRoutineDuration(obj.routine_id);
+				obj.total_duration_inMint = await getTotalRoutineMinutDuration(obj.routine_id);
 				All.push(obj);
 			}
 			userVideoList['rows'] = All;

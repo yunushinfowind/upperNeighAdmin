@@ -622,20 +622,34 @@ exports.challengesList = async (req, res) => {
             let offset = parseInt(0 + (req.query.page - 1) * limit);
             let totatCount = await Userchallenge.count({ where: { user_id: req.query.user_id } });
 
+            // var list = await Userchallenge.findAndCountAll({
+            //     where:
+
+            //         { user_id: req.query.user_id },
+
+
+            //     limit: limit,
+            //     offset: offset,
+            //     include: [
+            //         {
+            //             model: db.user
+            //         }
+            //     ]
+            // });
             var list = await Userchallenge.findAndCountAll({
-                where:
-
-                    { user_id: req.query.user_id },
-
-
-                limit: limit,
-                offset: offset,
-                include: [
-                    {
-                        model: db.user
-                    }
-                ]
-            });
+                
+                order: [
+                       ['id', 'DESC'],
+                     ],
+                  
+                   limit: limit,
+                   offset: offset,
+                   include: [
+                       {
+                           model: db.user
+                       }
+                   ]
+           });
             for (const row of list['rows']) {
 
                 var obj = Object.assign({}, row.get());
@@ -1639,12 +1653,21 @@ exports.quizList = async (req, res) => {
                                 quiz = { "level":"Beginner"}
                                 
                         } 
-                        if(optionArray[0]== 5 && optionArray[0,1]== 6 ) {
+                        if(optionArray[0]== 5 && optionArray[1]== 6 ) {
                         
                             quiz = { "level":"Level 1"}
                             
                     } 
-                    if(optionArray[0]== 5 && optionArray[0,1]==6  && optionArray[0,1,2]==7) {
+                    if(optionArray[0]== 5 && optionArray[1]==6  && optionArray[2]==7) {
+                        
+                        quiz = await Quiz.findOne({ where: { id: 3},
+                            include: [
+                                { model: db.quiz_question_options }
+                            ]
+                        })
+                        
+                    }
+                    if((optionArray[0]== 6 || optionArray[1]==7)||optionArray[0]== 6 || optionArray[0]== 7) {
                         
                         quiz = await Quiz.findOne({ where: { id: 3},
                             include: [

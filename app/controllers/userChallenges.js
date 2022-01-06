@@ -1645,12 +1645,21 @@ exports.quizList = async (req, res) => {
                                 quiz = { "level":"Beginner"}
                                 
                         } 
-                        if(optionArray[0]== 5 && optionArray[0,1]== 6 ) {
+                        if(optionArray[0]== 5 && optionArray[1]== 6 ) {
                         
                             quiz = { "level":"Level 1"}
                             
                     } 
-                    if(optionArray[0]== 5 && optionArray[0,1]==6  && optionArray[0,1,2]==7) {
+                    if(optionArray[0]== 5 && optionArray[1]==6  && optionArray[2]==7) {
+                        
+                        quiz = await Quiz.findOne({ where: { id: 3},
+                            include: [
+                                { model: db.quiz_question_options }
+                            ]
+                        })
+                        
+                    }
+                    if((optionArray[0]== 6 || optionArray[1]==7)||optionArray[0]== 6 || optionArray[0]== 7) {
                         
                         quiz = await Quiz.findOne({ where: { id: 3},
                             include: [

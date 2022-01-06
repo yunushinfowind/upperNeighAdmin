@@ -5,7 +5,7 @@ module.exports = {
   
   // SOUNDURL = "http://upperneighbormusic.com/",
  EMAIL:"yunush.infowind@gmail.com",
- PASS:"21@15together",
+ PASS:"losfngyxcoddocxq",
  SOUNDSLICE_URL:"www.soundslice.com",
  SOUNDSLICE_USERNAME : "",
  SOUNDSLICE_PASSWORD : "" ,
@@ -13,4 +13,5 @@ module.exports = {
  REQUEST_OPTION : {
 
  }
+
 };

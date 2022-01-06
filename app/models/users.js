@@ -24,7 +24,7 @@ module.exports = (sequelize, Sequelize) => {
     profile: {
       type: Sequelize.STRING,
       get() {
-        if(this.getDataValue('type') == 'social' && this.getDataValue('profile').indexOf("https://") == 0){
+        if(this.getDataValue('type') == 'social' && this.getDataValue('profile')  && this.getDataValue('profile').indexOf("https://") == 0){
           return (this.getDataValue('profile'))
         }else{
         return (this.getDataValue('profile')) ? config.HOST + 'uploads/profile/' + this.getDataValue('profile') : config.HOST + '/app/controllers/images/user_default.png';
@@ -58,6 +58,9 @@ module.exports = (sequelize, Sequelize) => {
     },
     login_token: {
       type: Sequelize.TEXT
+    },
+    sub_expiry_date:{
+      type: Sequelize.STRING,
     },
     routine_count: {
       type: Sequelize.VIRTUAL

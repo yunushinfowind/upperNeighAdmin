@@ -564,7 +564,7 @@ exports.uploadUserVideo = async (req, res) => {
                     thumbnailPath: 'uploads/users/thumbs',
                     tmpDir: 'uploads/users/videos/thumbs'
                 });
-                ;
+                console.log("tg",tg)
                 tg.generateOneByPercentCb(50, async (err, result) => {
                     video_thumb = result;
                     let data = {

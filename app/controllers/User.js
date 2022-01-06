@@ -115,12 +115,15 @@ exports.savedRoutineList = async function (req, res, next) {
 			var All = [];
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
+			let whereCondition = {
+				[Op.and]: [
+					{ user_id: loginId },
+					{ type: 'routine' }
+				]
+			}
 			let totatCount = await UserSavedRoutine.count({ where: { user_id: loginId, type: 'routine' } });
 			let userVideoList = await UserSavedRoutine.findAndCountAll({
-				where: {
-					user_id: loginId,
-					type: 'routine'
-				},
+				where: whereCondition,
 				limit: limit,
 				offset: offset,
 				include: [{
@@ -580,10 +583,21 @@ exports.teacherDetail = async function (req, res, next) {
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit
 			if (req.query.type == 'video') {
+				let whereCondition = {
+					[Op.and]: [{ user_id: req.query.teacher_id }]
+				}
+	
+				if (req.query.level && req.query.level != 'all') {
+					whereCondition = {
+						[Op.and]: [{ user_id: req.query.teacher_id },
+							       {video_level:req.query.level}
+						      ]
+					}
+				}
+				console.log('where',whereCondition)
+
 				result = await TeacherVideos.findAndCountAll({
-					where: {
-						[Op.and]: [{ user_id: req.query.teacher_id }]
-					},
+					where: whereCondition,
 					limit: limit,
 					offset: offset,
 					include: [{
@@ -604,10 +618,22 @@ exports.teacherDetail = async function (req, res, next) {
 				result['totalPages'] = Math.ceil(result['count'] / limit);
 			}
 			if (req.query.type == 'routine') {
+				let whereCondition = {
+					[Op.and]: [
+						{ user_id: req.query.teacher_id }
+					]
+				}
+	
+				if (req.query.level && req.query.level != 'all') {
+					whereCondition = {
+					[Op.and]: [
+						{ user_id: req.query.teacher_id },
+						{routine_level:req.query.level}
+					 ]
+					}
+				}
 				result = await Routine.findAndCountAll({
-					where: {
-						[Op.and]: [{ user_id: req.query.teacher_id }]
-					},
+					where: whereCondition,
 					limit: limit,
 					offset: offset,
 					include: [{
@@ -622,6 +648,7 @@ exports.teacherDetail = async function (req, res, next) {
 					obj.is_saved = (isSaved) ? true : false;
 					obj.total_duration = await getTotalRoutineDuration(obj.id);
 					obj.total_duration_inMint = await getTotalRoutineMinutDuration(obj.id);
+					obj.content_type = await checkRoutineContentType(obj.id);
 					All.push(obj);
 
 				}
@@ -691,7 +718,7 @@ exports.saveUnsaveVideo = async function (req, res, next) {
 			if (req.body.type == 'save') {
 				var saveData;
 				var playListId;
-				console.log(req.files.playlist_icon)
+				// console.log(req.files.playlist_icon)
 				if (req.body.playlist_type == 'name') {
 					var fileName = '';
 					if (req.files != null) {
@@ -861,10 +888,21 @@ let getPlayListVideoCount = async (playListId) => {
 	);
 
 }
+let checkRoutineContentType = async(routineId)=>{
+		let videos = await RoutineVideo.findAll({ where: {[Op.and]: [
+			 { content_type: 'free' },
+			 { routine_id: routineId }
+		     ]}
+		    });
+			if(videos && videos.length){
+				return 'free';
+			}else{
+				return 'premium';
+			}
+}
 
 let getTotalRoutineDuration = async (routineId) => {
 	let videos = await RoutineVideo.findAll({ where: { routine_id: routineId } });
-	console.log(videos);
 	if (videos) {
 		var times = [0, 0, 0]
 		var max = times.length;
@@ -879,13 +917,9 @@ let getTotalRoutineDuration = async (routineId) => {
 			secondsum = parseInt(secondsum) + parseInt(duration[2])
 
 		}
-		console.log(hoursum);
-		console.log(mintsum);
-		console.log(secondsum);
 		var hours = hoursum
 		var minutes = mintsum
 		var seconds = secondsum
-
 		if (seconds >= 60) {
 			var m = (seconds / 60) << 0
 			minutes += m

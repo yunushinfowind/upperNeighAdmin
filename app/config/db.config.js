@@ -3,6 +3,7 @@ module.exports = {
   USER: "root",
   PASSWORD: "",
   DB: "upperneighbour_live",
+  // DB: "upperneighbour_new",
   dialect: "mysql",
   pool: {
     max: 5,

@@ -848,6 +848,13 @@
                     },
                     {
                         "in": "query",
+                        "name": "level",
+                        "description": "level",
+                        "enum": [ "0", "1","2","3","4","all"],
+                        "required": false
+                    },
+                    {
+                        "in": "query",
                         "name": "page",
                         "description": "page",
                         "type": "string",
@@ -2245,6 +2252,13 @@
                         "name": "user_id",
                         "description": "user_id",
                         "type": "string",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "routine_level",
+                        "description": "routine_level",
+                        "enum": [ "0", "1","2","3","4"],
                         "required": false
                     },
                     {

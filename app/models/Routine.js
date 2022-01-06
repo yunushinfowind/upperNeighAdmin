@@ -33,6 +33,9 @@ module.exports = (sequelize, Sequelize) => {
     },
     video_count: {
       type: Sequelize.VIRTUAL
+    },
+    content_type: {
+      type: Sequelize.STRING
     }
   },
     {

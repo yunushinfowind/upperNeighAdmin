@@ -1124,8 +1124,9 @@ exports.getHashtagDetails = async function (req, res, next) {
 						'Accept': '*/*',
 						'Referer': 'https://www.instagram.com/',
 						'authority': 'i.Instagram.com/',
-						'Cookie': 'ds_user_id=44372909615; sessionid=44372909615%3A5J1AyRj2nXG37M%3A16;'
+						'Cookie': 'ds_user_id=44372909615; sessionid=44372909615%3AQHywPHTupeVFzY%3A1;'
 					}
+					// 'Cookie': 'ds_user_id=44372909615; sessionid=44372909615%3AQHywPHTupeVFzY%3A1;'
 				}).then(response => {
 					return response;
 				}).catch(error => {

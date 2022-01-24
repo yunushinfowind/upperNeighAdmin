@@ -280,6 +280,13 @@
                         "description": "level",
                         "type": "string",
                         "required": false
+                    },
+                    {
+                        "in": "formData",
+                        "name": "expiry_date",
+                        "description": "expiry_date",
+                        "type": "string",
+                        "required": false
                     }
                 ],
                 "responses": {
@@ -1010,13 +1017,6 @@
                         "in": "query",
                         "name": "page",
                         "description": "page",
-                        "type": "string",
-                        "required": true
-                    },
-                    {
-                        "in": "query",
-                        "name": "user_id",
-                        "description": "user_id",
                         "type": "string",
                         "required": true
                     }

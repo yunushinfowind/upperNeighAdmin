@@ -511,6 +511,7 @@ let getPracticeProductivityAvg = async (userId, type) => {
 
 
 exports.uploadUserVideo = async (req, res) => {
+    console.log("body",req.files)
     try {
 
         let token = await User.getToken(req);
@@ -529,13 +530,18 @@ exports.uploadUserVideo = async (req, res) => {
 
             videos = ((uploadedVideos != 'null') && !Array.isArray(uploadedVideos['videos'])) ? [uploadedVideos['videos']] : uploadedVideos['videos'];
             var length = videos.length;
+            console.log("viedosn",videos)
+            console.log("name",videos.name)
             let loginId = await getLoginUserId(token);
             for (let i = 0; i < length; i++) {
                 var video_thumb = '';
                 let dir = 'uploads/users/videos';
                 var NewName = Math.round(new Date() / 1000) + User.generateToken();
-                var fileExt = videos[i].mimetype.split('/').pop();
+                // var fileExt = videos[i].mimetype.split('/').pop();
+                var fileExt = videos[i].name.split('.').pop();
+                console.log("name.....",fileExt)
                 var fileName = NewName + '.' + fileExt;
+                console.log("filename",fileName)
                 const path = dir + '/' + fileName
 
                 if (!fs.existsSync(dir)) {
@@ -558,7 +564,7 @@ exports.uploadUserVideo = async (req, res) => {
                     thumbnailPath: 'uploads/users/thumbs',
                     tmpDir: 'uploads/users/videos/thumbs'
                 });
-                ;
+                console.log("tg",tg)
                 tg.generateOneByPercentCb(50, async (err, result) => {
                     video_thumb = result;
                     let data = {
@@ -582,13 +588,13 @@ exports.uploadUserVideo = async (req, res) => {
                         }]
                        
                     });
-                    console.log("ressssssss", ResultData)
+                    // console.log("ressssssss", ResultData)
                    
                     ResultData.total_likes = 0;
                     ResultData.total_comments = 0;
                     ResultData.total_shares = 0;
                     ResultData.is_like = await getIsLikeByUser(ResultData.id, loginId);
-console.log("rrrrrrr",  ResultData)
+// console.log("rrrrrrr",  ResultData)
                     res.send({ success: true, message: "video uploaded successfully.", data: ResultData });
                 })
             }
@@ -613,43 +619,29 @@ console.log("rrrrrrr",  ResultData)
 exports.challengesList = async (req, res) => {
     try {
         var All = [];
-        let token = await User.getToken(req);
-        let isValidToekn = await validateToekn(token);
-        if (isValidToekn) {
+         let token = await User.getToken(req);
+         let isValidToekn = await validateToekn(token);
+        // if (isValidToekn) {
 
-            let loginId = await getLoginUserId(token);
+             let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
-            let totatCount = await Userchallenge.count({ where: { user_id: req.query.user_id } });
+            // let totatCount = await Userchallenge.count({ where: { user_id: req.query.user_id } });
 
-            // var list = await Userchallenge.findAndCountAll({
-            //     where:
-
-            //         { user_id: req.query.user_id },
-
-
-            //     limit: limit,
-            //     offset: offset,
-            //     include: [
-            //         {
-            //             model: db.user
-            //         }
-            //     ]
-            // });
-            var list = await Userchallenge.findAndCountAll({
-                
-                order: [
-                       ['id', 'DESC'],
-                     ],
-                  
-                   limit: limit,
-                   offset: offset,
-                   include: [
-                       {
-                           model: db.user
-                       }
-                   ]
-           });
+        var list = await Userchallenge.findAndCountAll({
+            
+             order: [
+                    ['id', 'DESC'],
+                  ],
+               
+                limit: limit,
+                offset: offset,
+                include: [
+                    {
+                        model: db.user
+                    }
+                ]
+        });
             for (const row of list['rows']) {
 
                 var obj = Object.assign({}, row.get());
@@ -661,18 +653,18 @@ exports.challengesList = async (req, res) => {
             }
             if (list) {
                 list['rows'] = All;
-                list['count'] = totatCount;
+                // list['count'] = totatCount;
                 list['currentPage'] = req.query.page;
                 list['totalPages'] = Math.ceil(list['count'] / limit);
             }
 
 
             res.send({ success: true, message: "challenge video list", data: list });
-        } else {
+        // } else {
 
-            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
+        //     res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
 
-        }
+        // }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
     }

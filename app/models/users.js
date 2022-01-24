@@ -65,6 +65,10 @@ module.exports = (sequelize, Sequelize) => {
     routine_count: {
       type: Sequelize.VIRTUAL
     },
+    expiry_date: {
+      type: Sequelize.STRING
+
+    },
     video_count: {
       type: Sequelize.VIRTUAL
     },
@@ -76,7 +80,8 @@ module.exports = (sequelize, Sequelize) => {
       get() {
         return (this.getDataValue('status')=='active') ? true : false;
       }
-    }
+    },
+    
   },
     {
       createdAt: 'created_at',

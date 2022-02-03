@@ -64,7 +64,7 @@ let getIsLikeByUser = async (challengeId, userId) => {
 }
 
 let IsLikeByUser = async (commentId, userId) => {
-    let count = await Commentlikes.count({ where: {  comment_id: commentId, user_id: userId } });
+    let count = await Commentlikes.count({ where: { comment_id: commentId, user_id: userId } });
     if (count > 0) {
         return true
     } else {
@@ -77,20 +77,20 @@ let getShareCount = async (challengeId) => {
     return await Challengeshare.count({ where: { challenge_id: challengeId } });
 }
 let getLikeOnCommentCount = async (commentId) => {
-  
+
     return await Commentlikes.count({ where: { comment_id: commentId } });
-    }
-  
+}
+
 
 // let getCommentOnCommentCount = async (commentId) => {
 //     let count =   await Commentoncomment.count({ where: { comment_id: commentId } });     
 //     return count;
-    
+
 // }
 
 let commentCount = async (commentId) => {
-     return  await Challengecomment.count({ where: { parent_id: commentId } });     
- }
+    return await Challengecomment.count({ where: { parent_id: commentId } });
+}
 let getPracticeCommentCount = async (practiceId) => {
     return await Practicecomment.count({ where: { practice_id: practiceId, parent_id: 0 } });
 }
@@ -109,7 +109,7 @@ let getIsLikeAtPractice = async (practiceId, userId) => {
 
 let getPracticeLike = async (practicecommentId, userId) => {
     let count = await PracticelikeonComment.count({ where: { practice_comment_id: practicecommentId, user_id: userId } });
-    if(count > 0) {
+    if (count > 0) {
         return true
     } else {
         return false;
@@ -182,13 +182,13 @@ let getTotalPracticeDuration = async (userId, type) => {
         practices = await Practice.findAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: year,
-                        [Op.lt]: new Date()
-                    }
-                }]
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: year,
+                            [Op.lt]: new Date()
+                        }
+                    }]
             }
         })
     }
@@ -282,14 +282,14 @@ let getPracticeSessionCount = async (userId, type) => {
         session = await Practice.count({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: year,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: year,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             }
         })
     }
@@ -353,14 +353,14 @@ let getPracticeFocusAvg = async (userId, type) => {
         focus = await Practice.findAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: year,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: year,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('focus'))), 'avg_focus']]
         })
@@ -376,14 +376,14 @@ let getPracticeMoodAvg = async (userId, type) => {
         mood = await Practice.findAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: TODAY_START,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: TODAY_START,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('mood'))), 'avg_mood']]
         })
@@ -391,14 +391,14 @@ let getPracticeMoodAvg = async (userId, type) => {
         focus = await Practice.findAndCountAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: MON,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: MON,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('mood'))), 'avg_mood']]
         })
@@ -406,14 +406,14 @@ let getPracticeMoodAvg = async (userId, type) => {
         focus = await Practice.findAndCountAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: firstDay,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: firstDay,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('mood'))), 'avg_mood']]
         })
@@ -421,14 +421,14 @@ let getPracticeMoodAvg = async (userId, type) => {
         focus = await Practice.findAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: year,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: year,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('focus'))), 'avg_mood']]
         })
@@ -446,14 +446,14 @@ let getPracticeProductivityAvg = async (userId, type) => {
         productivity = await Practice.findAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: TODAY_START,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: TODAY_START,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('productivity'))), 'avg_productivity']]
         })
@@ -463,14 +463,14 @@ let getPracticeProductivityAvg = async (userId, type) => {
         productivity = await Practice.findAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: MON,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: MON,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('productivity'))), 'avg_productivity']]
         })
@@ -479,14 +479,14 @@ let getPracticeProductivityAvg = async (userId, type) => {
         productivity = await Practice.findAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: firstDay,
-                        [Op.lt]: new Date()
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: firstDay,
+                            [Op.lt]: new Date()
+                        }
                     }
-                }
-                ]
+                    ]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('productivity'))), 'avg_productivity']]
         })
@@ -494,13 +494,13 @@ let getPracticeProductivityAvg = async (userId, type) => {
         productivity = await Practice.findAll({
             where: {
                 [Op.and]:
-                [{ user_id: userId },
-                {
-                    created_at: {
-                        [Op.gt]: year,
-                        [Op.lt]: new Date()
-                    }
-                }]
+                    [{ user_id: userId },
+                    {
+                        created_at: {
+                            [Op.gt]: year,
+                            [Op.lt]: new Date()
+                        }
+                    }]
             },
             attributes: [[Sequelize.fn('round', Sequelize.fn('avg', Sequelize.col('productivity'))), 'avg_productivity']]
         })
@@ -511,7 +511,6 @@ let getPracticeProductivityAvg = async (userId, type) => {
 
 
 exports.uploadUserVideo = async (req, res) => {
-    console.log("body",req.files)
     try {
 
         let token = await User.getToken(req);
@@ -530,18 +529,14 @@ exports.uploadUserVideo = async (req, res) => {
 
             videos = ((uploadedVideos != 'null') && !Array.isArray(uploadedVideos['videos'])) ? [uploadedVideos['videos']] : uploadedVideos['videos'];
             var length = videos.length;
-            console.log("viedosn",videos)
-            console.log("name",videos.name)
             let loginId = await getLoginUserId(token);
             for (let i = 0; i < length; i++) {
                 var video_thumb = '';
                 let dir = 'uploads/users/videos';
                 var NewName = Math.round(new Date() / 1000) + User.generateToken();
-                // var fileExt = videos[i].mimetype.split('/').pop();
+                // var fileExt = videos[i].mimetype.split('.').pop();
                 var fileExt = videos[i].name.split('.').pop();
-                console.log("name.....",fileExt)
                 var fileName = NewName + '.' + fileExt;
-                console.log("filename",fileName)
                 const path = dir + '/' + fileName
 
                 if (!fs.existsSync(dir)) {
@@ -564,50 +559,48 @@ exports.uploadUserVideo = async (req, res) => {
                     thumbnailPath: 'uploads/users/thumbs',
                     tmpDir: 'uploads/users/videos/thumbs'
                 });
-                console.log("tg",tg)
-                tg.generateOneByPercentCb(50, async (err, result) => {
-                    video_thumb = result;
-                    let data = {
-                        video_link: video_link,
-                        user_id: loginId,
-                        thumb: result,
-                        vedio_name: fileName
-                    }
-                    response = await Userchallenge.create(data)
-                     
-                    ResultData = await Userchallenge.findOne({
-                       
-                        where: {
-                            [Op.and]: [{
+                ;
+                getDimensions(videoPath).then(dimensions => {
+                    let width = dimensions.width;
+                    let height = dimensions.height;
+                    tg.generate({
+                        size: width + "x" + height
+                    })
+                        .then(async result => {
+                            let data = {
+                                video_link: video_link,
                                 user_id: loginId,
-                                id: response.id
-                            }]
-                        },
-                        include: [{
-                            model: db.user
-                        }]
-                       
-                    });
-                    // console.log("ressssssss", ResultData)
-                   
-                    ResultData.total_likes = 0;
-                    ResultData.total_comments = 0;
-                    ResultData.total_shares = 0;
-                    ResultData.is_like = await getIsLikeByUser(ResultData.id, loginId);
-// console.log("rrrrrrr",  ResultData)
-                    res.send({ success: true, message: "video uploaded successfully.", data: ResultData });
-                })
+                                thumb: result[0],
+                                vedio_name: fileName
+                            }
+                            response = await Userchallenge.create(data)
+                            ResultData = await Userchallenge.findOne({
+                                where: {
+                                    [Op.and]: [{
+                                        user_id: loginId,
+                                        id: response.id
+                                    }]
+                                },
+                                include: [{
+                                    model: db.user
+                                }]
+
+                            });
+                            ResultData.total_likes = 0;
+                            ResultData.total_comments = 0;
+                            ResultData.total_shares = 0;
+                            ResultData.is_like = await getIsLikeByUser(ResultData.id, loginId);
+                            console.log("rrrrrrr", ResultData)
+                            res.send({ success: true, message: "video uploaded successfully.", data: ResultData });
+
+                        });
+                });
+
             }
-
-
-
         } else {
-
             res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
 
         }
-
-
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
     }
@@ -619,47 +612,47 @@ exports.uploadUserVideo = async (req, res) => {
 exports.challengesList = async (req, res) => {
     try {
         var All = [];
-         let token = await User.getToken(req);
-         let isValidToekn = await validateToekn(token);
+        let token = await User.getToken(req);
+        let isValidToekn = await validateToekn(token);
         // if (isValidToekn) {
 
-             let loginId = await getLoginUserId(token);
-            let limit = parseInt(req.query.limit);
-            let offset = parseInt(0 + (req.query.page - 1) * limit);
-            // let totatCount = await Userchallenge.count({ where: { user_id: req.query.user_id } });
+        let loginId = await getLoginUserId(token);
+        let limit = parseInt(req.query.limit);
+        let offset = parseInt(0 + (req.query.page - 1) * limit);
+        // let totatCount = await Userchallenge.count({ where: { user_id: req.query.user_id } });
 
         var list = await Userchallenge.findAndCountAll({
-            
-             order: [
-                    ['id', 'DESC'],
-                  ],
-               
-                limit: limit,
-                offset: offset,
-                include: [
-                    {
-                        model: db.user
-                    }
-                ]
+
+            order: [
+                ['id', 'DESC'],
+            ],
+
+            limit: limit,
+            offset: offset,
+            include: [
+                {
+                    model: db.user
+                }
+            ]
         });
-            for (const row of list['rows']) {
+        for (const row of list['rows']) {
 
-                var obj = Object.assign({}, row.get());
-                obj.is_like = await getIsLikeByUser(obj.id, loginId);
-                obj.total_likes = await getLikeCount(obj.id);
-                obj.total_comments = await getCommentCount(obj.id);
-                obj.total_shares = await getShareCount(obj.id);
-                All.push(obj);
-            }
-            if (list) {
-                list['rows'] = All;
-                // list['count'] = totatCount;
-                list['currentPage'] = req.query.page;
-                list['totalPages'] = Math.ceil(list['count'] / limit);
-            }
+            var obj = Object.assign({}, row.get());
+            obj.is_like = await getIsLikeByUser(obj.id, loginId);
+            obj.total_likes = await getLikeCount(obj.id);
+            obj.total_comments = await getCommentCount(obj.id);
+            obj.total_shares = await getShareCount(obj.id);
+            All.push(obj);
+        }
+        if (list) {
+            list['rows'] = All;
+            // list['count'] = totatCount;
+            list['currentPage'] = req.query.page;
+            list['totalPages'] = Math.ceil(list['count'] / limit);
+        }
 
 
-            res.send({ success: true, message: "challenge video list", data: list });
+        res.send({ success: true, message: "challenge video list", data: list });
         // } else {
 
         //     res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
@@ -701,7 +694,7 @@ exports.detailVideo = async (req, res) => {
             detail.is_like = await getIsLikeByUser(detail.id, loginId);
             detail.comment_count = await getCommentCount(detail.id);
             detail.share_video_count = await getShareCount(detail.id);
-            
+
             res.send({ success: true, message: "Data found Successfully..", data: detail });
 
         } else {
@@ -807,7 +800,7 @@ exports.challengesComment = async (req, res) => {
                 user_id: loginId,
                 challenge_id: req.body.challenge_id,
                 comment: req.body.comment,
-                parent_id : (req.body.comment_id)?req.body.comment_id:0
+                parent_id: (req.body.comment_id) ? req.body.comment_id : 0
 
             }
             var comment = await Challengecomment.create(data);
@@ -820,7 +813,7 @@ exports.challengesComment = async (req, res) => {
             })
             var obj = Object.assign({}, details.get());
             obj.total_comments_on_comment = 0;
-            obj.total_comment_likes = 0 ;
+            obj.total_comment_likes = 0;
             obj.is_like = await IsLikeByUser(obj.id, loginId);
             res.send({ success: true, message: "Commented successfully.", data: obj });
 
@@ -893,11 +886,11 @@ exports.videoCommentList = async (req, res) => {
             let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
-            let totatCount = await Challengecomment.count({ where: { challenge_id: req.query.challenge_id,parent_id : 0 } });
+            let totatCount = await Challengecomment.count({ where: { challenge_id: req.query.challenge_id, parent_id: 0 } });
             let list = await Challengecomment.findAndCountAll({
                 where: {
                     challenge_id: req.query.challenge_id,
-                    parent_id : 0
+                    parent_id: 0
                 },
                 limit: limit,
                 offset: offset,
@@ -930,7 +923,7 @@ exports.videoCommentList = async (req, res) => {
 }
 
 exports.commentOfComment = async (req, res) => {
-   
+
     try {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
@@ -939,10 +932,10 @@ exports.commentOfComment = async (req, res) => {
             let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
-            let totatCount = await Challengecomment.count({ where: { parent_id : req.query.comment_id } });
+            let totatCount = await Challengecomment.count({ where: { parent_id: req.query.comment_id } });
             let list = await Challengecomment.findAndCountAll({
                 where: {
-                    parent_id : req.query.comment_id
+                    parent_id: req.query.comment_id
                 },
                 limit: limit,
                 offset: offset,
@@ -966,7 +959,7 @@ exports.commentOfComment = async (req, res) => {
                 list['totalPages'] = Math.ceil(list['count'] / limit);
             }
             res.send({ success: true, message: "Comment List", data: list });
-          
+
         } else {
             res.send({ success: false, message: "Invalid token", data: [] });
         }
@@ -988,8 +981,8 @@ exports.commentOfComment = async (req, res) => {
 //             let limit = parseInt(req.query.limit);
 //             let offset = parseInt(0 + (req.query.page - 1) * limit);
 
-          
-        
+
+
 //        if( req.query.type == 'main'){
 //         whereCondition =  {
 //                     comment_id : req.query.comment_id }
@@ -997,7 +990,7 @@ exports.commentOfComment = async (req, res) => {
 //                     whereCondition =  { parent_id : req.query.comment_id
 //                     }
 //                 }         
-            
+
 //             let details = await Commentoncomment.findAndCountAll({
 //                 where: whereCondition,
 //                 limit: limit,
@@ -1027,8 +1020,8 @@ exports.commentOfComment = async (req, res) => {
 //                     obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'inner');
 //                     obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'inner');
 //                 }
-               
-               
+
+
 //                 All.push(obj);
 //             }
 
@@ -1097,7 +1090,7 @@ exports.commentLike = async (req, res) => {
                 user_id: loginId,
                 comment_id: req.body.comment_id
             }
-      
+
             if (req.body.type == '1') {
                 const likes = await Commentlikes.create(data);
                 res.send({ success: true, message: "liked a comment", data: [] });
@@ -1217,11 +1210,11 @@ exports.practiceList = async (req, res) => {
             let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
-            let totatCount = await Practice.count({ where: {  user_id: req.query.user_id } });
+            let totatCount = await Practice.count({ where: { user_id: req.query.user_id } });
             let lists = await Practice.findAndCountAll({
-                where: 
-                { user_id: req.query.user_id },
-                
+                where:
+                    { user_id: req.query.user_id },
+
                 limit: limit,
                 offset: offset,
 
@@ -1229,7 +1222,7 @@ exports.practiceList = async (req, res) => {
                     { model: db.user }
                 ]
 
-               
+
             });
             for (const row of lists['rows']) {
                 var obj = Object.assign({}, row.get());
@@ -1237,7 +1230,7 @@ exports.practiceList = async (req, res) => {
                 obj.like_practice_count = await getPracticeLikeCount(obj.id);
                 obj.comment_practice_count = await getPracticeCommentCount(obj.id);
                 obj.share_practice_count = await getPracticeShareCount(obj.id);
-                
+
                 All.push(obj);
             }
             if (lists) {
@@ -1269,24 +1262,24 @@ exports.practiceDetails = async (req, res) => {
             let detail = await Practice.findOne({
                 where: {
                     id: req.query.id
-                
+
                 },
                 include: [
                     {
                         model: db.user
                     }
                 ]
-               
+
             });
-       
+
             detail.like_practice_count = await getPracticeLikeCount(detail.id);
             detail.is_like = await getIsLikeAtPractice(detail.id, loginId);
             detail.comment_practice_count = await getPracticeCommentCount(detail.id);
             detail.share_practice_count = await getPracticeShareCount(detail.id);
-        
-           
+
+
             res.send({ success: true, message: "Details of Practice", data: detail });
-            
+
         } else {
             res.send({ success: false, type: "token_invalid", message: "Invalid Token", data: [] });
         }
@@ -1343,7 +1336,7 @@ exports.practiceComment = async (req, res) => {
                 user_id: loginId,
                 practice_id: req.body.practice_id,
                 comment: req.body.comment,
-                parent_id : (req.body.comment_id)?req.body.comment_id:0
+                parent_id: (req.body.comment_id) ? req.body.comment_id : 0
             }
             var comment = await Practicecomment.create(data);
             let details = await Practicecomment.findOne({
@@ -1352,7 +1345,7 @@ exports.practiceComment = async (req, res) => {
                     {
                         model: db.user
                     }]
-                })
+            })
             res.send({ success: true, message: "Commented on Practice ", data: details });
 
         } else {
@@ -1378,7 +1371,7 @@ exports.practiceCommentList = async (req, res) => {
                 where: {
                     [Op.and]: [
                         { practice_id: req.query.practice_id },
-                        { parent_id : 0 }
+                        { parent_id: 0 }
                     ]
                 },
                 limit: limit,
@@ -1410,7 +1403,7 @@ exports.practiceCommentList = async (req, res) => {
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
-     }
+    }
 }
 
 exports.practiceShare = async (req, res) => {
@@ -1477,26 +1470,26 @@ exports.practicecomment_Comment = async (req, res) => {
     try {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
-         var All = [];
+        var All = [];
         if (isValidToekn) {
             let loginId = await getLoginUserId(token);
             let limit = parseInt(req.query.limit);
             let offset = parseInt(0 + (req.query.page - 1) * limit);
-            totalcount = await Practicecomment.count({ where : {parent_id : req.query.comment_id}})
+            totalcount = await Practicecomment.count({ where: { parent_id: req.query.comment_id } })
             let list = await Practicecomment.findAndCountAll({
-                where : {
-                    parent_id : req.query.comment_id
+                where: {
+                    parent_id: req.query.comment_id
                 },
-                limit : limit,
-                offset : offset,
-                include : [
+                limit: limit,
+                offset: offset,
+                include: [
                     {
                         model: db.user
                     }
                 ]
             });
             for (const row of list['rows']) {
-                var obj = Object.assign({},row.get());
+                var obj = Object.assign({}, row.get());
                 obj.practice_comment_like_count = await getPracticeLikeOnCommentCount(obj.id)
                 obj.is_like = await getPracticeLike(obj.id, loginId);
                 obj.practice_comment_on_comment_count = await getPracticeCommentOnCommentCount(obj.id)
@@ -1506,7 +1499,7 @@ exports.practicecomment_Comment = async (req, res) => {
                 list['rows'] = All;
                 list['count'] = totalcount;
                 list['currentPage'] = req.query.page;
-                list['totalPages'] = Math.ceil(list['count'] /limit );
+                list['totalPages'] = Math.ceil(list['count'] / limit);
             }
             res.send({ success: true, message: "Comment List ", data: list });
 
@@ -1588,135 +1581,143 @@ exports.practiceStats = async (req, res) => {
 
 exports.quizList = async (req, res) => {
 
-      try {
+    try {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
-            let quiz ;
-            
-             if(req.query.type == 'question'){
-                 quiz = await Quiz.findOne( {  where: { id : 1 },
+            let quiz;
+
+            if (req.query.type == 'question') {
+                quiz = await Quiz.findOne({
+                    where: { id: 1 },
                     include: [
                         { model: db.quiz_question_options }
                     ]
-            })
-           
-               } else {
-                    let question = req.query.question_id;
-                      var optionArray = JSON.parse("[" + req.query.id + "]");
-                    // var optionArray = ("[" + req.query.id + "]");
-                    
-                  
-                    if(question == '1'){
-                        switch(optionArray[0]) {
-                            case 1:
-                                quiz = { "level":"Beginner"}
-                                break;
-                            case 2:
-                                    
-                                    quiz = await Quiz.findOne({ where: { id:2},
-                                        include: [
-                                            { model: db.quiz_question_options }
-                                        ]
-                                    })
-                                break;
-                            case 3:
-                                        quiz = await Quiz.findOne({ where: { id:3},
-                                            include: [
-                                                { model: db.quiz_question_options }
-                                            ]
-                                        })
-                                break;
-                            case 4:
-                                quiz = await Quiz.findOne({ where: { id: 4},
-                                    include: [
-                                        { model: db.quiz_question_options }
-                                    ]
-                                })
-                                break;
-                        }
-                        
-                    
+                })
 
-                    }else if(question == '2'){
-                      
-                        if(optionArray[0]==5) {
-                            
-                                quiz = { "level":"Beginner"}
-                                
-                        } 
-                        if(optionArray[0]== 5 && optionArray[1]== 6 ) {
-                        
-                            quiz = { "level":"Level 1"}
-                            
-                    } 
-                    if(optionArray[0]== 5 && optionArray[1]==6  && optionArray[2]==7) {
-                        
-                        quiz = await Quiz.findOne({ where: { id: 3},
+            } else {
+                let question = req.query.question_id;
+                var optionArray = JSON.parse("[" + req.query.id + "]");
+                // var optionArray = ("[" + req.query.id + "]");
+
+
+                if (question == '1') {
+                    switch (optionArray[0]) {
+                        case 1:
+                            quiz = { "level": "Beginner" }
+                            break;
+                        case 2:
+
+                            quiz = await Quiz.findOne({
+                                where: { id: 2 },
+                                include: [
+                                    { model: db.quiz_question_options }
+                                ]
+                            })
+                            break;
+                        case 3:
+                            quiz = await Quiz.findOne({
+                                where: { id: 3 },
+                                include: [
+                                    { model: db.quiz_question_options }
+                                ]
+                            })
+                            break;
+                        case 4:
+                            quiz = await Quiz.findOne({
+                                where: { id: 4 },
+                                include: [
+                                    { model: db.quiz_question_options }
+                                ]
+                            })
+                            break;
+                    }
+
+
+
+                } else if (question == '2') {
+
+                    if (optionArray[0] == 5) {
+
+                        quiz = { "level": "Beginner" }
+
+                    }
+                    if (optionArray[0] == 5 && optionArray[1] == 6) {
+
+                        quiz = { "level": "Level 1" }
+
+                    }
+                    if (optionArray[0] == 5 && optionArray[1] == 6 && optionArray[2] == 7) {
+
+                        quiz = await Quiz.findOne({
+                            where: { id: 3 },
                             include: [
                                 { model: db.quiz_question_options }
                             ]
                         })
-                        
+
                     }
-                    if((optionArray[0]== 6 || optionArray[1]==7)||optionArray[0]== 6 || optionArray[0]== 7) {
-                        
-                        quiz = await Quiz.findOne({ where: { id: 3},
+                    if ((optionArray[0] == 6 || optionArray[1] == 7) || optionArray[0] == 6 || optionArray[0] == 7) {
+
+                        quiz = await Quiz.findOne({
+                            where: { id: 3 },
                             include: [
                                 { model: db.quiz_question_options }
                             ]
                         })
-                        
+
                     }
-                   }else if(question == '3'){
-                        switch(optionArray[0]) {
+                } else if (question == '3') {
+                    switch (optionArray[0]) {
                         case 8:
-                            quiz = await Quiz.findOne({ where: { id: 4},
+                            quiz = await Quiz.findOne({
+                                where: { id: 4 },
                                 include: [
                                     { model: db.quiz_question_options }
                                 ]
                             })
                             break;
                         case 9:
-                                quiz ={ "level":"Level 1"}
+                            quiz = { "level": "Level 1" }
                             break;
                         case 10:
-                                quiz = { "level":"Level 2" }
+                            quiz = { "level": "Level 2" }
                             break;
-                                }
-                    }else if(question == '4'){
-                        switch(optionArray[0]) {
+                    }
+                } else if (question == '4') {
+                    switch (optionArray[0]) {
                         case 11:
-                                quiz = await Quiz.findOne({ where: { id: 5},
-                                        include: [
-                                             { model: db.quiz_question_options }
-                                                ]
-                                            })
-                                        break;
+                            quiz = await Quiz.findOne({
+                                where: { id: 5 },
+                                include: [
+                                    { model: db.quiz_question_options }
+                                ]
+                            })
+                            break;
                         case 12:
-                                quiz = { "level":"Level 4 or 5"}
-                                break;
-                                        }           
-                  }else{
-                    switch(optionArray[0]) {
+                            quiz = { "level": "Level 4 or 5" }
+                            break;
+                    }
+                } else {
+                    switch (optionArray[0]) {
                         case 13:
-                                quiz = { "level":"Level 5+"}
-                                break;
+                            quiz = { "level": "Level 5+" }
+                            break;
                         case 14:
-                                quiz = { "level":"Level 4 or 5"}
-                                break;
-                            }
-                                    }
-                                   
-                                }
-     
-     res.send({ success: true, message:"QUIz" , data: quiz });
-     
-    }else{
-        
-        res.send({ success: false, type: "token_invalid", message: "Invalid Token", data: [] })
+                            quiz = { "level": "Level 4 or 5" }
+                            break;
+                    }
+                }
 
-    }
+            }
+
+            res.send({ success: true, message: "QUIz", data: quiz });
+
+        } else {
+
+            res.send({ success: false, type: "token_invalid", message: "Invalid Token", data: [] })
+
+        }
 
 
     } catch (e) {

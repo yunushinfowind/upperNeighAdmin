@@ -59,9 +59,9 @@ module.exports = (sequelize, Sequelize) => {
     login_token: {
       type: Sequelize.TEXT
     },
-    sub_expiry_date:{
-      type: Sequelize.STRING,
-    },
+    // sub_expiry_date:{
+    //   type: Sequelize.STRING,
+    // },
     routine_count: {
       type: Sequelize.VIRTUAL
     },

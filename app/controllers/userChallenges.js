@@ -755,47 +755,7 @@ exports.likeVideo = async (req, res) => {
 }
 
 
-// exports.commentVideo = async (req, res) => {
-//     try {
 
-//         let token = await User.getToken(req);
-//         let isValidToekn = await validateToekn(token);
-
-//         if (isValidToekn) {
-//             let loginId = await getLoginUserId(token);
-
-//             let data = {
-//                 user_id: loginId,
-//                 challenge_id: req.body.challenge_id,
-//                 comment: req.body.comment
-
-//             }
-//             var comment = await Challengecomment.create(data);
-
-
-//             let details = await Challengecomment.findOne({
-//                 where: { id: comment.id },
-
-//                 include: [
-//                     {
-//                         model: db.user
-//                     }]
-//             })
-
-
-//             res.send({ success: true, message: "commented on a video", data: details });
-
-//         } else {
-
-//             res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
-
-//         }
-
-//     } catch (e) {
-//         res.send({ success: false, message: e.message, data: [] });
-//     }
-
-// }
 exports.challengesComment = async (req, res) => {
     try {
 
@@ -835,54 +795,7 @@ exports.challengesComment = async (req, res) => {
 
 }
 
-// exports.commentVideolist = async (req, res) => {
-//     try {
-//         let token = await User.getToken(req);
-//         let isValidToekn = await validateToekn(token);
-//         var All = [];
-//         if (isValidToekn) {
-//             let limit = parseInt(req.query.limit);
-//             let offset = parseInt(0 + (req.query.page - 1) * limit);
-//             let totatCount = await Challengecomment.count({ where: { challenge_id: req.query.challenge_id } });
 
-//             let list = await Challengecomment.findAndCountAll({
-//                 where: {
-
-//                     challenge_id: req.query.challenge_id
-
-//                 },
-//                 limit: limit,
-//                 offset: offset,
-
-//                 include: [
-//                     {
-//                         model: db.user
-//                     },
-//                 ]
-//             });
-//             for (const row of list['rows']) {
-
-//                 var obj = Object.assign({}, row.get());
-//                 obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'main');
-//                 obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'main');
-//                 All.push(obj);
-//             }
-
-
-//             if (list) {
-//                 list['rows'] = All;
-//                 list['count'] = totatCount;
-//                 list['currentPage'] = req.query.page;
-//                 list['totalPages'] = Math.ceil(list['count'] / limit);
-//             }
-//             res.send({ success: true, message: "Comment List", data: list });
-//         } else {
-//             res.send({ success: false, message: "Invalid token", data: [] });
-//         }
-//     } catch (e) {
-//         res.send({ success: false, message: e.message, data: [] });
-//     }
-// }
 
 exports.videoCommentList = async (req, res) => {
     try {
@@ -978,79 +891,6 @@ exports.commentOfComment = async (req, res) => {
 
 
 
-// exports.commentDetails = async (req, res) => {
-//     try {
-//         let token = await User.getToken(req);
-//         let isValidToekn = await validateToekn(token);
-//         var All = [];
-//         if (isValidToekn) {
-
-//             let limit = parseInt(req.query.limit);
-//             let offset = parseInt(0 + (req.query.page - 1) * limit);
-
-          
-        
-//        if( req.query.type == 'main'){
-//         whereCondition =  {
-//                     comment_id : req.query.comment_id }
-//                 }else{
-//                     whereCondition =  { parent_id : req.query.comment_id
-//                     }
-//                 }         
-            
-//             let details = await Commentoncomment.findAndCountAll({
-//                 where: whereCondition,
-//                 limit: limit,
-//                 offset: offset,
-
-//                 include: [
-//                     {
-//                         model: db.user
-//                     }
-//                     // {
-//                     //     model: db.comment_on_comment,
-//                     //     include: [
-//                     //         {
-//                     //             model: db.user
-//                     //         }
-//                     //     ]
-//                     // }
-//                 ]
-//             });
-//             for (const row of details['rows']) {
-
-//                 var obj = Object.assign({}, row.get());
-//                 if(req.query.type == 'main'){
-//                     obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'inner');
-//                     obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'inner');
-//                 }else{
-//                     obj.total_comment_likes = await getLikeOnCommentCount(obj.id,'inner');
-//                     obj.total_comments_on_comment = await getCommentOnCommentCount(obj.id,'inner');
-//                 }
-               
-               
-//                 All.push(obj);
-//             }
-
-
-//             if (details) {
-//                 details['rows'] = All;
-//                 details['count'] = details.count;
-//                 details['currentPage'] = req.query.page;
-//                 details['totalPages'] = Math.ceil(details['count'] / limit);
-//             }
-//             res.send({ success: true, message: "Comments Details", data: details });
-
-//         } else {
-//             res.send({ success: false, message: "Invalid token", data: [] });
-//         }
-
-
-//     } catch (e) {
-//         res.send({ success: false, message: e.message, data: [] });
-//     }
-// }
-
 
 exports.shareVideo = async (req, res) => {
     try {
@@ -1124,52 +964,6 @@ exports.commentLike = async (req, res) => {
 
 }
 
-// exports.commentOnComment = async (req, res) => {
-//     try {
-
-//         let token = await User.getToken(req);
-//         let isValidToekn = await validateToekn(token);
-
-//         if (isValidToekn) {
-//             let loginId = await getLoginUserId(token);
-//             if (req.body.type == 'main') {
-//                 var data = {
-//                     user_id: loginId,
-//                     comment_id: req.body.comment_id,
-//                     comment: req.body.comment
-//                 }
-
-//             }else{
-//                 var data = {
-//                     user_id: loginId,
-//                     parent_id: req.body.comment_id,
-//                     comment: req.body.comment
-//                 }
-//             }
-//             let comment = await Commentoncomment.create(data);
-//             let detail = await Commentoncomment.findOne({
-//                 where: { id: comment.id },
-//                 include: [
-//                     { model: db.user }
-//                 ]
-//             });
-
-//             res.send({ success: true, message: "commented on comment", data: detail });
-
-
-
-
-//         } else {
-
-//             res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
-
-//         }
-
-//     } catch (e) {
-//         res.send({ success: false, message: e.message, data: [] });
-//     }
-
-// }
 
 
 //PRACTICE

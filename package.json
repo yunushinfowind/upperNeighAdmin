@@ -34,6 +34,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "follow-redirects": "^1.13.0",
     "get-video-duration": "^3.0.2",
+    "get-video-width-height": "^2.0.0",
     "http": "0.0.1-security",
     "https": "^1.0.0",
     "instagram-web-api": "^2.2.2",

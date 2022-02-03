@@ -9,6 +9,7 @@ var auth = require('../config/passport');
 var nodemailer = require('nodemailer');
 var appRoot = require('app-root-path');
 const config = require("../config/config.js");
+const fs = require('fs');
 
 
 
@@ -71,6 +72,7 @@ exports.register = (req, res) => {
 
 };
 
+
 exports.updateProfile = async function (req, res) {
 	console.log("level", req.body)
 	try {
@@ -82,6 +84,23 @@ exports.updateProfile = async function (req, res) {
 				data = await User.update({ level: req.body.level }, { where: { id: req.body.user_id } })
 			} else if (req.body.expiry_date) {
 				data = await User.update({ expiry_date: req.body.expiry_date }, { where: { id: req.body.user_id } })
+			}else if(req.files){          //change profile
+				var image = req.files.profile;
+				filePath ='uploads/profile/' + image.name;
+				 data = await User.update({ profile: filePath }, { where: { id: req.body.user_id  } });
+				console.log("resssssssssssss", filePath)
+				image.mv('/upperNeighAdmin/uploads/profile/' + filePath, function (err) {
+					if (err) {
+						console.log(err);
+					} else {
+						if (data.profile != 'app/controllers/images/user_default.png') {
+							if (fs.existsSync( user.profile)) {
+								fs.unlinkSync( user.profile);
+							}
+						}
+					}
+
+				});
 			}
 			console.log("user", data)
 			 user = await User.findOne({ where: { id: req.body.user_id } });

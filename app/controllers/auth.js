@@ -78,12 +78,37 @@ exports.updateProfile = async function (req, res) {
 		
 		if (user) {
 			let data;
-			if (req.body.level) {
-				data = await User.update({ level: req.body.level }, { where: { id: req.body.user_id } })
-			} else if (req.body.expiry_date) {
-				data = await User.update({ expiry_date: req.body.expiry_date }, { where: { id: req.body.user_id } })
+			// if (req.body.level) {
+			// 	data = await User.update({ level: req.body.level }, { where: { id: req.body.user_id } })
+			// } else if (req.body.expiry_date) {
+			// 	data = await User.update({ expiry_date: req.body.expiry_date }, { where: { id: req.body.user_id } })
+			// }
+
+			let updateData = {
+				level : req.body.level,
+				sub_expiry_date : req.body.sub_expiry_date
+				
 			}
-			console.log("user", data)
+			if(req.files){          //change profile
+				var image = req.files.profile;
+				let dir = 'uploads/profile';
+                const path = dir + '/' + image.name
+				
+				// console.log("resssssssssssss", path)
+				image.mv(path , function (err) {
+					  if (err) {
+		                    res.writeHead(500, {
+		                        'Content-Type': 'application/json'
+		                    })
+		                    res.end(JSON.stringify({ status: 'error', message: err }))
+		                }
+
+				});
+				updateData.profile = image.name;
+			}
+			
+		    await User.update(updateData, { where: { id: req.body.user_id  } });
+			// console.log("user", data)
 			 user = await User.findOne({ where: { id: req.body.user_id } });
 			console.log("user", user)
 			res.send({ 'success': true, message: "Profile updated ", data: user });

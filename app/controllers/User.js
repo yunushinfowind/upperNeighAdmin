@@ -955,7 +955,7 @@ let getTotalRoutineMinutDuration = async (routineId) => {
 		var minutes = mintsum
 
 
-		return (hoursMin + minutes);
+		return (hoursMin)?(""+hoursMin + minutes+""):(""+minutes+"");
 	}
 }
 

@@ -1,4 +1,4 @@
-const db = require("../models");
+ const db = require("../models");
 const User = db.user;
 const Room = db.room;
 const Op = db.Sequelize.Op;
@@ -10,7 +10,6 @@ var nodemailer = require('nodemailer');
 var appRoot = require('app-root-path');
 const config = require("../config/config.js");
 const fs = require('fs');
-
 
 
 // Create and Save a new user
@@ -72,7 +71,6 @@ exports.register = (req, res) => {
 
 };
 
-
 exports.updateProfile = async function (req, res) {
 	console.log("level", req.body)
 	try {
@@ -122,13 +120,12 @@ exports.updateProfile = async function (req, res) {
 	}
 }
 
-
 exports.login = async function (req, res, next) {
 
 	try {
 		let user = await User.findOne({ where: { email: req.body.email, role_id: req.body.role_id } });
-		if (user && user.status == 'inactive') {
-			return res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
+		if(user && user.status == 'inactive'){
+		return	res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
 		}
 		if (user) {
 			await bcrypt.compare(req.body.password, user.password, function (err, isMatch) {
@@ -167,8 +164,8 @@ exports.socialLogin = async function (req, res, next) {
 
 		let token = User.generateToken();
 		var user = await User.findOne({ where: { source_id: req.body.source_id } });
-		if (user && user.status == 'inactive') {
-			return res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
+		if(user && user.status == 'inactive'){
+			return	res.send({ 'success': false, message: "You account is inactive , Please contact to admin." });
 		}
 		if (user) {
 			let updateData = {

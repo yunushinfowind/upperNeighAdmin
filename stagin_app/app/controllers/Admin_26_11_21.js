@@ -15,6 +15,10 @@ const UserEmoji = db.userEmoji;
 const EmojiImage = db.emojiImage;
 const RoutineFolder = db.routineFolder;
 const VideoSliceModel = db.videoSlice;
+const Series = db.series;
+const SeriesVideos = db.series_videos;
+const Quiz = db.quiz_quests;
+const Quiz_Options = db.quiz_question_options;
 const Setting = db.setting;
 const Op = db.Sequelize.Op;
 const bcrypt = require('bcrypt');
@@ -31,12 +35,13 @@ var https = require('follow-redirects').https;
 var qs = require('querystring');
 const aws4 = require('aws4');
 var nodemailer = require('nodemailer');
-var logger   = require('@setreflex/logger').logger();
+const ffprobe = require('@ffprobe-installer/ffprobe');
+const { create } = require("domain");
+const e = require("express");
+var logger = require('@setreflex/logger').logger();
 
 
 exports.changePassword = async function (req, res, next) {
-    //console.log(req.body);
-
     try {
 
         let token = await User.getToken(req);
@@ -78,9 +83,7 @@ exports.changePassword = async function (req, res, next) {
                 });
             };
         } else {
-            res.status(422).send({
-                'success': false, message: "Invalid token."
-            });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
@@ -110,9 +113,7 @@ exports.updateStatus = async function (req, res, next) {
                 });
             };
         } else {
-            res.status(422).send({
-                'success': false, message: "Invalid token."
-            });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
@@ -128,11 +129,11 @@ exports.forgotPassword = async (req, res) => {
                 service: 'gmail',
                 host: 'smtp.gmail.com',
                 port: 587,
-                secure: false,
+                secure: true,
                 requireTLS: true,
                 auth: {
-                    user: 'yunush.infowind@gmail.com',
-                    pass: '21@15together'
+                    user: config.EMAIL,
+                    pass: config.PASS
                 }
             };
             var password = '';
@@ -149,10 +150,10 @@ exports.forgotPassword = async (req, res) => {
                 User.update(userData, { where: { email: req.body.email } });
             });
 
-            var message = '<B>Your new Password Id :' + password + '</b>';
+            var message = '<B>Your new Password is :' + password + '</b>';
             var transporter = nodemailer.createTransport(smtpConfig);
             var mailOptions = {
-                from: 'yunush.infowind@gmail.com', // sender address
+                from: config.EMAIL, // sender address
                 to: req.body.email, // list of receivers
                 subject: "Forgot Password", // Subject line
                 text: 'Hello world ?', // plaintext body
@@ -204,12 +205,13 @@ exports.addBlog = async (req, res) => {
                 title: req.body.title,
                 description: req.body.description,
                 image: fileName,
-                url: req.body.url
+                url: req.body.url,
+                list_order: await getAllBlogCount() + 1
             }
             await Blog.create(data);
             res.send({ success: true, message: "Blog created successfully.", data: [] });
         } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
@@ -267,9 +269,11 @@ exports.blogDetail = async (req, res) => {
     let isValidToekn = await validateToekn(token);
     if (isValidToekn) {
         var blog = await Blog.findOne({ where: { id: req.params.id } });
-        res.send({ success: true, message: "", data: blog });
+        var obj = Object.assign({}, blog.get());
+        // obj.description = obj.description.replace(/<\/?[^>]+(>|$)/g, "");
+        res.send({ success: true, message: "", data: obj });
     } else {
-        res.send({ success: false, message: "Invalid token", data: [] });
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
     }
 
 };
@@ -281,9 +285,17 @@ exports.teacherInfo = async (req, res) => {
         var teacher = await User.findOne({
             where:
                 { id: req.params.id },
-            include: [{
-                model: db.teacherProfile
-            }]
+            include: [
+                {
+                    model: db.teacherProfile
+                    , include: [
+                        {
+                            model: db.userEmoji
+                        }
+                    ]
+                },
+
+            ]
         });
         res.send({ success: true, message: "", data: teacher });
     } else {
@@ -297,9 +309,9 @@ exports.blogDelete = async (req, res) => {
     let isValidToekn = await validateToekn(token);
     if (isValidToekn) {
         var blog = await Blog.destroy({ where: { id: req.params.id } });
-        res.send({ success: true, message: "Bolog deleted successfully.", data: [] });
+        res.send({ success: true, message: "Blog deleted successfully.", data: [] });
     } else {
-        res.send({ success: false, message: "Invalid token", data: [] });
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
     }
 
 };
@@ -329,8 +341,10 @@ exports.routineList = async function (req, res, next) {
 
                 }
             }
-            let limit = 10
-            let offset = 0 + (req.query.page - 1) * limit
+
+            let limit = 10;
+            let offset = 0 + (req.query.page - 1) * limit;
+            let count = await Routine.count({ where: search });
             let routineList = await Routine.findAndCountAll({
                 where: search,
                 limit: limit,
@@ -353,6 +367,7 @@ exports.routineList = async function (req, res, next) {
             }
             routineList['rows'] = All;
             routineList['currentPage'] = req.query.page;
+            routineList['count'] = count;
             routineList['totalPages'] = Math.ceil(routineList['count'] / limit);
             res.send({ success: true, message: "", data: routineList });
         } else {
@@ -392,8 +407,8 @@ exports.userList = async (req, res) => {
             let offset = 0 + (req.query.page - 1) * limit
             let userList = await User.findAndCountAll({
                 where: search,
-                // limit: limit,
-                // offset: offset,
+                limit: limit,
+                offset: offset,
                 order: [['id', 'DESC']]
             }
             );
@@ -402,7 +417,7 @@ exports.userList = async (req, res) => {
             userList['totalPages'] = Math.ceil(userList['count'] / limit);
             res.send({ success: true, message: "", data: userList });
         } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
 
     } catch (e) {
@@ -431,6 +446,12 @@ exports.addRoutine = async (req, res) => {
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
             var fileName = '';
+
+            var routine = await Routine.findOne({ where: { routine_name: req.body.routine_name, user_id: parseInt(req.body.user_id) } });
+            if (routine) {
+                return res.send({ success: false, message: "This Routine already has been added by you.", data: [] });
+            }
+
             if (req.files) {
                 const image = req.files.image
                 let dir = 'uploads/routines/images';
@@ -448,6 +469,7 @@ exports.addRoutine = async (req, res) => {
                 })
                 fileName = image.name
             }
+
             var user = await User.findOne({ where: { id: req.body.user_id } });
             var sliceFolderName = user.fullname + ' ' + req.body.routine_name
             let insertData = {
@@ -486,7 +508,7 @@ exports.addRoutine = async (req, res) => {
             requset.end();
             res.send({ success: true, message: "Routine created successfully.", data: [] });
         } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
@@ -500,6 +522,30 @@ exports.editRoutine = async (req, res) => {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
+
+            var routineExist = await Routine.findOne({
+                where: {
+                    routine_name: req.body.routine_name,
+                    [Op.and]: [
+                        { user_id: parseInt(req.body.user_id) },
+                        {
+                            id: {
+                                [Op.not]: req.body.id
+                            }
+                        },
+                        {
+                            routine_name: {
+                                [Op.eq]: req.body.routine_name
+                            }
+                        }
+                    ]
+                }
+            });
+
+            if (routineExist) {
+                return res.send({ success: false, message: "This Routine already has been added by you.", data: [] });
+            }
+
             var routine = await Routine.findOne({
                 where: { id: req.body.id },
                 include: [
@@ -564,14 +610,14 @@ exports.editRoutine = async (req, res) => {
                 res.send({ success: false, message: "Routine not found.", data: [] });
             }
         } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
     }
 }
 
-exports.editRoutineVideo = async (req, res) => {
+exports.editRoutineVideoOld = async (req, res) => {
 
     try {
 
@@ -641,14 +687,308 @@ exports.editRoutineVideo = async (req, res) => {
             }
             res.send({ success: false, message: "Routine video not found.", data: [] });
         } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
     }
 }
 
+exports.editRoutineVideo = async (req, res) => {
+    try {
+
+        let token = await User.getToken(req);
+        let isValidToekn = await validateToekn(token);
+        if (isValidToekn) {
+            var routineVideo = await RoutineVideo.findOne({ where: { id: req.body.id } });
+
+            if (routineVideo) {
+                if (routineVideo.video_type == 'embed_url') {
+                    if (req.files != null) {
+                        var thumbFile = routineVideo.video_thumb.replace(config.HOST, "");
+                        var filePath = 'uploads/routines/thumbs' + '/' + thumbFile;
+                        if (fs.existsSync(filePath)) {
+                            fs.unlinkSync(filePath);
+                        }
+                        var videos = req.files.thumb;
+                        let dir = 'uploads/routines/thumbs';
+                        const path = dir + '/' + videos.name
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir, { recursive: true });
+                        }
+                        videos.mv(path, (error) => {
+                            if (error) {
+                                res.writeHead(500, {
+                                    'Content-Type': 'application/json'
+                                })
+                                res.end(JSON.stringify({ status: 'error', message: error }))
+                            }
+                        })
+                        video_link = videos.name
+                        let Data = {
+                            video_title: req.body.video_title,
+                            video_description: req.body.video_description,
+                            video_duration: "00:00:00",
+                            video_thumb: video_link,
+                            video_link: req.body.embed_url,
+                        }
+
+                        await RoutineVideo.update(Data, { where: { id: req.body.id } });
+
+                        return res.send({ success: true, message: "Artist video updated.", data: [] });
+                    } else {
+                        let Data = {
+                            video_title: req.body.video_title,
+                            video_description: req.body.video_description,
+                            video_link: req.body.embed_url
+                        }
+                        await RoutineVideo.update(Data, { where: { id: req.body.id } });
+                        /// Update videoslice table data //
+                        var embed_video_link = req.body.embed_url
+                        var rest = embed_video_link.replace("https://www.soundslice.com/slices/", "");
+                        var lastFirst = rest.replace("/embed", "");
+                        var lastScorehash = lastFirst.replace("/", "");
+
+                        var sliceBody = {
+                            "scorehash": lastScorehash,
+                            "slug": "",
+                            "slug": "",
+                            "slug": "",
+                            "url": "",
+                            "embed_url": ""
+
+                        }
+
+                        sliceData = {
+                            type: 'embed_url',
+                            slice_info: JSON.stringify(sliceBody),
+                            recording_info: JSON.stringify({ "errors": { "source_data": ["Enter a valid URL."] } })
+                        }
+
+                        await VideoSliceModel.update(sliceData, { where: { video_id: req.body.id, routine_id: routineVideo.routine_id, type: 'embed_url' } });
+
+                        return res.send({ success: true, message: "Artist video updated.", data: [] });
+                    }
+                } else {
+                    if (req.files != null) {
+                        var filePath = 'uploads/routines/videos' + '/' + routineVideo.video_file_name;
+                        if (fs.existsSync(filePath)) {
+                            fs.unlinkSync(filePath);
+                        }
+                        var videos = req.files.video;
+                        let dir = 'uploads/routines/videos';
+                        const path = dir + '/' + videos.name
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir, { recursive: true });
+                        }
+                        videos.mv(path, (error) => {
+                            if (error) {
+                                res.writeHead(500, {
+                                    'Content-Type': 'application/json'
+                                })
+                                res.end(JSON.stringify({ status: 'error', message: error }))
+                            }
+                        })
+                        video_link = videos.name
+                        var videoPath = 'uploads/routines/videos/' + video_link;
+                        dir = 'uploads/routines/thumbs/';
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir, { recursive: true });
+                        }
+                        var duration = await getVideoDurationInSeconds(config.HOST + videoPath);
+                        var measuredTime = new Date(null);
+                        measuredTime.setSeconds(duration); // specify value of SECONDS
+                        var MHSTime = measuredTime.toISOString().substr(11, 8);
+                        total_duration = MHSTime;
+                        const tg = await new ThumbnailGenerator({
+                            sourcePath: videoPath,
+                            thumbnailPath: 'uploads/routines/thumbs/',
+                            tmpDir: '/uploads/routines/videos/thumbs/'
+                        });
+
+                        tg.generateOneByPercentCb(50, async (err, result) => {
+                            video_thumb = result;
+                            let Data = {
+                                video_title: req.body.video_title,
+                                video_description: req.body.video_description,
+                                video_duration: total_duration,
+                                video_thumb: video_thumb,
+                                video_link: video_link,
+                                slice_added: 'no',
+                                notation_file_added: 'no',
+                            }
+                            await RoutineVideo.update(Data, { where: { id: req.body.id } });
+                        });
+                        return res.send({ success: true, message: "Routine video updated.", data: [] });
+                    } else {
+                        let data = {
+                            video_title: req.body.video_title,
+                            video_description: req.body.video_description
+                        }
+                        await RoutineVideo.update(data, { where: { id: req.body.id } });
+                        return res.send({ success: true, message: "Routine video updated.", data: [] });
+                    }
+                }
+            }
+            res.send({ success: false, message: "Routine video not found.", data: [] });
+        } else {
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
+        }
+    } catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
+}
+
+
 exports.editArtistVideo = async (req, res) => {
+
+    try {
+        let token = await User.getToken(req);
+        let isValidToekn = await validateToekn(token);
+        if (isValidToekn) {
+            var routineVideo = await TeacherVideo.findOne({ where: { id: req.body.id } });
+            if (routineVideo) {
+                if (routineVideo.video_type == 'embed_url') {
+                    if (req.files != null) {
+
+                        var thumbFile = routineVideo.video_thumb.replace(config.HOST, "");
+                        var filePath = 'uploads/artists/thumbs' + '/' + thumbFile;
+                        if (fs.existsSync(filePath)) {
+                            fs.unlinkSync(filePath);
+                        }
+                        var videos = req.files.thumb;
+                        let dir = 'uploads/artists/thumbs';
+                        const path = dir + '/' + videos.name
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir, { recursive: true });
+                        }
+                        videos.mv(path, (error) => {
+                            if (error) {
+                                res.writeHead(500, {
+                                    'Content-Type': 'application/json'
+                                })
+                                res.end(JSON.stringify({ status: 'error', message: error }))
+                            }
+                        })
+                        video_link = videos.name
+                        let Data = {
+                            video_title: req.body.video_title,
+                            video_description: req.body.video_description,
+                            duration: "00:00:00",
+                            video_thumb: video_link,
+                            video_link: req.body.embed_url,
+                        }
+                        await TeacherVideo.update(Data, { where: { id: req.body.id } });
+
+                        return res.send({ success: true, message: "Artist video updated.", data: [] });
+                    } else {
+                        let data = {
+                            video_title: req.body.video_title,
+                            video_description: req.body.video_description,
+                            video_link: req.body.embed_url
+                        }
+                        await TeacherVideo.update(data, { where: { id: req.body.id } });
+                        /// Update videoslice table data //
+                        var embed_video_link = req.body.embed_url
+                        var rest = embed_video_link.replace("https://www.soundslice.com/slices/", "");
+                        var lastFirst = rest.replace("/embed", "");
+                        var lastScorehash = lastFirst.replace("/", "");
+
+                        var sliceBody = {
+                            "scorehash": lastScorehash,
+                            "slug": "",
+                            "slug": "",
+                            "slug": "",
+                            "url": "",
+                            "embed_url": ""
+
+                        }
+
+                        sliceData = {
+                            type: 'embed_url',
+                            slice_info: JSON.stringify(sliceBody),
+                            recording_info: JSON.stringify({ "errors": { "source_data": ["Enter a valid URL."] } })
+                        }
+
+                        await VideoSliceModel.update(sliceData, { where: { artist_video_id: req.body.id, artist_id: routineVideo.user_id, type: 'embed_url' } });
+
+                        return res.send({ success: true, message: "Artist video updated.", data: [] });
+                    }
+                } else {
+                    if (req.files != null) {
+                        var filePath = 'uploads/artists/videos' + '/' + routineVideo.video_file_name;
+                        if (fs.existsSync(filePath)) {
+                            fs.unlinkSync(filePath);
+                        }
+                        var videos = req.files.video;
+                        let dir = 'uploads/artists/videos';
+                        const path = dir + '/' + videos.name
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir, { recursive: true });
+                        }
+                        videos.mv(path, (error) => {
+                            if (error) {
+                                res.writeHead(500, {
+                                    'Content-Type': 'application/json'
+                                })
+                                res.end(JSON.stringify({ status: 'error', message: error }))
+                            }
+                        })
+                        video_link = videos.name
+                        var videoPath = 'uploads/artists/videos/' + video_link;
+                        dir = 'uploads/artists/thumbs/';
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir, { recursive: true });
+                        }
+                        // console.log(config.HOST+videoPath);
+                        var duration = await getVideoDurationInSeconds(config.HOST + videoPath);
+                        var measuredTime = new Date(null);
+                        measuredTime.setSeconds(duration); // specify value of SECONDS
+                        var MHSTime = measuredTime.toISOString().substr(11, 8);
+                        total_duration = MHSTime;
+
+                        const tg = await new ThumbnailGenerator({
+                            sourcePath: videoPath,
+                            thumbnailPath: 'uploads/artists/thumbs/',
+                            tmpDir: '/uploads/artists/videos/thumbs/'
+                        });
+
+                        tg.generateOneByPercentCb(50, async (err, result) => {
+                            video_thumb = result;
+                            let Data = {
+                                video_title: req.body.video_title,
+                                video_description: req.body.video_description,
+                                duration: total_duration,
+                                video_thumb: video_thumb,
+                                video_link: video_link,
+                                slice_added: 'no',
+                                notation_file_added: 'no'
+                            }
+                            await TeacherVideo.update(Data, { where: { id: req.body.id } });
+                        });
+                        return res.send({ success: true, message: "Artist video updated.", data: [] });
+                    } else {
+                        let data = {
+                            video_title: req.body.video_title,
+                            video_description: req.body.video_description
+                        }
+                        await TeacherVideo.update(data, { where: { id: req.body.id } });
+                        return res.send({ success: true, message: "Artist video updated.", data: [] });
+                    }
+                }
+
+            }
+            res.send({ success: false, message: "Routine video not found.", data: [] });
+        } else {
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
+        }
+    } catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
+}
+
+
+exports.editArtistVideoOld = async (req, res) => {
 
     try {
         let token = await User.getToken(req);
@@ -717,7 +1057,7 @@ exports.editArtistVideo = async (req, res) => {
             }
             res.send({ success: false, message: "Routine video not found.", data: [] });
         } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
@@ -759,7 +1099,7 @@ exports.routineVideoDetail = async (req, res) => {
                 }
             ],
         });
-        console.log(routine);
+        //console.log(routine);
         res.send({ success: true, message: "", data: routine });
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
@@ -931,7 +1271,7 @@ exports.routineDetail1 = (req, res) => {
 
             response.on("end", function (chunk) {
                 var body = Buffer.concat(chunks);
-                console.log(body.toString());
+                //console.log(body.toString());
                 res.send({ success: true, message: "", data: JSON.parse(body) });
             });
 
@@ -970,55 +1310,57 @@ exports.routineDelete = async (request, res) => {
             ],
         });
         await removeFileFromFolder('uploads/routines/images' + routine.image)
-        var folderId = routine.routineFolder.folder_info.id;
-        /*delete folder's sloces*/
-        var slices = await VideoSliceModel.findAll({ where: { routine_id: routine.id } });
-        if (slices && slices.length > 0) {
-            for (let i = 0; i < slices.length; i++) {
-                var slug = slices[i];
-                var slugId = JSON.parse(slug.slice_info).slug;
-                var options = await getOptionValue('/api/v1/scores/' + slugId, 'DELETE');
-                var req = https.request(options, function (response) {
-                    var chunks = [];
-                    response.on("data", function (chunk) {
-                        chunks.push(chunk);
-                    });
-                    response.on("end", function (chunk) {
-                        var body = Buffer.concat(chunks);
-                    });
-                    response.on("error", function (error) {
-                        console.error(error);
-                    });
-                });
-                var postData = qs.stringify({
-                });
-                req.write(postData);
-                req.end();
-            }
-        }
-        /*delete routine folder from soundslice*/
-        var options = await getOptionValue('/api/v1/folders/' + folderId + '/', 'DELETE');
-        var req = https.request(options, function (response) {
-            var chunks = [];
-            response.on("data", function (chunk) {
-                chunks.push(chunk);
-            });
-            response.on("end", async function (chunk) {
-                var body = Buffer.concat(chunks);
-                console.log(body.toString());
-                var routineDelete = await Routine.destroy({ where: { id: request.params.id } });
-                res.send({ success: true, message: "Routine deleted successfully.", data: [] });
-            });
-            response.on("error", function (error) {
-                return res.send({ success: false, message: error.message, data: [] });
-            });
-        });
-        var postData = qs.stringify({
-        });
-        req.write(postData);
-        req.end();
+        var routineDelete = await Routine.destroy({ where: { id: request.params.id } });
+        res.send({ success: true, message: "Routine deleted successfully.", data: [] });
+        // var folderId = routine.routineFolder.folder_info.id;
+        // /*delete folder's sloces*/
+        // var slices = await VideoSliceModel.findAll({ where: { routine_id: routine.id } });
+        // if (slices && slices.length > 0) {
+        //     for (let i = 0; i < slices.length; i++) {
+        //         var slug = slices[i];
+        //         var slugId = JSON.parse(slug.slice_info).slug;
+        //         var options = await getOptionValue('/api/v1/scores/' + slugId, 'DELETE');
+        //         var req = https.request(options, function (response) {
+        //             var chunks = [];
+        //             response.on("data", function (chunk) {
+        //                 chunks.push(chunk);
+        //             });
+        //             response.on("end", function (chunk) {
+        //                 var body = Buffer.concat(chunks);
+        //             });
+        //             response.on("error", function (error) {
+        //                 console.error(error);
+        //             });
+        //         });
+        //         var postData = qs.stringify({
+        //         });
+        //         req.write(postData);
+        //         req.end();
+        //     }
+        // }
+        // /*delete routine folder from soundslice*/
+        // var options = await getOptionValue('/api/v1/folders/' + folderId + '/', 'DELETE');
+        // var req = https.request(options, function (response) {
+        //     var chunks = [];
+        //     response.on("data", function (chunk) {
+        //         chunks.push(chunk);
+        //     });
+        //     response.on("end", async function (chunk) {
+        //         var body = Buffer.concat(chunks);
+        //         //console.log(body.toString());
+        //         var routineDelete = await Routine.destroy({ where: { id: request.params.id } });
+        //         res.send({ success: true, message: "Routine deleted successfully.", data: [] });
+        //     });
+        //     response.on("error", function (error) {
+        //         return res.send({ success: false, message: error.message, data: [] });
+        //     });
+        // });
+        // var postData = qs.stringify({
+        // });
+        // req.write(postData);
+        // req.end();
     } else {
-        res.send({ success: false, message: "Invalid token", data: [] });
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
     }
 
 };
@@ -1063,7 +1405,7 @@ exports.routineVideoDelete = async (request, res) => {
         }
 
     } else {
-        res.send({ success: false, message: "Invalid token", data: [] });
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
     }
 
 };
@@ -1075,7 +1417,7 @@ exports.teacherDelete = async (req, res) => {
         var blog = await User.destroy({ where: { id: req.params.id } });
         res.send({ success: true, message: "Artist deleted successfully.", data: [] });
     } else {
-        res.send({ success: false, message: "Invalid token", data: [] });
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
     }
 
 };
@@ -1089,7 +1431,7 @@ exports.videoArtistDelete = async (req, res) => {
         await TeacherVideo.destroy({ where: { id: req.params.id } });
         res.send({ success: true, message: "Artist video deleted successfully.", data: [] });
     } else {
-        res.send({ success: false, message: "Invalid token", data: [] });
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
     }
 };
 
@@ -1102,11 +1444,11 @@ exports.addRoutineVideoOld = async (req, res) => {
         // console.log(req.body);
         videos = ((uploadedVideos != 'null') && !Array.isArray(uploadedVideos['videos[]'])) ? [uploadedVideos['videos[]']] : uploadedVideos['videos[]'];
         postData = ((req.body != 'null') && !Array.isArray(req.body['data[]'])) ? [req.body['data[]']] : req.body['data[]'];
-        console.log(postData);
+        //console.log(postData);
         var length = videos.length;
         for (let i = 0; i < length; i++) {
             postData[i] = JSON.parse(postData[i]);
-            console.log(postData[i]);
+            //console.log(postData[i]);
             var video_thumb = '';
             var video_link = '';
             var total_duration = '';
@@ -1138,11 +1480,11 @@ exports.addRoutineVideoOld = async (req, res) => {
                 fs.mkdirSync(dir, { recursive: true });
             }
             console.log(videoPath);
-             var duration = await getVideoDurationInSeconds(config.HOST+videoPath);
-             var measuredTime = new Date(null);
-             measuredTime.setSeconds(duration); // specify value of SECONDS
-             var MHSTime = measuredTime.toISOString().substr(11, 8);
-             total_duration =  MHSTime;
+            var duration = await getVideoDurationInSeconds(config.HOST + videoPath);
+            var measuredTime = new Date(null);
+            measuredTime.setSeconds(duration); // specify value of SECONDS
+            var MHSTime = measuredTime.toISOString().substr(11, 8);
+            total_duration = MHSTime;
 
             const tg = await new ThumbnailGenerator({
                 sourcePath: videoPath,
@@ -1173,6 +1515,7 @@ exports.addRoutineVideoOld = async (req, res) => {
 }
 
 exports.addRoutineVideo = async (req, res) => {
+
     try {
         var videos = [];
         var postData = [];
@@ -1181,54 +1524,108 @@ exports.addRoutineVideo = async (req, res) => {
         var thumbs = [];
         // console.log(req.body);
         videos = ((uploadedVideos != 'null') && !Array.isArray(uploadedVideos['videos[]'])) ? [uploadedVideos['videos[]']] : uploadedVideos['videos[]'];
-        //thumbs = ((uploadedVideos != 'null') && !Array.isArray(uploadedVideos['thumb[]'])) ? [uploadedVideos['thumb[]']] : uploadedVideos['thumb[]'];
         postData = ((req.body != 'null') && !Array.isArray(req.body['data[]'])) ? [req.body['data[]']] : req.body['data[]'];
+
         var length1 = videos.length;
         var length = postData.length;
         for (let i = 0; i < length; i++) {
             postData[i] = JSON.parse(postData[i]);
-            console.log(postData[i]);
             var video_thumb = '';
-            //var video_link = '';
             var total_duration = '';
             //if(postData[i].embed_url !="" && postData[i].embed_url != undefined){
-            if(postData[i].video_type !="" && postData[i].video_type =='embed_url'){
-                 var embed_video_link = postData[i].embed_url
-                 if (videos[i] && videos[i]!=undefined) {
-                    let dir = 'uploads/routines/thumbs/';
-                    var NewName = Math.round(new Date() / 1000) + User.generateToken();
-                    var fileExt = videos[i].mimetype.split('/').pop();
-                    var thumbfileName = NewName + '.' + fileExt;
-                    const path = dir + '/' + thumbfileName
-                    if (!fs.existsSync(dir)) {
-                        fs.mkdirSync(dir, { recursive: true });
-                    }
-                    videos[i].mv(path, (error) => {
-                        if (error) {
-                            res.writeHead(500, {
-                                'Content-Type': 'application/json'
+            if (postData[i].video_type != "" && postData[i].video_type == 'embed_url') {
+                var embed_video_link = postData[i].embed_url
+                var rest = embed_video_link.replace("https://www.soundslice.com/slices/", "");
+                var lastFirst = rest.replace("/embed", "");
+                var lastScorehash = lastFirst.replace("/", "");
+                console.log('scorehash:' + lastScorehash)
+                var thumb_video_thumb = '';
+                if (videos[i] && videos[i] != undefined) {
+
+                    /*get url video duration*/
+                    var urlVideoDuration;
+                    var options = await getOptionValue('/api/v1/slices/' + lastScorehash + '/recordings/', 'GET');
+                    var req = https.request(options, async function (response) {
+                        var chunks = [];
+                        response.on("data", function (chunk) {
+                            chunks.push(chunk);
+                        });
+                        response.on("end", async function (chunk) {
+                            var body = Buffer.concat(chunks);
+                            var responseBody = body.toString();
+                            responseBody = JSON.parse(responseBody)
+                            urlVideoDuration = convertSecondToHMS(responseBody[0].cropped_duration)
+                            /*adding data*/
+                            let dir = 'uploads/routines/thumbs/';
+                            var NewName = Math.round(new Date() / 1000) + User.generateToken();
+                            var fileExt = videos[i].mimetype.split('/').pop();
+                            var thumbfileName = NewName + '.' + fileExt;
+                            const path = dir + '/' + thumbfileName
+                            if (!fs.existsSync(dir)) {
+                                fs.mkdirSync(dir, { recursive: true });
+                            }
+                            videos[i].mv(path, (error) => {
+                                if (error) {
+                                    res.writeHead(500, {
+                                        'Content-Type': 'application/json'
+                                    })
+                                    res.end(JSON.stringify({ status: 'error', message: error }))
+                                }
                             })
-                            res.end(JSON.stringify({ status: 'error', message: error }))
-                        }
-                    })
-                    //video_link = fileName
-                     var thumb_video_thumb = thumbfileName;
-                     let insertData = {
-                        user_id: parseInt(postData[i].user_id),
-                        routine_id: postData[i].routine_id,
-                        video_title: postData[i].video_title,
-                        video_duration: "00:00:00",
-                        video_description: postData[i].video_description,
-                        video_thumb: thumb_video_thumb,
-                        video_link: embed_video_link,
-                        video_type: (postData[i].video_type) ? postData[i].video_type : 'local'
-                    }
-                    var routineVideo = await RoutineVideo.create(insertData);
+                            var thumb_file_name = thumbfileName;
+                            console.log('datav------------------------',postData[i])
+                            let insertData = {
+                                user_id: parseInt(postData[i].user_id),
+                                routine_id: postData[i].routine_id,
+                                video_title: postData[i].video_title,
+                                video_duration: urlVideoDuration,
+                                video_description: postData[i].video_description,
+                                content_type: postData[i].content_type,
+                                video_thumb: thumb_file_name,
+                                video_link: postData[i].embed_url,
+                                slice_added: "yes",
+                                notation_file_added: "yes",
+                                video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
+                                list_order: await getRoutineVideoCount(parseInt(postData[i].user_id)) + 1
+                            }
+                            var routineVideo = await RoutineVideo.create(insertData);
+                            var embed_video_link = postData[i].embed_url
+                            var rest = embed_video_link.replace("https://www.soundslice.com/slices/", "");
+                            var lastFirst = rest.replace("/embed", "");
+                            var lastScorehash = lastFirst.replace("/", "");
+                            let sliceBody = {
+                                "scorehash": lastScorehash,
+                                "slug": "",
+                                "slug": "",
+                                "slug": "",
+                                "url": "",
+                                "embed_url": ""
+
+                            }
+                            let sliceData = {
+                                video_id: routineVideo.id,
+                                type: 'embed_url',
+                                slice_info: JSON.stringify(sliceBody),
+                                recording_info: JSON.stringify({ "errors": { "source_data": ["Enter a valid URL."] } }),
+                                routine_id: postData[i].routine_id
+                            }
+                            VideoSliceModel.create(sliceData);
+                        });
+                        response.on("error", function (error) {
+                            return res.send({ success: false, message: error.message, data: [] });
+                        });
+                    });
+                    var pData = qs.stringify({
+                    });
+                    req.write(pData);
+                    req.end();
+                    console.log('final duration :' + urlVideoDuration)
 
                 }
-             }else{
+
+            } else {
                 logger.info('Lenght count  #### %s.', videos[i]);
-                if (videos[i] && videos[i]!=undefined) {
+                if (videos[i] && videos[i] != undefined) {
                     let dir = 'uploads/routines/videos';
                     var NewName = Math.round(new Date() / 1000) + User.generateToken();
                     var fileExt = videos[i].mimetype.split('/').pop();
@@ -1246,43 +1643,46 @@ exports.addRoutineVideo = async (req, res) => {
                         }
                     })
                     var video_link = fileName
-                
-                /*if (req.body.video_url) {
-                  video_link = req.body.video_url
-                }*/
-                var videoPath = 'uploads/routines/videos/' + video_link;
-                let thumbdir = 'uploads/routines/thumbs/';
-                if (!fs.existsSync(thumbdir)) {
-                    fs.mkdirSync(thumbdir, { recursive: true });
-                }
-                console.log(videoPath);
-                 //var duration = await getVideoDurationInSeconds(config.HOST+videoPath);
-                 //var measuredTime = new Date(null);
-                 //measuredTime.setSeconds(duration); // specify value of SECONDS
-                 //var MHSTime = measuredTime.toISOString().substr(11, 8);
-                 //total_duration =  MHSTime;
 
-                const tg = await new ThumbnailGenerator({
-                    sourcePath: videoPath,
-                    thumbnailPath: 'uploads/routines/thumbs/',
-                    tmpDir: '/uploads/routines/videos/thumbs/'
-                });
 
-                tg.generateOneByPercentCb(50, async (err, result) => {
-                    video_thumb = result;
-                    let insertData = {
-                        user_id: parseInt(postData[i].user_id),
-                        routine_id: postData[i].routine_id,
-                        video_title: postData[i].video_title,
-                        video_duration: "00:00:00",
-                        video_description: postData[i].video_description,
-                        video_thumb: video_thumb,
-                        video_link: video_link,
-                        video_type: (postData[i].video_type) ? postData[i].video_type : 'local'
+                    var videoPath = 'uploads/routines/videos/' + video_link;
+                    let thumbdir = 'uploads/routines/thumbs/';
+                    if (!fs.existsSync(thumbdir)) {
+                        fs.mkdirSync(thumbdir, { recursive: true });
                     }
-                    var routineVideo = await RoutineVideo.create(insertData);
-                });
-             }
+                    console.log(videoPath);
+                    var duration = await getVideoDurationInSeconds(config.HOST + videoPath);
+                    var measuredTime = new Date(null);
+                    measuredTime.setSeconds(duration); // specify value of SECONDS
+                    var MHSTime = measuredTime.toISOString().substr(11, 8);
+                    total_duration = MHSTime;
+
+                    const tg = await new ThumbnailGenerator({
+                        sourcePath: videoPath,
+                        thumbnailPath: 'uploads/routines/thumbs/',
+                        tmpDir: '/uploads/routines/videos/thumbs/'
+                    });
+
+                    tg.generateOneByPercentCb(50, async (err, result) => {
+                        video_thumb = result;
+                        console.log('video_link');
+                        console.log(video_link);
+                        console.log('datav------------------------',postData[i])
+                        let insertData = {
+                            user_id: parseInt(postData[i].user_id),
+                            routine_id: postData[i].routine_id,
+                            video_title: postData[i].video_title,
+                            video_duration: '0:0:0',
+                            video_description: postData[i].video_description,
+                            content_type: postData[i].content_type,
+                            video_thumb: video_thumb,
+                            video_link: video_link,
+                            video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
+                            list_order: await getRoutineVideoCount(parseInt(postData[i].user_id)) + 1
+                        }
+                        var routineVideo = await RoutineVideo.create(insertData);
+                    });
+                }
             }
         }
         console.log('complete')
@@ -1292,41 +1692,123 @@ exports.addRoutineVideo = async (req, res) => {
     }
 }
 
-
-exports.addArtistVideoOld = async (req, res) => {
+exports.addArtistVideo = async (req, res) => {
 
     try {
-
-        //console.log(req.body)
-        logger.info('video Details  #### %s.', JSON.stringify(req.body));
-        
         var videos = [];
         var postData = [];
         var uploadedVideos = req.files;
-        // console.log(req.body);
+        var thumbs = [];
+
+
+        if (uploadedVideos == null) {
+            console.log(uploadedVideos);
+        }
+
         videos = ((uploadedVideos != 'null') && !Array.isArray(uploadedVideos['videos[]'])) ? [uploadedVideos['videos[]']] : uploadedVideos['videos[]'];
         postData = ((req.body != 'null') && !Array.isArray(req.body['data[]'])) ? [req.body['data[]']] : req.body['data[]'];
         var length1 = videos.length;
-        var length  = postData.length
-         logger.info('Lenght count  #### %s.', length);
+        var length = postData.length;
         for (let i = 0; i < length; i++) {
             postData[i] = JSON.parse(postData[i]);
+            console.log(postData[i]);
             var video_thumb = '';
-            var video_link = '';
+            //var video_link = '';
             var total_duration = '';
-            if(postData[i].embed_url !="" && postData[i].embed_url != undefined){
-                 var embed_video_link = postData[i].embed_url
-                 var videoPath = video_link;
-                 logger.info('Okay Details  #### %s.', video_link);
-            }else{
-                logger.info('Not Okay Details  #### %s.');
-                if (videos[i]) {
+            //if(postData[i].embed_url !="" && postData[i].embed_url != undefined){
+            if (postData[i].video_type != "" && postData[i].video_type == 'embed_url') {
+                var embed_video_link = postData[i].embed_url
+                var rest = embed_video_link.replace("https://www.soundslice.com/slices/", "");
+                var lastFirst = rest.replace("/embed", "");
+                var lastScorehash = lastFirst.replace("/", "");
+                if (videos[i] && videos[i] != undefined) {
+
+                    /*get url video duration*/
+                    var urlVideoDuration;
+                    var options = await getOptionValue('/api/v1/slices/' + lastScorehash + '/recordings/', 'GET');
+                    var req = https.request(options, function (response) {
+                        var chunks = [];
+                        response.on("data", function (chunk) {
+                            chunks.push(chunk);
+                        });
+                        response.on("end", async function (chunk) {
+                            var body = Buffer.concat(chunks);
+                            var responseBody = body.toString();
+                            responseBody = JSON.parse(responseBody)
+                            urlVideoDuration = convertSecondToHMS(responseBody[0].cropped_duration)
+                            /*Insert data into table*/
+                            let dir = 'uploads/artists/thumbs/';
+                            var NewName = Math.round(new Date() / 1000) + User.generateToken();
+                            var fileExt = videos[i].mimetype.split('/').pop();
+                            var thumbfileName = NewName + '.' + fileExt;
+                            const path = dir + '/' + thumbfileName
+                            if (!fs.existsSync(dir)) {
+                                fs.mkdirSync(dir, { recursive: true });
+                            }
+                            videos[i].mv(path, (error) => {
+                                if (error) {
+                                    res.writeHead(500, {
+                                        'Content-Type': 'application/json'
+                                    })
+                                    res.end(JSON.stringify({ status: 'error', message: error }))
+                                }
+                            })
+                            var thumb_video_thumb = thumbfileName;
+                            let insertData = {
+                                user_id: parseInt(postData[i].user_id),
+                                video_title: postData[i].video_title,
+                                duration: urlVideoDuration,
+                                video_description: postData[i].video_description,
+                                video_thumb: thumb_video_thumb,
+                                video_link: postData[i].embed_url,
+                                video_level: postData[i].video_level,
+                                slice_added: "yes",
+                                notation_file_added: "yes",
+                                video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
+                                list_order: await getArtistVideoCount(parseInt(postData[i].user_id)) + 1
+                            }
+                            var routineVideo = await TeacherVideo.create(insertData);
+                            var embed_video_link = postData[i].embed_url
+                            var rest = embed_video_link.replace("https://www.soundslice.com/slices/", "");
+                            var lastFirst = rest.replace("/embed", "");
+                            var lastScorehash = lastFirst.replace("/", "");
+                            var sliceBody = {
+                                "scorehash": lastScorehash,
+                                "slug": "",
+                                "slug": "",
+                                "slug": "",
+                                "url": "",
+                                "embed_url": ""
+
+                            }
+
+                            sliceData = {
+                                artist_video_id: routineVideo.id,
+                                type: 'embed_url',
+                                slice_info: JSON.stringify(sliceBody),
+                                recording_info: JSON.stringify({ "errors": { "source_data": ["Enter a valid URL."] } }),
+                                artist_id: parseInt(postData[i].user_id)
+                            }
+                            VideoSliceModel.create(sliceData);
+                        });
+                        response.on("error", function (error) {
+                            return res.send({ success: false, message: error.message, data: [] });
+                        });
+                    });
+                    var pData = qs.stringify({
+                    });
+                    req.write(pData);
+                    req.end();
+                }
+
+            } else {
+                // logger.info('Lenght count  #### %s.', videos[i]);
+                if (videos[i] && videos[i] != undefined) {
                     let dir = 'uploads/artists/videos';
                     var NewName = Math.round(new Date() / 1000) + User.generateToken();
                     var fileExt = videos[i].mimetype.split('/').pop();
                     var fileName = NewName + '.' + fileExt;
                     const path = dir + '/' + fileName
-
                     if (!fs.existsSync(dir)) {
                         fs.mkdirSync(dir, { recursive: true });
                     }
@@ -1339,55 +1821,56 @@ exports.addArtistVideoOld = async (req, res) => {
                         }
                     })
                     var video_link = fileName
+
+                    /*if (req.body.video_url) {
+                      video_link = req.body.video_url
+                    }*/
                     var videoPath = 'uploads/artists/videos/' + video_link;
-               } 
-            }
-            logger.info('video link  #### %s.', video_link);
-            /*if (req.body.video_url) {
-                video_link = req.body.video_url
-            }*/
-            
-            let dir = 'uploads/artists/thumbs/';
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir, { recursive: true });
-            }
-            console.log(videoPath);
-            // var duration = await getVideoDurationInSeconds(videoPath);
+                    let thumbdir = 'uploads/artists/thumbs/';
+                    if (!fs.existsSync(thumbdir)) {
+                        fs.mkdirSync(thumbdir, { recursive: true });
+                    }
+                    console.log(videoPath);
+                    var duration = await getVideoDurationInSeconds(config.HOST + videoPath);
+                    var measuredTime = new Date(null);
+                    measuredTime.setSeconds(duration); // specify value of SECONDS
+                    var MHSTime = measuredTime.toISOString().substr(11, 8);
+                    total_duration = MHSTime;
 
-            // total_duration =  secondsToHms(duration);
-            // console.log(duration)
-            const tg = await new ThumbnailGenerator({
-                sourcePath: videoPath,
-                thumbnailPath: 'uploads/artists/thumbs/',
-                tmpDir: '/uploads/artists/videos/thumbs/'
-            });
+                    const tg = await new ThumbnailGenerator({
+                        sourcePath: videoPath,
+                        thumbnailPath: 'uploads/artists/thumbs/',
+                        tmpDir: '/uploads/artists/videos/thumbs/'
+                    });
 
-            if(postData[i].embed_url !="" && postData[i].embed_url != undefined){
-              var new_video_link = embed_video_link;
-            }else{
-              var new_video_link = video_link;
-            }
-
-            tg.generateOneByPercentCb(50, async (err, result) => {
-                video_thumb = result;
-                let insertData = {
-                    user_id: parseInt(postData[i].user_id),
-                    video_title: postData[i].video_title,
-                    duration: '00:00:00',
-                    video_description: postData[i].video_description,
-                    video_thumb: video_thumb,
-                    video_link: video_link,
+                    tg.generateOneByPercentCb(50, async (err, result) => {
+                        video_thumb = result;
+                        let insertData = {
+                            user_id: parseInt(postData[i].user_id),
+                            video_title: postData[i].video_title,
+                            duration: total_duration,
+                            video_description: postData[i].video_description,
+                            video_thumb: video_thumb,
+                            video_link: video_link,
+                            video_level: postData[i].video_level,
+                            video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
+                            list_order: await getArtistVideoCount(parseInt(postData[i].user_id)) + 1
+                        }
+                        var routineVideo = await TeacherVideo.create(insertData);
+                    });
                 }
-                var routineVideo = await TeacherVideo.create(insertData);
-            });
+            }
         }
+        console.log('complete')
         return res.send({ success: true, message: "Artist video created successfully.", data: [] });
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
     }
 }
 
-exports.addArtistVideo = async (req, res) => {
+
+
+exports.addArtistVideoOld = async (req, res) => {
 
     try {
 
@@ -1465,7 +1948,7 @@ exports.addArtistVideo = async (req, res) => {
 
 exports.artistVideoList = async function (req, res, next) {
 
-    console.log(req.query)
+    //console.log(req.query)
     try {
         console.log(req.query);
         let token = await User.getToken(req);
@@ -1493,9 +1976,14 @@ exports.artistVideoList = async function (req, res, next) {
                 limit: limit,
                 offset: offset,
                 include: [{
-                    model: db.user
+                    model: db.user,
+                    include: [
+                        {
+                            model: db.routineFolder,
+                        }
+                    ]
                 }],
-                order: [['id', 'DESC']]
+                order: [['list_order', 'ASC']]
             }
             );
             routineVideoList['rows'] = routineVideoList['rows'];
@@ -1503,7 +1991,7 @@ exports.artistVideoList = async function (req, res, next) {
             routineVideoList['totalPages'] = Math.ceil(routineVideoList['count'] / limit);
             res.send({ success: true, message: "", data: routineVideoList });
         } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
 
     } catch (e) {
@@ -1542,9 +2030,9 @@ exports.createVideoSliceRecordong = async (req, res) => {
         source = 3
     } else if (video.video_type == 'video') {
         source = 3
-    }else if (video.video_type == 'embed_url') {
+    } else if (video.video_type == 'embed_url') {
         source = 1
-    }else if (video.video_type == 'youtube') {
+    } else if (video.video_type == 'youtube') {
         source = 1
     }
 
@@ -1552,9 +2040,9 @@ exports.createVideoSliceRecordong = async (req, res) => {
         source_data = videoPath;
     } else if (video.video_type == 'video') {
         source_data = videoPath
-    }else if (video.video_type == 'embed_url') {
+    } else if (video.video_type == 'embed_url') {
         source_data = video.video_link
-    }else if (video.video_type == 'youtube') {
+    } else if (video.video_type == 'youtube') {
         source_data = video.video_link
     }
     //console.log(source_data);
@@ -1565,9 +2053,9 @@ exports.createVideoSliceRecordong = async (req, res) => {
         var chunks = [];
         response.on("data", function (chunk) {
             chunks.push(chunk);
-        logger.info('chunk data %s%', JSON.stringify(chunk));
+            logger.info('chunk data %s%', JSON.stringify(chunk));
         });
-        
+
         response.on("end", async function (chunk) {
             var sliceBody = Buffer.concat(chunks);
             sliceinfo = JSON.parse(sliceBody.toString());
@@ -1591,6 +2079,7 @@ exports.createVideoSliceRecordong = async (req, res) => {
                         recording_info: body,
                         routine_id: video.routine_id
                     }
+                    VideoSliceModel.destroy({ where: { video_id: video.id, routine_id: video.routine_id } });
                     VideoSliceModel.create(sliceData);
                     RoutineVideo.update({ slice_added: 'yes' }, { where: { id: req.body.video_id } });
                     res.send({ success: true, message: "Slice created successfully", data: JSON.parse(body) });
@@ -1626,6 +2115,125 @@ exports.createVideoSliceRecordong = async (req, res) => {
     /** end slice */
 
 }
+
+// create artist video slice 
+
+exports.createArtistVideoSliceRecordong = async (req, res) => {
+
+    var video = await TeacherVideo.findOne({
+        where: { id: req.body.video_id },
+        include: [{
+            model: db.videoSlice
+        },
+        {
+            model: db.user,
+            include: [
+                {
+                    model: db.routineFolder
+                }
+            ]
+        }
+        ],
+    });
+    logger.info('video Details  #### %s.', JSON.stringify(video));
+    var videoPath = video.video_link;
+    logger.info('videoPath %s%', videoPath);
+    var artist = video.user.fullname;
+    var routineFolder = video.user.routineFolder;
+    var recordingName = video.video_title;
+
+    // var slug = video.videoSlouse.slice_info.slug;
+    if (video.video_type == 'local') {
+        source = 3
+    } else if (video.video_type == 'video') {
+        source = 3
+    } else if (video.video_type == 'embed_url') {
+        source = 1
+    } else if (video.video_type == 'youtube') {
+        source = 1
+    }
+
+    if (video.video_type == 'local') {
+        source_data = videoPath;
+    } else if (video.video_type == 'video') {
+        source_data = videoPath
+    } else if (video.video_type == 'embed_url') {
+        source_data = video.video_link
+    } else if (video.video_type == 'youtube') {
+        source_data = video.video_link
+    }
+    //console.log(source_data);
+    var sliceData;
+    var options = await getOptionValue('/api/v1/scores/', 'POST');
+    /** create slice */
+    var apiReq = https.request(options, function (response) {
+        var chunks = [];
+        response.on("data", function (chunk) {
+            chunks.push(chunk);
+            logger.info('chunk data %s%', JSON.stringify(chunk));
+        });
+
+        response.on("end", async function (chunk) {
+            var sliceBody = Buffer.concat(chunks);
+            sliceinfo = JSON.parse(sliceBody.toString());
+
+            /** slice recording */
+            var recordingOptions = await getOptionValue('/api/v1/scores/' + sliceinfo.slug + '/recordings/', 'POST');
+            var recordingReq = https.request(recordingOptions, function (recordingResponse) {
+                var chunks = [];
+
+                recordingResponse.on("data", function (chunk) {
+                    chunks.push(chunk);
+                });
+                recordingResponse.on("end", function (chunk) {
+                    var body = Buffer.concat(chunks);
+                    //console.log(body.toString());
+                    logger.info('recording info %s%', JSON.stringify(body));
+                    sliceData = {
+                        artist_video_id: video.id,
+                        type: 'normal',
+                        slice_info: sliceBody,
+                        recording_info: body,
+                        artist_id: video.user.id
+                    }
+                    //console.log(sliceData);
+                    VideoSliceModel.destroy({ where: { artist_video_id: video.id, artist_id: video.user.id } });
+                    VideoSliceModel.create(sliceData);
+                    TeacherVideo.update({ slice_added: 'yes' }, { where: { id: req.body.video_id } });
+                    res.send({ success: true, message: "Slice created successfully", data: JSON.parse(body) });
+                });
+
+                recordingResponse.on("error", function (error) {
+                    return res.send({ success: false, message: error.message, data: [] });
+                });
+            });
+            var postData = qs.stringify({
+                'name': recordingName,
+                'source': source,
+                'source_data': source_data
+            });
+            recordingReq.write(postData);
+            recordingReq.end();
+            /**end recording */
+        });
+        response.on("error", function (error) {
+            return res.send({ success: false, message: error.message, data: [] });
+        });
+    });
+    var postData = qs.stringify({
+        'name': video.video_title,
+        'artist': artist,
+        'embed_status': '4',
+        'print_status': '3',
+        'status': '3',
+        'folder_id': req.body.folder_id
+    });
+    apiReq.write(postData);
+    apiReq.end();
+    /** end slice */
+
+}
+
 
 exports.addSliceNotation = async function (req1, res, next) {
 
@@ -1723,7 +2331,105 @@ exports.addSliceNotation = async function (req1, res, next) {
     }
 }
 
-exports.addTeacher = async (req, res) => {
+// add notation for artist video 
+
+exports.addArtistVideoSliceNotation = async function (req1, res, next) {
+
+    try {
+
+        var video = await TeacherVideo.findOne({
+            where: { id: req1.body.video_id },
+            include: [{
+                model: db.videoSlice
+            },
+            {
+                model: db.user,
+                include: [
+                    {
+                        model: db.routineFolder
+                    }
+                ]
+            }
+            ],
+        });
+
+
+        if (video) {
+            var slug = video.videoSlouse.slice_info.slug;
+            var notation_file = req1.files.notation_file;
+            var file_name;
+            if (notation_file) {
+                let dir = 'uploads/notations';
+                const path = dir + '/' + notation_file.name
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir, { recursive: true });
+                }
+                notation_file.mv(path, (error) => {
+                    if (error) {
+                        res.writeHead(500, {
+                            'Content-Type': 'application/json'
+                        })
+                        res.end(JSON.stringify({ status: 'error', message: error }))
+                    }
+                })
+                file_name = notation_file.name
+            }
+
+            var options = {
+                'method': 'POST',
+                'hostname': 'www.soundslice.com',
+                'path': '/api/v1/scores/' + slug + '/notation/',
+                'headers': {
+                    'Authorization': 'Basic c2JFclNrenFtUkNCRUZxWVBrR2NOTklXdlJWd0lIY0Q6eTlrUGVhOlJmJnEyelh1QXMqXFF0Ji9+TVUyXEpSU1Q=',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                'maxRedirects': 20
+            };
+
+            var req = https.request(options, function (response) {
+                var chunks = [];
+                response.on("data", function (chunk) {
+                    chunks.push(chunk);
+                });
+                response.on("end", function (chunk) {
+                    var body = Buffer.concat(chunks);
+                    var bodyInfo = JSON.parse(body)
+                    var URL = bodyInfo.url;
+                    request({
+                        url: URL,
+                        method: 'PUT',
+                        headers: {
+                        },
+                        body: fs.readFileSync('uploads/notations/' + file_name).toString()
+                    }, (error, response, body1) => {
+                        if (error) {
+                            console.log('Error sending message: ', error)
+                        } else {
+                            console.log(response.body);
+                            console.log('Response: ', response.body.toString())
+                        }
+                        TeacherVideo.update({ notation_file_added: 'yes' }, { where: { id: req1.body.video_id } });
+                        return res.send({ success: true, message: "Slice notatation added.", data: JSON.parse(body) });
+                    })
+                });
+                response.on("error", function (error) {
+                    console.error(error);
+                });
+            });
+            var postData = qs.stringify({
+
+            });
+            req.write(postData);
+            req.end();
+        }
+
+    } catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
+}
+
+
+exports.addTeacherOld = async (req, res) => {
     let token = await User.getToken(req);
     let isValidToekn = await validateToekn(token);
     if (isValidToekn) {
@@ -1764,20 +2470,114 @@ exports.addTeacher = async (req, res) => {
         await UserProfile.create(profileData);
         res.send({ success: true, message: "Teacher added successfully.", data: [] });
     } else {
-        res.send({ success: false, message: "Invalid token", data: [] });
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
     }
 }
 
 
+exports.addTeacher = async (req, res) => {
 
-exports.editTeacher = async (req, res) => {
+    let token = await User.getToken(req);
+    let isValidToekn = await validateToekn(token);
+    if (isValidToekn) {
+        var fileName = '';
+        var imageFile = typeof req.files.profile !== "undefined" ? req.files.profile.name : "";
+        if (imageFile != "") {
+            const image = req.files.profile
+            let dir = 'uploads/profile';
+            const path = dir + '/' + image.name
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            image.mv(path, (error) => {
+                if (error) {
+                    res.writeHead(500, {
+                        'Content-Type': 'application/json'
+                    })
+                    res.end(JSON.stringify({ status: 'error', message: error }))
+                }
+            })
+            fileName = image.name
+        }
+        let userData = {
+            fullname: req.body.fullname,
+            profile: fileName,
+            role_id: 3
+        }
+        var userObj = await User.create(userData);
+        let profileData = {
+            user_id: userObj.id,
+            profession: req.body.profession,
+            history: req.body.history,
+            career_highlight: req.body.career_highlight,
+            key_point: req.body.key_point,
+            performance: req.body.performance,
+            address: req.body.address,
+            list_order: await getAllArtistCount() + 1
+        }
+        await UserProfile.create(profileData);
+
+        /* create artist folder */
+        var sliceFolderName = req.body.fullname + new Date().toLocaleDateString();
+        var options = await getOptionValue('/api/v1/folders/', 'POST');
+        var requset = https.request(options, function (response) {
+            var chunks = [];
+            response.on("data", function (chunk) {
+                chunks.push(chunk);
+            });
+            response.on("end", function (chunk) {
+                var body = Buffer.concat(chunks);
+                var routineFolder = {
+                    type: 'normal',
+                    folder_info: body,
+                    artist_id: userObj.id
+                }
+                console.log(routineFolder);
+                RoutineFolder.create(routineFolder);
+            });
+            response.on("error", function (error) {
+                console.error(error);
+            });
+        });
+        var postData = qs.stringify({
+            'name': sliceFolderName,
+        });
+        requset.write(postData);
+        requset.end();
+
+        /*create artist emoji*/
+        var emojis = JSON.parse(req.body['emojis[]']);
+        var length = emojis.length;
+        var teacherProfile = await TeacherPrfile.findOne({ where: { user_id: userObj.id } });
+        for (let i = 0; i < length; i++) {
+            let emojiData = {
+                user_id: userObj.id,
+                emoji: emojis[i],
+                teacher_profile_id: teacherProfile.id
+            }
+            await UserEmoji.create(emojiData);
+        }
+
+        res.send({ success: true, message: "Artist added successfully.", data: [] });
+    } else {
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
+    }
+}
+
+exports.updateAdminProfile = async (req, res) => {
 
     try {
 
         let token = await User.getToken(req);
+
+
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
-            var teacher = await User.findOne({ where: { id: req.body.id } });
+            var admin = await User.findOne(
+                {
+                    where: { id: req.body.id }
+                });
+
             var fileName;
             if (req.files != null) {
                 const image = req.files.profile
@@ -1796,47 +2596,215 @@ exports.editTeacher = async (req, res) => {
                 })
                 fileName = image.name
             }
-            if (teacher) {
-                let data = {
-                    title: req.body.fullname,
-                    profile: fileName
-                }
-               
-                await User.update(data, { where: { id: req.body.id } });
 
-                let profileData = {
-                    user_id: teacher.id,
-                    profession: req.body.profession,
-                    history: req.body.history,
-                    career_highlight: req.body.career_highlight,
-                    key_point: req.body.key_point,
-                    performance: req.body.performance,
-                    address: req.body.address
+            if (admin) {
+                var data;
+                if (fileName) {
+                    data = {
+                        fullname: req.body.fullname,
+                        profile: fileName,
+                        email: req.body.email
+                    }
+                } else {
+                    data = {
+                        fullname: req.body.fullname,
+                        email: req.body.email
+                    }
                 }
-                await UserProfile.update(profileData, { where: { user_id: teacher.id } });
-                res.send({ success: true, message: "Teacher profile updated successfully.", data: [] });
+                await User.update(data, { where: { id: req.body.id } });
+                var updatedAdmin = await User.findOne(
+                    {
+                        where: { id: req.body.id }
+                    });
+                res.send({ success: true, message: "Profile updated successfully.", data: updatedAdmin });
             } else {
                 res.send({ success: false, message: "Blog not found.", data: [] });
             }
         } else {
-            res.send({ success: false, message: "Invalid token", data: [] });
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
         }
     } catch (e) {
         res.send({ success: false, message: e.message, data: [] });
     }
 }
 
+exports.checkAdminCurrentPass = async (req, res) => {
+    let token = await User.getToken(req);
+    var loginId = await getLoginUserId(token);
+    let user = await User.findOne({ where: { id: loginId } });
+    if (user) {
+        await bcrypt.compare(req.body.current_password, user.password, function (err, isMatch) {
+            if (err) {
+                res.status(500).send({
+                    'success': false, message: err.message
+                });
+            }
+            if (!isMatch) {
+                res.send({ 'success': false, message: "Current password doesn't match." });
+            } else {
+                res.send({ 'success': true, message: '', 'data': [] });
+            }
+        });
+    }
+}
+
+exports.editTeacher = async (req, res) => {
+
+    // try {
+
+    let token = await User.getToken(req);
+
+
+    let isValidToekn = await validateToekn(token);
+    if (isValidToekn) {
+        var teacher = await User.findOne(
+            {
+                where: { id: req.body.id },
+                include: [
+                    {
+                        model: db.routineFolder
+                    },
+                    {
+                        model: db.teacherProfile
+                    }
+                ],
+            });
+        if (teacher.role_id == 3) {
+            var folderId = teacher.routineFolder.folder_info.id;
+        } else {
+            var folderId = "";
+        }
+
+        var fileName;
+        if (req.files != null) {
+            const image = req.files.profile
+            let dir = 'uploads/profile';
+            const path = dir + '/' + image.name
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            image.mv(path, (error) => {
+                if (error) {
+                    res.writeHead(500, {
+                        'Content-Type': 'application/json'
+                    })
+                    res.end(JSON.stringify({ status: 'error', message: error }))
+                }
+            })
+            fileName = image.name
+        }
+        console.log("file:" + fileName);
+        if (teacher) {
+            let data = {
+                fullname: req.body.fullname,
+                profile: fileName,
+                email: req.body.email
+            }
+
+            await User.update(data, { where: { id: req.body.id } });
+
+            let profileData = {
+                user_id: teacher.id,
+                profession: req.body.profession,
+                history: req.body.history,
+                career_highlight: req.body.career_highlight,
+                key_point: req.body.key_point,
+                performance: req.body.performance,
+                address: req.body.address
+            }
+            await UserProfile.update(profileData, { where: { user_id: teacher.id } });
+            /*update emoji*/
+
+            if (req.body['emojis[]']) {
+                await UserEmoji.destroy({ where: { user_id: teacher.id } });
+                var emojis = JSON.parse(req.body['emojis[]']);
+                var length = emojis.length;
+                for (let i = 0; i < length; i++) {
+                    let emojiData = {
+                        teacher_profile_id: teacher.teacherProfile.id,
+                        user_id: teacher.id,
+                        emoji: emojis[i],
+                    }
+                    await UserEmoji.create(emojiData);
+                }
+            }
+
+            /*update artist folder name */
+            if (folderId != "") {
+                if (teacher.fullname != req.body.fullname) {
+                    var options = await getOptionValue('/api/v1/folders/' + folderId + '/', 'POST');
+                    var requset = https.request(options, function (response) {
+                        var chunks = [];
+                        response.on("data", function (chunk) {
+                            chunks.push(chunk);
+                        });
+                        response.on("end", function (chunk) {
+                            var body = Buffer.concat(chunks);
+                            // console.log(JSON.parse(body))
+                        });
+                        response.on("error", function (error) {
+                            console.error(error);
+                        });
+                    });
+                    var postData = qs.stringify({
+                        'name': req.body.fullname,
+                    });
+                    requset.write(postData);
+                    requset.end();
+                }
+            }
+
+
+            res.send({ success: true, message: "Artist profile updated successfully.", data: [] });
+        } else {
+            res.send({ success: false, message: "Blog not found.", data: [] });
+        }
+    } else {
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
+    }
+    // } catch (e) {
+    //     res.send({ success: false, message: e.message, data: [] });
+    // }
+}
+
+// exports.blogList = async (req, res) => {
+//     let token = await User.getToken(req);
+//     let isValidToekn = await validateToekn(token);
+//     if (isValidToekn) {
+//         let where = {
+//             status: 'active'
+//         }
+//         console.log(req.query)
+//         if (req.query.search) {
+//             console.log('innnn')
+//             where = {
+//                 [Op.and]: [
+//                     { status: 'active' },
+//                     {
+//                         title: {
+//                             [Op.like]: '%' + req.query.search + '%'
+//                         }
+//                     }
+//                 ]
+//             }
+//         }
+//         let blogList = await Blog.findAll({ where: where });
+//         res.send({ success: true, message: "", data: blogList });
+//     } else {
+//         res.send({ success: false, message: "Invalid token", data: [] });
+//     }
+
+// };
+
 exports.blogList = async (req, res) => {
     let token = await User.getToken(req);
     let isValidToekn = await validateToekn(token);
     if (isValidToekn) {
-        let where = {
+        let whereCondition = {
             status: 'active'
         }
-        console.log(req.query)
         if (req.query.search) {
-            console.log('innnn')
-            where = {
+            whereCondition = {
                 [Op.and]: [
                     { status: 'active' },
                     {
@@ -1847,15 +2815,174 @@ exports.blogList = async (req, res) => {
                 ]
             }
         }
-        let blogList = await Blog.findAll({ where: where });
+        var All = [];
+        let limit = 10
+        let offset = 0 + (req.query.page - 1) * limit
+        let blogList = await Blog.findAndCountAll({
+            where: whereCondition,
+            // limit: limit,
+            // offset: offset,
+            order: [['list_order', 'ASC']]
+        });
+        for (const row of blogList['rows']) {
+            var obj = Object.assign({}, row.get());
+            // obj.description = obj.description.replace(/<\/?[^>]+(>|$)/g, "");
+            All.push(obj);
+        }
+        if (blogList) {
+            blogList['rows'] = All;
+            blogList['currentPage'] = req.query.page;
+            blogList['totalPages'] = Math.ceil(blogList['count'] / limit);
+        }
         res.send({ success: true, message: "", data: blogList });
+    } else {
+        res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
+    }
+};
+
+exports.commonList = async (req, res) => {
+    console.log(req.query)
+    let token = await User.getToken(req);
+    let isValidToekn = await validateToekn(token);
+    if (isValidToekn) {
+        var whereCondition = {
+            status: 'active'
+        }
+        var model;
+        let limit = 10
+        let offset = 0 + (req.query.page - 1) * limit
+        var list;
+        if (req.query.model == 'blog') {
+            list = await Blog.findAndCountAll({
+                where: whereCondition,
+                limit: limit,
+                offset: offset,
+                order: [['list_order', 'ASC']]
+            });
+        } else if (req.query.model == 'artist') {
+            let whereCondition = {
+                [Op.and]: [
+                    { role_id: 3 },
+                    { status: 'active' }
+                ]
+            }
+            list = await User.findAndCountAll({
+                where: whereCondition,
+                include: [{
+                    model: db.teacherProfile
+                }
+                ],
+                limit: limit,
+                offset: offset,
+                order: [['teacherProfile', 'list_order', 'ASC']]
+            });
+        } else if (req.query.model == 'artist_video') {
+            let whereCondition = {
+                [Op.and]: [
+                    { user_id: req.query.user_id },
+                ]
+            }
+            list = await TeacherVideo.findAndCountAll({
+                where: whereCondition,
+                limit: limit,
+                offset: offset,
+                order: [['list_order', 'ASC']]
+            });
+        } else if (req.query.model == 'routine_video') {
+            let whereCondition = {
+                [Op.and]: [
+                    { routine_id: req.query.routine_id },
+                ]
+            }
+            list = await RoutineVideo.findAndCountAll({
+                where: whereCondition,
+                limit: limit,
+                offset: offset,
+                order: [['list_order', 'ASC']]
+            });
+        }
+        if (list) {
+            list['rows'] = list['rows'];
+            list['currentPage'] = req.query.page;
+            list['totalPages'] = Math.ceil(list['count'] / limit);
+        }
+        res.send({ success: true, message: "", data: list });
     } else {
         res.send({ success: false, message: "Invalid token", data: [] });
     }
-
 };
 
+exports.updateOfList = async (req, res) => {
 
+    let token = await User.getToken(req);
+    let isValidToekn = await validateToekn(token);
+    if (isValidToekn) {
+
+        var model;
+        if (req.body.model == 'blog') {
+            model = Blog;
+        } else if (req.body.model == 'teacherProfile') {
+            model = TeacherPrfile;
+        } else if (req.body.model == 'artist_video') {
+            model = TeacherVideo;
+        } else if (req.body.model == 'routine_video') {
+            model = RoutineVideo;
+        }
+        // console.log(req.body)
+        var newRecoreArray = ((req.body != 'null') && !Array.isArray(req.body['data[]'])) ? [req.body['data[]']] : req.body['data[]'];
+        newRecoreArray = JSON.parse(newRecoreArray[0]);
+        for (let i = 0; i < newRecoreArray.length; i++) {
+            console.log('userId:' + req.body.user_id)
+            console.log('Id:' + newRecoreArray[i].id)
+            console.log(TeacherVideo)
+            var order = (i + 1) + (10 * (req.body.page - 1));
+
+            let data = {
+                list_order: order,
+            }
+            var Id;
+            var whereCon;
+            if (req.body.model == 'blog') {
+                Id = newRecoreArray[i].id;
+                whereCon = {
+                    id: Id
+                }
+            }
+            else if (req.body.model == 'teacherProfile') {
+                Id = newRecoreArray[i].teacherProfile.id;
+                whereCon = {
+                    id: Id
+                }
+            } else if (req.body.model == 'artist_video') {
+                Id = newRecoreArray[i].id;
+                whereCon = {
+                    id: Id,
+                    user_id: req.body.user_id
+                }
+            } else if (req.body.model == 'routine_video') {
+                Id = newRecoreArray[i].id;
+                whereCon = {
+                    id: Id,
+                    routine_id: req.body.routine_id
+                }
+            }
+            await model.update(data, { where: whereCon });
+        }
+
+
+        res.send({ success: true, message: "Order updated successfully", data: [] });
+    } else {
+        res.send({ success: false, message: "Invalid token", data: [] });
+    }
+};
+
+let updateValue = async (model, data, id) => {
+    let obj = await model.update(data, { where: { id: id } });
+    if (obj) {
+        return true;
+    }
+    return false;
+}
 
 exports.savedVideoList = async function (req, res, next) {
 
@@ -1957,7 +3084,7 @@ exports.routineVideoList = async function (req, res, next) {
             let offset = 0 + (req.query.page - 1) * limit
             let routineVideoList = await RoutineVideo.findAndCountAll({
                 where: {
-                    [Op.and]: [{ routine_id: req.query.routine_id }]
+                    routine_id: req.query.routine_id
                 },
                 limit: limit,
                 offset: offset,
@@ -1986,9 +3113,9 @@ exports.getEmojis = async function (req, res, next) {
             res.send({ success: true, message: "Invalid token", data: emojiImage });
         }
 
-        } catch (e) {
-            res.send({ success: false, message: e.message, data: [] });
-        }
+    } catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
 }
 
 exports.teacherDetail = async function (req, res, next) {
@@ -2110,14 +3237,15 @@ exports.updateSettings = async function (req, res, next) {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
-            postData = ((req.body != 'null') && !Array.isArray(req.body['data[]'])) ? [req.body['data[]']] : req.body['data[]'];
-            var length = videos.length;
+            postData = ((req.body != 'null') && !Array.isArray(req.body['settings[]'])) ? [req.body['settings[]']] : req.body['settings[]'];
+            postData = JSON.parse(postData);
+            console.log(postData)
+            var length = postData.length;
             for (let i = 0; i < length; i++) {
                 let data = {
-                    key_value: postData[i].key_value,
                     value: postData[i].value
                 }
-                await Setting.update(data, { where: { id: postData[i].id } });
+                await Setting.update(data, { where: { key_value: postData[i].key } });
             }
             res.send({ success: true, message: 'Setting update successfully.', data: [] });
         } else {
@@ -2232,10 +3360,26 @@ exports.getSliceNotation = async function (req, res, next) {
     });
 }
 
+exports.dashboardCount = async function (req, res, next) {
+
+    try {
+        var result = {};
+        result['artist_count'] = await getTotalArtist();
+        result['user_count'] = await getTotalUser();
+        result['video_count'] = await getTotalVideoCount();
+        result['routine_count'] = await getTotalRoutineCount();
+
+        res.send({ success: true, message: "", data: result });
+    } catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
+}
+
+
 let getOptionValue = async (path, method) => {
     let data = {
         'method': method,
-        'hostname': "www.soundslice.com",
+        'hostname': config.SOUNDSLICE_URL,
         'path': path,
         'headers': {
             'Authorization': config.SOUNDSLICE_AUTH,
@@ -2246,6 +3390,36 @@ let getOptionValue = async (path, method) => {
     return data;
 }
 
+let getTotalArtist = async () => {
+    return await User.count({ where: { role_id: 3 } });
+}
+
+
+let getAllArtistCount = async () => {
+    return await User.count({ where: { role_id: 3 } });
+}
+
+let getAllBlogCount = async () => {
+    return await Blog.count();
+}
+
+let getArtistVideoCount = async (userId) => {
+    return await TeacherVideo.count({ where: { user_id: userId } });
+}
+let getRoutineVideoCount = async (routineId) => {
+    return await RoutineVideo.count({ where: { routine_id: routineId } });
+}
+let getTotalUser = async () => {
+    return await User.count({ where: { role_id: 2 } });
+}
+
+let getTotalVideoCount = async () => {
+    return await RoutineVideo.count();
+}
+
+let getTotalRoutineCount = async () => {
+    return await Routine.count();
+}
 let getRoutineCount = async (teacherId) => {
     return await Routine.count({ where: { user_id: teacherId } });
 }
@@ -2306,6 +3480,7 @@ let remove = removeFileFromFolder = async (filePath) => {
         return await fs.unlinkSync(filePath);
     }
 }
+
 let secondsToHms = (d) => {
     d = Number(d);
     var h = Math.floor(d / 3600);
@@ -2317,6 +3492,19 @@ let secondsToHms = (d) => {
     var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
     return hDisplay + mDisplay + sDisplay;
 }
+
+let convertSecondToHMS = (totalSeconds) => {
+    let hours = Math.floor(totalSeconds / 3600);
+    totalSeconds %= 3600;
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    // If you want strings with leading zeroes:
+    minutes = String(minutes).padStart(2, "0");
+    hours = String(hours).padStart(2, "0");
+    seconds = String(seconds).padStart(2, "0");
+    return hours + ":" + minutes + ":" + seconds;
+}
+
 let validateToekn = async (token) => {
     let userObj = await User.findOne({ where: { login_token: token } });
     if (userObj) {
@@ -2411,16 +3599,19 @@ exports.hashtagDetail = async (req, res) => {
 exports.updateHashtag = async (req, res) => {
 
     try {
-            
+
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
             var hashtagData = await Hashtag.findOne();
             var fileName;
             if (req.files != null) {
+                var NewName = Math.round(new Date() / 1000) + User.generateToken();
                 const image = req.files.hashtagVideo
+                var fileExt = image.mimetype.split('/').pop();
+                var fileName = NewName + '.' + fileExt;
                 let dir = 'uploads/hashtag';
-                const path = dir + '/' + image.name
+                const path = dir + '/' + fileName
                 if (!fs.existsSync(dir)) {
                     fs.mkdirSync(dir, { recursive: true });
                 }
@@ -2432,11 +3623,11 @@ exports.updateHashtag = async (req, res) => {
                         res.end(JSON.stringify({ status: 'error', message: error }))
                     }
                 })
-                fileName = image.name
+                fileName = fileName
 
                 //const image = req.files.hashtagVideo
                 const tg = await new ThumbnailGenerator({
-                    sourcePath: 'uploads/hashtag/'+image.name,
+                    sourcePath: 'uploads/hashtag/' + fileName,
                     thumbnailPath: 'uploads/hashtag/thumbs/',
                     tmpDir: '/uploads/hashtag/thumbs/'
                 });
@@ -2448,30 +3639,30 @@ exports.updateHashtag = async (req, res) => {
                         image: fileName,
                         video_thumb: video_thumb,
                     }
-                    if(hashtagData){
-                       await Hashtag.update(data, { where: { type: "hashtag" } });
-                    }else{
-                       await Hashtag.create(data); 
+                    if (hashtagData) {
+                        await Hashtag.update(data, { where: { type: "hashtag" } });
+                    } else {
+                        await Hashtag.create(data);
                     }
-                    
+
                 });
 
-            }else{
+            } else {
                 var data = {
-                        hashtag: req.body.hashtag,
-                        image: hashtagData.image,
-                        video_thumb: hashtagData.video_thumb,
-                    }
-                    if(hashtagData){
-                        await Hashtag.update(data, { where: { type: "hashtag" } });
-                    }else{
-                       await Hashtag.create(data); 
-                    }
+                    hashtag: req.body.hashtag,
+                    image: hashtagData.image,
+                    video_thumb: hashtagData.video_thumb,
+                }
+                if (hashtagData) {
+                    await Hashtag.update(data, { where: { type: "hashtag" } });
+                } else {
+                    await Hashtag.create(data);
+                }
             }
-             
-                //await Hashtag.update(data);
-                res.send({ success: true, message: "Hashtag updated successfully.", data: [] });
-            
+
+            //await Hashtag.update(data);
+            res.send({ success: true, message: "Hashtag updated successfully.", data: [] });
+
         } else {
             res.send({ success: false, message: "Invalid token", data: [] });
         }
@@ -2491,3 +3682,110 @@ exports.hashtagDelete = async (req, res) => {
         res.send({ success: false, message: "Invalid token", data: [] });
     }
 };
+
+//SERIES-----------------
+
+exports.addSeries = async (req, res) => {
+    try {
+        let token = await User.getToken(req);
+        let isValidToekn = await validateToekn(token);
+        if (isValidToekn) {
+
+
+
+            const image = req.files.image
+            let dir = 'uploads/series/images';
+            const path = dir + '/' + image.name
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            image.mv(path, (error) => {
+                if (error) {
+                    res.writeHead(500, {
+                        'Content-Type': 'application/json'
+                    })
+                    res.end(JSON.stringify({ status: 'error', message: error }))
+                }
+            })
+            var fileName = image.name
+
+
+            let Data = {
+                name: req.body.name,
+                description: req.body.description,
+                image: fileName
+            }
+
+            await Series.create(Data);
+
+
+
+            res.send({ success: true, message: "Series created successfully.", data: Data });
+        } else {
+            res.send({ success: false, type: "token_invalid", message: "Invalid token", data: [] });
+        }
+    }
+    catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
+}
+
+// Quiz Add
+exports.addQuiz = async (req, res) => {
+    try {
+        let token = await User.getToken(req);
+        let isValidToekn = await validateToekn(token);
+        console.log("isValidToekn", isValidToekn);
+        if (isValidToekn) {
+            let Data = {
+                question: req.body.question,
+            }
+            let quiz = await Quiz.create(Data);
+            let option = [];
+            options = req.body.option_name;
+            option = options.split(",");
+
+            // option.forEach(async function (optionRow, i) {
+            for (const row of option) {
+                let data = {
+                    question_id: quiz.id,
+                    option_name: row
+                }
+
+                await Quiz_Options.create(data);
+
+            };
+
+            res.send({ success: true, message: "Quiz created successfully.", data: [] });
+        } else {
+            res.send({ success: false, message: "Invalid Token", data: [] });
+        }
+    } catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
+}
+
+exports.quizList = async (req, res) => {
+    try {
+        let token = await User.getToken(req);
+        let isValidToekn = await validateToekn(token);
+        if (isValidToekn) {
+            let list = await Quiz.findOne(
+                {
+                    where: {
+                        id: req.query.id
+                    },
+                    include: [{
+                        model: db.quiz_question_options
+                    }]
+                });
+            res.send({ success: true, message: "Quiz list", data: list })
+        } else {
+            res.send({ success: false, message: "Invalid Token", data: [] });
+        }
+
+    } catch (e) {
+        res.send({ success: false, message: e.message, data: [] });
+    }
+}
+    

@@ -22,6 +22,7 @@ const request = require('request');
 var https = require('follow-redirects').https;
 var qs = require('querystring');
 const axios = require('axios');
+var fs = require('fs');
 
 
 // const { where } = require("sequelize");
@@ -52,7 +53,7 @@ exports.blogList = async (req, res) => {
 		var All = [];
 		let limit = 10
 		let offset = 0 + (req.query.page - 1) * limit;
-		let totatCount = await Blog.count({ where: whereCondition});
+		let totatCount = await Blog.count({ where: whereCondition });
 		let blogList = await Blog.findAndCountAll({
 			where: whereCondition,
 			limit: limit,
@@ -60,10 +61,10 @@ exports.blogList = async (req, res) => {
 			order: [['list_order', 'ASC']]
 		});
 		for (const row of blogList['rows']) {
-            var obj = Object.assign({}, row.get());
-            obj.description = obj.description.replace(/<\/?[^>]+(>|$)/g, "");
-            All.push(obj);
-        }
+			var obj = Object.assign({}, row.get());
+			obj.description = (obj.description)?obj.description.replace(/<\/?[^>]+(>|$)/g, ""):'';
+			All.push(obj);
+		}
 		if (blogList) {
 			blogList['rows'] = All;
 			blogList['count'] = totatCount;
@@ -114,7 +115,7 @@ exports.savedRoutineList = async function (req, res, next) {
 			var All = [];
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await UserSavedRoutine.count({ where: {user_id: loginId , type: 'routine'}});
+			let totatCount = await UserSavedRoutine.count({ where: { user_id: loginId, type: 'routine' } });
 			let userVideoList = await UserSavedRoutine.findAndCountAll({
 				where: {
 					user_id: loginId,
@@ -160,12 +161,12 @@ exports.savedVideoList = async function (req, res, next) {
 			var All = [];
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await UserSavedRoutine.count({ where: {user_id: loginId , type: 'video' , playlist_id:req.query.play_list_id}});
+			let totatCount = await UserSavedRoutine.count({ where: { user_id: loginId, type: 'video', playlist_id: req.query.play_list_id } });
 			let userVideoList = await UserSavedRoutine.findAndCountAll({
 				where: {
 					user_id: loginId,
 					type: 'video',
-					playlist_id:req.query.play_list_id
+					playlist_id: req.query.play_list_id
 				},
 				limit: limit,
 				offset: offset,
@@ -237,7 +238,7 @@ exports.teacherList = async function (req, res, next) {
 			}
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await User.count({ where: whereCondition});
+			let totatCount = await User.count({ where: whereCondition });
 			let teacherList = await User.findAndCountAll({
 				where: whereCondition,
 				include: [{
@@ -249,7 +250,7 @@ exports.teacherList = async function (req, res, next) {
 				],
 				limit: limit,
 				offset: offset,
-				order: [['teacherProfile','list_order', 'ASC']]
+				order: [['teacherProfile', 'list_order', 'ASC']]
 			}
 			);
 			for (const row of teacherList['rows']) {
@@ -310,7 +311,7 @@ exports.adminTeacherList = async function (req, res, next) {
 				],
 				limit: limit,
 				offset: offset,
-				order: [['teacherProfile','list_order', 'ASC']]
+				order: [['teacherProfile', 'list_order', 'ASC']]
 			}
 			);
 			for (const row of teacherList['rows']) {
@@ -378,7 +379,7 @@ exports.routineVideoList = async function (req, res, next) {
 			}
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await RoutineVideo.count({ where: whereCondition});
+			let totatCount = await RoutineVideo.count({ where: whereCondition });
 			let routineVideoList = await RoutineVideo.findAndCountAll({
 				where: whereCondition,
 				limit: limit,
@@ -445,7 +446,7 @@ exports.adminRoutineVideoList = async function (req, res, next) {
 			}
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
-			let count = await RoutineVideo.count({where: whereCondition});
+			let count = await RoutineVideo.count({ where: whereCondition });
 			let routineVideoList = await RoutineVideo.findAndCountAll({
 				where: whereCondition,
 				limit: limit,
@@ -512,7 +513,7 @@ exports.getUserPlayList = async function (req, res, next) {
 			}
 			let limit = 10
 			let offset = 0 + (req.query.page - 1) * limit;
-			let totatCount = await UserPlaylist.count({ where: whereCondition});
+			let totatCount = await UserPlaylist.count({ where: whereCondition });
 			let routineVideoList = await UserPlaylist.findAndCountAll({
 				where: whereCondition,
 				limit: limit,
@@ -541,16 +542,17 @@ exports.getUserPlayList = async function (req, res, next) {
 	}
 }
 
+
 exports.removeArticle = async function (req, res, next) {
 
 	try {
-	  var playList = await UserPlaylist.destroy({ where: { id: req.query.id} });
-	  if(playList){
-		await UserSavedRoutine.destroy({ where: { playlist_id: req.query.id} });
-		res.send({ success: true, message: "PlayList deleted successfully.", data: '' });
-	  }else{
-		res.send({ success: false, message: "PlayList not found.", data: '' });
-	  }
+		var playList = await UserPlaylist.destroy({ where: { id: req.query.id } });
+		if (playList) {
+			await UserSavedRoutine.destroy({ where: { playlist_id: req.query.id } });
+			res.send({ success: true, message: "PlayList deleted successfully.", data: '' });
+		} else {
+			res.send({ success: false, message: "PlayList not found.", data: '' });
+		}
 	} catch (e) {
 		res.send({ success: false, message: e.message, data: [] });
 	}
@@ -688,18 +690,47 @@ exports.saveUnsaveVideo = async function (req, res, next) {
 			if (req.body.type == 'save') {
 				var saveData;
 				var playListId;
-				if(req.body.playlist_type == 'name'){
-					let createData = {
-						user_id : user_id,
-						name : req.body.playlist
+				console.log(req.files.playlist_icon)
+				if (req.body.playlist_type == 'name') {
+					var fileName = '';
+					if (req.files != null) {
+						const image = req.files.playlist_icon
+						let dir = 'uploads/playlist_icon';
+						const path = dir + '/' + image.name
+						if (!fs.existsSync(dir)) {
+							fs.mkdirSync(dir, { recursive: true });
+						}
+						image.mv(path, (error) => {
+							if (error) {
+								res.writeHead(500, {
+									'Content-Type': 'application/json'
+								})
+								res.end(JSON.stringify({ status: 'error', message: error }))
+							}
+						})
+						fileName = image.name
 					}
-					let playList = await UserPlaylist.findOne({where:createData});
-					if(playList){
-					 return	res.send({ success: false, message: 'Sorry , this playlist already has been added by you.', data: [] });	
+					var createData;
+					if (req.files != null) {
+						 createData = {
+							user_id: user_id,
+							name: req.body.playlist,
+							icon : fileName
+						}
+			     	}else{
+						createData = {
+							user_id: user_id,
+							name: req.body.playlist,
+						}
+					 }
+					 console.log(createData)
+					let playList = await UserPlaylist.findOne({ where: {user_id:user_id , name:createData.name} });
+					if (playList) {
+						return res.send({ success: false, message: 'Sorry , this playlist already has been added by you.', data: [] });
 					}
 					let addRes = await UserPlaylist.create(createData);
 					playListId = addRes.id;
-				}else{
+				} else {
 					playListId = req.body.playlist;
 				}
 
@@ -708,14 +739,14 @@ exports.saveUnsaveVideo = async function (req, res, next) {
 						user_id: user_id,
 						video_id: req.body.video_id,
 						type: 'video',
-						playlist_id:playListId
+						playlist_id: playListId
 					}
 				} else {
 					saveData = {
 						user_id: user_id,
 						routine_video_id: req.body.video_id,
 						type: 'video',
-						playlist_id:playListId
+						playlist_id: playListId
 					}
 				}
 				var isSaved = await UserSavedRoutine.findOne({ where: saveData });
@@ -742,6 +773,59 @@ exports.saveUnsaveVideo = async function (req, res, next) {
 	} catch (e) {
 		res.send({ success: false, message: e.message, data: [] });
 	}
+}
+exports.updatePlayListIcon = async function (req, res, next) {
+	//   logger.info('get data  #### %s.', req.body.type);
+	try {
+		let token = await User.getToken(req);
+		let isValidToekn = await validateToekn(token);
+		var message;
+		if (isValidToekn) {
+			console.log(req.body)
+			var playListIcon;
+			if (req.files != null) {
+		      playListIcon =	await uploadPlayListIcon(req.files.playlist_icon);
+			}
+		var playList = await UserPlaylist.findOne({where:{id:req.body.playlist_id}});
+		let updateData = {
+			icon: (playListIcon)?playListIcon:playList.icon,
+			name:req.body.name
+		}
+		var Updatedstatus = UserPlaylist.update(updateData, { where: { id: req.body.playlist_id } });
+		 if(Updatedstatus){
+		  res.send({ success: true, message: 'Playlist Updated Successfully.', data: [] });
+		 }else{
+			res.send({ success: false, message: 'Something went wrong.', data: [] });
+		 }
+		} else {
+			res.send({ success: false, message: message, data: [] });
+		}
+
+	} catch (e) {
+		res.send({ success: false, message: e.message, data: [] });
+	}
+}
+
+let uploadPlayListIcon = async (playListIcon) => {
+	var fileName;
+	if (playListIcon != null) {
+		const image = playListIcon
+		let dir = 'uploads/playlist_icon';
+		const path = dir + '/' + image.name
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir, { recursive: true });
+		}
+		await image.mv(path, (error) => {
+			if (error) {
+				res.writeHead(500, {
+					'Content-Type': 'application/json'
+				})
+				res.end(JSON.stringify({ status: 'error', message: error }))
+			}
+		})
+		fileName = image.name
+	}
+	return fileName;
 }
 
 let getRandomString = (num) => {
@@ -841,7 +925,7 @@ let getTotalRoutineMinutDuration = async (routineId) => {
 }
 
 let getTotalPlayListDuration = async (playListId) => {
-	
+
 	let savedVideos = await UserSavedRoutine.findAll({
 		where: {
 			playlist_id: playListId,
@@ -849,16 +933,16 @@ let getTotalPlayListDuration = async (playListId) => {
 		},
 		include: [
 			{
-			  model: db.teacherVideo
+				model: db.teacherVideo
 			},
 			{
-			  model: db.routineVideo
+				model: db.routineVideo
 			}
 		],
 		order: [['id', 'DESC']]
 	}
 	);
-	
+
 	if (savedVideos) {
 		var times = [0, 0, 0]
 		var max = times.length;
@@ -867,9 +951,9 @@ let getTotalPlayListDuration = async (playListId) => {
 		var mintsum = 0;
 		var secondsum = 0;
 		for (var j = 0; j < savedVideos.length; j++) {
-			if(savedVideos[j].teacherVideo){
+			if (savedVideos[j].teacherVideo) {
 				var duration = (savedVideos[j].teacherVideo.duration).split(':');
-			}else if(savedVideos[j].routineVideo){
+			} else if (savedVideos[j].routineVideo) {
 				var duration = (savedVideos[j].routineVideo.video_duration).split(':');
 			}
 			hoursum = parseInt(hoursum) + parseInt(duration[0])
@@ -891,10 +975,10 @@ let getTotalDurationHms = async (playListId) => {
 		},
 		include: [
 			{
-			  model: db.teacherVideo
+				model: db.teacherVideo
 			},
 			{
-			  model: db.routineVideo
+				model: db.routineVideo
 			}
 		],
 		order: [['id', 'DESC']]
@@ -908,9 +992,9 @@ let getTotalDurationHms = async (playListId) => {
 		var mintsum = 0;
 		var secondsum = 0;
 		for (var j = 0; j < savedVideos.length; j++) {
-			if(savedVideos[j].teacherVideo){
+			if (savedVideos[j].teacherVideo) {
 				var duration = (savedVideos[j].teacherVideo.duration).split(':');
-			}else if(savedVideos[j].routineVideo){
+			} else if (savedVideos[j].routineVideo) {
 				var duration = (savedVideos[j].routineVideo.video_duration).split(':');
 			}
 			hoursum = parseInt(hoursum) + parseInt(duration[0])

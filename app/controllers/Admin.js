@@ -1588,7 +1588,8 @@ exports.addRoutineVideo = async (req, res) => {
                             /*adding data*/
                             let dir = 'uploads/routines/thumbs/';
                             var NewName = Math.round(new Date() / 1000) + User.generateToken();
-                            var fileExt = videos[i].mimetype.split('/').pop();
+                            // var fileExt = videos[i].mimetype.split('/').pop();
+                            var fileExt = videos[i].name.split('.').pop();
                             var thumbfileName = NewName + '.' + fileExt;
                             const path = dir + '/' + thumbfileName
                             if (!fs.existsSync(dir)) {
@@ -1616,7 +1617,7 @@ exports.addRoutineVideo = async (req, res) => {
                                 slice_added: "yes",
                                 notation_file_added: "yes",
                                 video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
-                                list_order: await getRoutineVideoCount(parseInt(postData[i].user_id)) + 1
+                                list_order: await getRoutineVideoCount(parseInt(postData[i].routine_id)) + 1
                             }
                             var routineVideo = await RoutineVideo.create(insertData);
                             var embed_video_link = postData[i].embed_url
@@ -1658,7 +1659,8 @@ exports.addRoutineVideo = async (req, res) => {
                 if (videos[i] && videos[i] != undefined) {
                     let dir = 'uploads/routines/videos';
                     var NewName = Math.round(new Date() / 1000) + User.generateToken();
-                    var fileExt = videos[i].mimetype.split('/').pop();
+                    // var fileExt = videos[i].mimetype.split('/').pop();
+                    var fileExt = videos[i].name.split('.').pop();
                     var fileName = NewName + '.' + fileExt;
                     const path = dir + '/' + fileName
                     if (!fs.existsSync(dir)) {
@@ -1708,7 +1710,7 @@ exports.addRoutineVideo = async (req, res) => {
                             video_thumb: video_thumb,
                             video_link: video_link,
                             video_type: (postData[i].video_type) ? postData[i].video_type : 'local',
-                            list_order: await getRoutineVideoCount(parseInt(postData[i].user_id)) + 1
+                            list_order: await getRoutineVideoCount(parseInt(postData[i].routine_id)) + 1
                         }
                         var routineVideo = await RoutineVideo.create(insertData);
                     });
@@ -1769,6 +1771,7 @@ exports.addArtistVideo = async (req, res) => {
                             let dir = 'uploads/artists/thumbs/';
                             var NewName = Math.round(new Date() / 1000) + User.generateToken();
                             var fileExt = videos[i].mimetype.split('/').pop();
+                            // var fileExt = videos[i].name.split('.').pop();
                             var thumbfileName = NewName + '.' + fileExt;
                             const path = dir + '/' + thumbfileName
                             if (!fs.existsSync(dir)) {
@@ -1837,6 +1840,7 @@ exports.addArtistVideo = async (req, res) => {
                     let dir = 'uploads/artists/videos';
                     var NewName = Math.round(new Date() / 1000) + User.generateToken();
                     var fileExt = videos[i].mimetype.split('/').pop();
+                    // var fileExt = videos[i].name.split('.').pop();
                     var fileName = NewName + '.' + fileExt;
                     const path = dir + '/' + fileName
                     if (!fs.existsSync(dir)) {

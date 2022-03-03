@@ -18,6 +18,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         playlist_id :{
             type: Sequelize.INTEGER
+        },
+        content_type: {
+            type: Sequelize.VIRTUAL
         }
         
     },

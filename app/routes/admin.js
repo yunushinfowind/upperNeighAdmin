@@ -31,6 +31,19 @@ module.exports = app => {
   router.post("/edit-routine-video" , admin.editRoutineVideo);
   router.get("/routine-video/:id" , admin.routineVideoDetail);
   router.delete("/delete-routine-video/:id" , admin.routineVideoDelete);
+
+   /*series video routing*/
+   router.get("/series-list", admin.seriesList);
+   router.post("/add-series", admin.addSeries);
+   router.post("/edit-series", admin.editSeries);
+   router.get("/series/:id", admin.seriesDetail);
+   router.delete("/delete-series/:id", admin.seriesDelete);
+
+  router.post("/add-series-video", admin.addSeriesVideo);
+  router.post("/edit-series-video" , admin.editSeriesVideo);
+  router.get("/series-video/:id" , admin.seriesVideoDetail);
+  router.delete("/delete-series-video/:id" , admin.seriesVideoDelete);
+
   /*artist video routing*/
   router.post("/add-artist-video", admin.addArtistVideo);
   router.get("/artist-video-list", admin.artistVideoList);

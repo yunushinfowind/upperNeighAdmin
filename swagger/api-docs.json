@@ -836,7 +836,7 @@
                         "in": "query",
                         "name": "type",
                         "description": "type",
-                        "enum": ["profile","video","routine"],
+                        "enum": ["profile","video","routine","series"],
                         "required": true
                     },
                     {
@@ -896,6 +896,51 @@
                         "in": "query",
                         "name": "routine_id",
                         "description": "routine_id",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "page",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User object.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/series-video-list": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "description": "series-list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "token",
+                        "description": "token",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "in": "query",
+                        "name": "series_id",
+                        "description": "series_id",
                         "type": "string",
                         "required": true
                     },

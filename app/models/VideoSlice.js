@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
         artist_id: {
             type: Sequelize.INTEGER
         },
+        series_id : {
+            type: Sequelize.INTEGER
+        },
         artist_video_id: {
             type: Sequelize.INTEGER
         },

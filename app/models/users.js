@@ -59,15 +59,14 @@ module.exports = (sequelize, Sequelize) => {
     login_token: {
       type: Sequelize.TEXT
     },
-    // sub_expiry_date:{
-    //   type: Sequelize.STRING,
-    // },
-    routine_count: {
+    sub_expiry_date:{
+      type: Sequelize.STRING,
+    },
+    series_count: {
       type: Sequelize.VIRTUAL
     },
-    expiry_date: {
-      type: Sequelize.STRING
-
+    routine_count: {
+      type: Sequelize.VIRTUAL
     },
     video_count: {
       type: Sequelize.VIRTUAL
@@ -80,8 +79,7 @@ module.exports = (sequelize, Sequelize) => {
       get() {
         return (this.getDataValue('status')=='active') ? true : false;
       }
-    },
-    
+    }
   },
     {
       createdAt: 'created_at',

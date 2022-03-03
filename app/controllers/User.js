@@ -23,7 +23,8 @@ var https = require('follow-redirects').https;
 var qs = require('querystring');
 const axios = require('axios');
 var fs = require('fs');
-
+const Series = db.series;
+const SeriesVideo = db.seriesVideo; 
 
 // const { where } = require("sequelize");
 // const Instagram = require('instagram-web-api')
@@ -136,6 +137,8 @@ exports.savedRoutineList = async function (req, res, next) {
 				var obj = Object.assign({}, row.get());
 				obj.total_duration = await getTotalRoutineDuration(obj.routine_id);
 				obj.total_duration_inMint = await getTotalRoutineMinutDuration(obj.routine_id);
+				var type = await checkRoutineContentType(obj.routine_id,'routine');
+				obj.content_type = (type == 'same')?obj.content_type : type;
 				All.push(obj);
 			}
 			userVideoList['rows'] = All;
@@ -319,6 +322,7 @@ exports.adminTeacherList = async function (req, res, next) {
 			);
 			for (const row of teacherList['rows']) {
 				var obj = Object.assign({}, row.get());
+				obj.series_count = await getSeriesCount(obj.id);
 				obj.routine_count = await getRoutineCount(obj.id);
 				obj.video_count = await getVideoCount(obj.id);
 				obj.normal_video_count = await getNormalVideoCount(obj.id);
@@ -426,6 +430,73 @@ exports.routineVideoList = async function (req, res, next) {
 	}
 }
 
+exports.seriesVideoList =  async function(req, res, next){
+	try {
+
+		let token = await User.getToken(req);
+		let isValidToekn = await validateToekn(token);
+		if (isValidToekn) {
+			let whereCondition = {
+				series_id: req.query.series_id
+			}
+			if (req.query.search) {
+				whereCondition = {
+					[Op.and]: [
+						{ series_id: req.query.series_id },
+						{
+							video_title: {
+								[Op.like]: '%' + req.query.search + '%'
+							}
+						}
+					]
+				}
+			}
+			
+			let limit = 10
+			let offset = 0 + (req.query.page - 1) * limit;
+			let totatCount = await SeriesVideo.count({ where: whereCondition });
+			let routineVideoList = await SeriesVideo.findAndCountAll({
+				where: whereCondition,
+				limit: limit,
+				offset: offset,
+				include: [
+					{
+						model: db.videoSlice
+					},
+					{
+						model: db.series
+					},
+					{
+						model: db.user
+					},
+					{
+						model: db.series,
+						include: [
+							// {
+							// 	model: db.routineFolder,
+							// }
+						]
+					}
+				],
+				group: ['seriesVideo.id'],
+				// order: [['id', 'DESC']]
+				order: [['list_order', 'ASC']]
+			}
+			);
+			routineVideoList['rows'] = routineVideoList['rows'];
+			routineVideoList['count'] = totatCount;
+			routineVideoList['currentPage'] = req.query.page;
+			routineVideoList['totalPages'] = Math.ceil(routineVideoList['count'] / limit);
+			res.send({ success: true, message: "", data: routineVideoList });
+		} else {
+			res.send({ success: false, message: "Invalid token", data: [] });
+		}
+
+	} catch (e) {
+		res.send({ success: false, message: e.message, data: [] });
+	}
+}
+
 exports.adminRoutineVideoList = async function (req, res, next) {
 
 	try {
@@ -492,9 +563,75 @@ exports.adminRoutineVideoList = async function (req, res, next) {
 	}
 }
 
-exports.getUserPlayList = async function (req, res, next) {
+exports.adminSeriesVideoList = async function (req, res, next) {
 
 	try {
+
+		let token = await User.getToken(req);
+		let isValidToekn = await validateToekn(token);
+		if (isValidToekn) {
+			let whereCondition = {
+				series_id: req.query.series_id
+			}
+			if (req.query.search) {
+				whereCondition = {
+					[Op.and]: [
+						{ series_id: req.query.series_id },
+						{
+							video_title: {
+								[Op.like]: '%' + req.query.search + '%'
+							}
+						}
+					]
+				}
+			}
+			let limit = 10
+			let offset = 0 + (req.query.page - 1) * limit;
+			let count = await SeriesVideo.count({ where: whereCondition });
+			let routineVideoList = await SeriesVideo.findAndCountAll({
+				where: whereCondition,
+				limit: limit,
+				offset: offset,
+				include: [
+					{
+						model: db.videoSlice
+					},
+					{
+						model: db.series
+					},
+					{
+						model: db.user
+					},
+					{
+						model: db.series,
+						include: [
+							{
+								model: db.routineFolder,
+							}
+						]
+					}
+				],
+				group: ['seriesVideo.id'],
+				order: [['list_order', 'ASC']]
+			}
+			);
+			routineVideoList['rows'] = routineVideoList['rows'];
+			routineVideoList['count'] = count;
+			routineVideoList['currentPage'] = req.query.page;
+			routineVideoList['totalPages'] = Math.ceil(routineVideoList['count'] / limit);
+			res.send({ success: true, message: "", data: routineVideoList });
+		} else {
+			res.send({ success: false, message: "Invalid token", data: [] });
+		}
+
+	} catch (e) {
+		res.send({ success: false, message: e.message, data: [] });
+	}
+}
+
+exports.getUserPlayList = async function (req, res, next) {
+
+	// try {
 
 		let token = await User.getToken(req);
 		let isValidToekn = await validateToekn(token);
@@ -541,9 +678,9 @@ exports.getUserPlayList = async function (req, res, next) {
 			res.send({ success: false, message: "Invalid token", data: [] });
 		}
 
-	} catch (e) {
-		res.send({ success: false, message: e.message, data: [] });
-	}
+	// } catch (e) {
+	// 	res.send({ success: false, message: e.message, data: [] });
+	// }
 }
 
 
@@ -648,7 +785,48 @@ exports.teacherDetail = async function (req, res, next) {
 					obj.is_saved = (isSaved) ? true : false;
 					obj.total_duration = await getTotalRoutineDuration(obj.id);
 					obj.total_duration_inMint = await getTotalRoutineMinutDuration(obj.id);
-					obj.content_type = await checkRoutineContentType(obj.id);
+					var type = await checkRoutineContentType(obj.id,'routine');
+					obj.content_type = (type == 'same')?obj.content_type : type;
+					All.push(obj);
+
+				}
+				result['rows'] = All;
+				result['currentPage'] = req.query.page;
+				result['totalPages'] = Math.ceil(result['count'] / limit);
+			}
+			if (req.query.type == 'series') {
+				let whereCondition = {
+					[Op.and]: [
+						{ user_id: req.query.teacher_id }
+					]
+				}
+	
+				if (req.query.level && req.query.level != 'all') {
+					whereCondition = {
+					[Op.and]: [
+						{ user_id: req.query.teacher_id },
+						{series_level:req.query.level}
+					 ]
+					}
+				}
+				result = await Series.findAndCountAll({
+					where: whereCondition,
+					limit: limit,
+					offset: offset,
+					// include: [{
+					// 	model: db.routineFolder
+					// }],
+					order: [['id', 'DESC']]
+				}
+				);
+				for (const row of result['rows']) {
+					var obj = Object.assign({}, row.get());
+					// var isSaved = await UserSavedRoutine.findOne({ where: { routine_id: obj.id, user_id: req.query.teacher_id } });
+					// obj.is_saved = (isSaved) ? true : false;
+					obj.total_duration = await getTotalRoutineDuration(obj.id);
+					obj.total_duration_inMint = await getTotalRoutineMinutDuration(obj.id);
+					var type = await checkRoutineContentType(obj.id,'series');
+					obj.content_type = (type == 'same')?obj.content_type : type;
 					All.push(obj);
 
 				}
@@ -869,6 +1047,9 @@ let getRoutineCount = async (teacherId) => {
 	return await Routine.count({ where: { user_id: teacherId } });
 }
 
+let getSeriesCount = async (teacherId) => {
+	return await Series.count({ where: { user_id: teacherId } });
+}
 
 let getVideoCount = async (teacherId) => {
 	return await RoutineVideo.count({ where: { user_id: teacherId } });
@@ -888,17 +1069,45 @@ let getPlayListVideoCount = async (playListId) => {
 	);
 
 }
-let checkRoutineContentType = async(routineId)=>{
-		let videos = await RoutineVideo.findAll({ where: {[Op.and]: [
+let checkRoutineContentType = async(routineId,type)=>{
+	  var videos;
+	  console.log('routineId',routineId)
+	  if(type == 'routine'){
+		var exist  = await RoutineVideo.count({ where: {
+			 routine_id: routineId }
+		   });
+		   if(!exist){
+			return 'same';
+		   }
+		 videos = await RoutineVideo.count({ where: {[Op.and]: [
 			 { content_type: 'free' },
 			 { routine_id: routineId }
 		     ]}
 		    });
-			if(videos && videos.length){
+			if(parseInt(videos) != 0){
 				return 'free';
 			}else{
 				return 'premium';
 			}
+		}else{
+		 var exist = await SeriesVideo.count({ where: {
+		    	series_id: routineId }
+			});
+			if(!exist){
+				return 'same';
+			}
+		 videos = await SeriesVideo.count({ where: {[Op.and]: [
+				{ content_type: 'free' },
+				{ series_id: routineId }
+				]}
+			   });
+			if(parseInt(videos) != 0){
+				return 'free';
+			}else{
+				return 'premium';
+			}
+		}		
+		
 }
 
 let getTotalRoutineDuration = async (routineId) => {
@@ -985,15 +1194,17 @@ let getTotalPlayListDuration = async (playListId) => {
 		var hoursum = 0;
 		var mintsum = 0;
 		var secondsum = 0;
+		var duration = 0;
 		for (var j = 0; j < savedVideos.length; j++) {
 			if (savedVideos[j].teacherVideo) {
-				var duration = (savedVideos[j].teacherVideo.duration).split(':');
+				 duration = (savedVideos[j].teacherVideo.duration).split(':');
 			} else if (savedVideos[j].routineVideo) {
-				var duration = (savedVideos[j].routineVideo.video_duration).split(':');
+				 duration = (savedVideos[j].routineVideo.video_duration).split(':');
 			}
-			hoursum = parseInt(hoursum) + parseInt(duration[0])
-			mintsum = parseInt(mintsum) + parseInt(duration[1])
-			secondsum = parseInt(secondsum) + parseInt(duration[2])
+			
+			hoursum = parseInt(hoursum) + (typeof duration !== 'undefined' && duration)?parseInt(duration[0]):0
+			mintsum = parseInt(mintsum) + (typeof duration !== 'undefined' && duration)?parseInt(duration[1]):0
+			secondsum = parseInt(secondsum) + (typeof duration !== 'undefined' && duration)?parseInt(duration[2]):0
 
 		}
 		var hoursMin = hoursum * 60
@@ -1032,9 +1243,9 @@ let getTotalDurationHms = async (playListId) => {
 			} else if (savedVideos[j].routineVideo) {
 				var duration = (savedVideos[j].routineVideo.video_duration).split(':');
 			}
-			hoursum = parseInt(hoursum) + parseInt(duration[0])
-			mintsum = parseInt(mintsum) + parseInt(duration[1])
-			secondsum = parseInt(secondsum) + parseInt(duration[2])
+			hoursum = parseInt(hoursum) + (typeof duration !== 'undefined' && duration)?parseInt(duration[0]):0
+			mintsum = parseInt(mintsum) + (typeof duration !== 'undefined' && duration)?parseInt(duration[1]):0
+			secondsum = parseInt(secondsum) + (typeof duration !== 'undefined' && duration)?parseInt(duration[2]):0
 
 		}
 		var hours = hoursum
@@ -1126,7 +1337,6 @@ exports.getHashtagDetails = async function (req, res, next) {
 						'authority': 'i.Instagram.com/',
 						'Cookie': 'ds_user_id=44372909615; sessionid=44372909615%3AQHywPHTupeVFzY%3A1;'
 					}
-					// 'Cookie': 'ds_user_id=44372909615; sessionid=44372909615%3AQHywPHTupeVFzY%3A1;'
 				}).then(response => {
 					return response;
 				}).catch(error => {

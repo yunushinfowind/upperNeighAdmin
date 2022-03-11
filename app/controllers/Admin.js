@@ -344,7 +344,7 @@ exports.routineList = async function (req, res, next) {
                 }
             }
 
-            let limit = 10;
+            let limit = 50;
             let offset = 0 + (req.query.page - 1) * limit;
             let count = await Routine.count({ where: search });
             let routineList = await Routine.findAndCountAll({
@@ -409,7 +409,7 @@ exports.seriesList = async function (req, res, next) {
                 }
             }
 
-            let limit = 10;
+            let limit = 50;
             let offset = 0 + (req.query.page - 1) * limit;
             let count = await Series.count({ where: search });
             let routineList = await Series.findAndCountAll({
@@ -472,7 +472,7 @@ exports.userList = async (req, res) => {
 
                 }
             }
-            let limit = 10
+            let limit = 50
             let offset = 0 + (req.query.page - 1) * limit
             let userList = await User.findAndCountAll({
                 where: search,
@@ -2849,7 +2849,7 @@ exports.artistVideoList = async function (req, res, next) {
                     ]
                 }
             }
-            let limit = 10
+            let limit = 50
             let offset = 0 + (req.query.page - 1) * limit
             let routineVideoList = await TeacherVideo.findAndCountAll({
                 where: whereCondition,
@@ -3696,7 +3696,7 @@ exports.blogList = async (req, res) => {
             }
         }
         var All = [];
-        let limit = 10
+        let limit = 50
         let offset = 0 + (req.query.page - 1) * limit
         let blogList = await Blog.findAndCountAll({
             where: whereCondition,
@@ -3729,7 +3729,7 @@ exports.commonList = async (req, res) => {
             status: 'active'
         }
         var model;
-        let limit = 10
+        let limit = 50
         let offset = 0 + (req.query.page - 1) * limit
         var list;
         if (req.query.model == 'blog') {
@@ -3819,16 +3819,14 @@ exports.updateOfList = async (req, res) => {
             model = TeacherVideo;
         } else if (req.body.model == 'routine_video') {
             model = RoutineVideo;
+        }else if (req.body.model == 'series_video') {
+            model = SeriesVideo;
         }
         // console.log(req.body)
         var newRecoreArray = ((req.body != 'null') && !Array.isArray(req.body['data[]'])) ? [req.body['data[]']] : req.body['data[]'];
         newRecoreArray = JSON.parse(newRecoreArray[0]);
         for (let i = 0; i < newRecoreArray.length; i++) {
-            console.log('userId:' + req.body.user_id)
-            console.log('Id:' + newRecoreArray[i].id)
-            console.log(TeacherVideo)
             var order = (i + 1) + (10 * (req.body.page - 1));
-
             let data = {
                 list_order: order,
             }
@@ -3857,6 +3855,12 @@ exports.updateOfList = async (req, res) => {
                     id: Id,
                     routine_id: req.body.routine_id
                 }
+            }else if (req.body.model == 'series_video') {
+                Id = newRecoreArray[i].id;
+                whereCon = {
+                    id: Id,
+                    series_id: req.body.series_id
+                }
             }
             await model.update(data, { where: whereCon });
         }
@@ -3884,7 +3888,7 @@ exports.savedVideoList = async function (req, res, next) {
         if (isValidToekn) {
             let loginId = await getLoginUserId(token);
 
-            let limit = 10
+            let limit = 50
             let offset = 0 + (req.query.page - 1) * limit
             let userVideoList = await UserSavedRoutine.findAndCountAll({
                 where: {
@@ -3936,7 +3940,7 @@ exports.teacherList = async function (req, res, next) {
 
                 }
             }
-            let limit = 10
+            let limit = 50
             let offset = 0 + (req.query.page - 1) * limit
             let teacherList = await User.findAndCountAll({
                 where: search,
@@ -3972,7 +3976,7 @@ exports.routineVideoList = async function (req, res, next) {
         let token = await User.getToken(req);
         let isValidToekn = await validateToekn(token);
         if (isValidToekn) {
-            let limit = 10
+            let limit = 50
             let offset = 0 + (req.query.page - 1) * limit
             let routineVideoList = await RoutineVideo.findAndCountAll({
                 where: {
@@ -4027,7 +4031,7 @@ exports.teacherDetail = async function (req, res, next) {
                 result['emojis'] = emojis;
             }
 
-            let limit = 10
+            let limit = 50
             let offset = 0 + (req.query.page - 1) * limit
             if (req.query.type == 'video') {
                 result = await RoutineVideo.findAndCountAll({

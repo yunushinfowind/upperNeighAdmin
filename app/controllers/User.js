@@ -307,7 +307,7 @@ exports.adminTeacherList = async function (req, res, next) {
 					]
 				}
 			}
-			let limit = 10
+			let limit = 50
 			let offset = 0 + (req.query.page - 1) * limit
 			let teacherList = await User.findAndCountAll({
 				where: whereCondition,
@@ -585,7 +585,7 @@ exports.adminSeriesVideoList = async function (req, res, next) {
 					]
 				}
 			}
-			let limit = 10
+			let limit = 50
 			let offset = 0 + (req.query.page - 1) * limit;
 			let count = await SeriesVideo.count({ where: whereCondition });
 			let routineVideoList = await SeriesVideo.findAndCountAll({
@@ -823,8 +823,8 @@ exports.teacherDetail = async function (req, res, next) {
 					var obj = Object.assign({}, row.get());
 					// var isSaved = await UserSavedRoutine.findOne({ where: { routine_id: obj.id, user_id: req.query.teacher_id } });
 					// obj.is_saved = (isSaved) ? true : false;
-					obj.total_duration = await getTotalRoutineDuration(obj.id);
-					obj.total_duration_inMint = await getTotalRoutineMinutDuration(obj.id);
+					obj.total_duration = await getTotalSeriesDuration(obj.id);
+					obj.total_duration_inMint = await getTotalSeriesMinutDuration(obj.id);
 					var type = await checkRoutineContentType(obj.id,'series');
 					obj.content_type = (type == 'same')?obj.content_type : type;
 					All.push(obj);
@@ -1144,8 +1144,66 @@ let getTotalRoutineDuration = async (routineId) => {
 	}
 }
 
+let getTotalSeriesDuration = async (seriesId) =>{
+	let videos = await SeriesVideo.findAll({ where: { series_id: seriesId } });
+	if (videos) {
+		var times = [0, 0, 0]
+		var max = times.length;
+		// store time values
+		var hoursum = 0;
+		var mintsum = 0;
+		var secondsum = 0;
+		for (var j = 0; j < videos.length; j++) {
+			var duration = (videos[j].video_duration || '').split(':');
+			hoursum = parseInt(hoursum) + parseInt(duration[0])
+			mintsum = parseInt(mintsum) + parseInt(duration[1])
+			secondsum = parseInt(secondsum) + parseInt(duration[2])
+
+		}
+		var hours = hoursum
+		var minutes = mintsum
+		var seconds = secondsum
+		if (seconds >= 60) {
+			var m = (seconds / 60) << 0
+			minutes += m
+			seconds -= 60 * m
+		}
+
+		if (minutes >= 60) {
+			var h = (minutes / 60) << 0
+			hours += h
+			minutes -= 60 * h
+		}
+		return ('0' + hours).slice(-2) + ' hrs :' + ('0' + minutes).slice(-2) + ' min :' + ('0' + seconds).slice(-2) + ' sec'
+	}
+}
+
 let getTotalRoutineMinutDuration = async (routineId) => {
 	let videos = await RoutineVideo.findAll({ where: { routine_id: routineId } });
+	if (videos) {
+		var times = [0, 0, 0]
+		var max = times.length;
+		// store time values
+		var hoursum = 0;
+		var mintsum = 0;
+		var secondsum = 0;
+		for (var j = 0; j < videos.length; j++) {
+			var duration = (videos[j].video_duration || '').split(':');
+			hoursum = parseInt(hoursum) + parseInt(duration[0])
+			mintsum = parseInt(mintsum) + parseInt(duration[1])
+			secondsum = parseInt(secondsum) + parseInt(duration[2])
+
+		}
+		var hoursMin = hoursum * 60
+		var minutes = mintsum
+
+
+		return (hoursMin)?(""+hoursMin + minutes+""):(""+minutes+"");
+	}
+}
+
+let getTotalSeriesMinutDuration = async(seriesId) =>{
+	let videos = await SeriesVideo.findAll({ where: { series_id: seriesId } });
 	if (videos) {
 		var times = [0, 0, 0]
 		var max = times.length;

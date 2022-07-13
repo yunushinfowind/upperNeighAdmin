@@ -3826,7 +3826,7 @@ exports.updateOfList = async (req, res) => {
         var newRecoreArray = ((req.body != 'null') && !Array.isArray(req.body['data[]'])) ? [req.body['data[]']] : req.body['data[]'];
         newRecoreArray = JSON.parse(newRecoreArray[0]);
         for (let i = 0; i < newRecoreArray.length; i++) {
-            var order = (i + 1) + (10 * (req.body.page - 1));
+            var order = (i + 1) + (50 * (req.body.page - 1));
             let data = {
                 list_order: order,
             }
